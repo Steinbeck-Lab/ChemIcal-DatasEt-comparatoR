@@ -21,8 +21,18 @@ The first step after the set-up is to load the SDFiles for comparison into the n
 
 ### Overview
 
-To get an overview of the datasets the number of molecules in every dataset can be determined using the 'get_number_of_molecules' function. Additionally one can create a grit image of molecules from each dataset with 'draw_molecules' function. The number of displayed molecules from every datasets can be specified as well as the size of the images. The images will also be saved in an output folder.
+To get an overview of the datasets the number of molecules in every dataset can be determined using the 'get_number_of_molecules' function. The results for every dataset are inclued in the dataframe. Additionally one can create a grit image of molecules from each dataset with 'draw_molecules' function. The number of displayed molecules from every datasets can be specified as well as the size of the images. The images will also be saved in an output folder.
 
 ### Identifier
 
+For the subsequent comparison the molecules need a string representation and therefore one can use SMILES, InChI or InChIKey strings. The 'get_identifier_list_key' function gets the chosen identifier strings for every molecules and puts them in the dataframe.
+If one uses datasets from a certain database the database's ID for the molecules can also be extracted from the SDFiles and stored in the dataframe ('get_database_id'). 
+
+### Molecule comparision
+
+### Descriptor and descriptor value distribution 
+
+### Lipinski Rule of 5
+
+### Chemical Space Visualization
 
