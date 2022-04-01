@@ -4,10 +4,14 @@ This repository contains a Jupyter Notebook that can be used to compare SDFiles 
 
 ## Set-up
 
+The notebook can be run in a conda environment with RDKit.
+
 ```shell
-conda create -c rdkit -n myenv rdkit
-activate new_env
-conda install -c conda-forge rdkit
-conda install jupyter
-pip install matplotlib==3.5.1 seaborn==0.11.2 chemplot==1.2.0 matplotlib_venn==0.11.6
+$ conda create -c rdkit -n myenv rdkit
+$ activate new_env
+$ conda install -c conda-forge rdkit
+$ conda install jupyter
+$ pip install matplotlib==3.5.1 seaborn==0.11.2 chemplot==1.2.0 matplotlib_venn==0.11.6
 ```
+## How to use the notebook
+
