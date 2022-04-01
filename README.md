@@ -30,7 +30,11 @@ If one uses datasets from a certain database the database's ID for the molecules
 
 ### Molecule comparision
 
+With 'get_shared_molecules_key' one get the number and identifier string for those molecules which are present in all of the compared datasets. If there are no more than three datasets a Venn diagramm of the intersection of the datasets can be created using 'visualize_intersection'. The image will be saved in the output file.
+
 ### Descriptor and descriptor value distribution 
+
+
 
 ### Lipinski Rule of 5
 
