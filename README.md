@@ -40,5 +40,9 @@ With the database ID one can also search for the descriptor value of a specific 
 
 ### Lipinski Rule of 5
 
+With 'get_lipinski_key' the number of broken Lipinki Rules for every molecule is calculated and a summary for every SDFile is created. Subsequently the 'lipinski_plot' function visualizes the number of broken rules. Again the results are exported as csv-file and the bar-plot is also saved with a selectable format (variable: data_type) in the output folder. 
+
 ### Chemical Space Visualization
+
+For the visualization of the chemical space the chemplot module is used. The extended connectivity fingerprints can be specified with the fingerprint radius (variable: fp_radius) and the size (variable: fp_bits). For the dimension reduction PCA, t-SNE or UMAP can be chosen (variable: dimension_reduction). The chemical space plot is saved in the output folder except when choosing to create an interactive plot (variable: interactive). Then the plot will be displayed and can be manually saved.
 
