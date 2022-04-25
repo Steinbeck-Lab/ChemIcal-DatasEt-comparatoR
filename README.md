@@ -46,7 +46,7 @@ To get an overview of the datasets the number of molecules in every dataset can 
 
 ### Identifier
 
-For the subsequent comparison the molecules need a string representation and therefore one can use SMILES, InChI or InChIKey strings. The 'get_identifier_list_key' function gets the chosen identifier strings (variable: id_type) for every molecules and puts them in the dataframe.
+For the subsequent comparison the molecules need a string representation and therefore one can use SMILES, InChI or InChIKey strings. The 'get_identifier_list_key' function gets the chosen identifier strings (variable: id_type) for every molecules and puts them in the dataframe.  
 If one uses datasets from a certain database and the database provides an own ID, this dataset ID can also be extracted from the SDFiles and stored in the dataframe. Therefore one can use the function 'get_database_id' and input the ID name (variable: id_name).  
   
 | **function**  |  get_identifier_list_key |   
@@ -54,11 +54,31 @@ If one uses datasets from a certain database and the database provides an own ID
 |  **parameter**  | all_dict : *dict*  |
 |   | &nbsp;&nbsp; Name of the dictionary with the imported SDFiles. |
 |   | id_type : *str, default='inchi'*  |
-|   | &nbsp;&nbsp; Type of Identifier ("inchi", "inchikey" or "smiles"). |
+|   | &nbsp;&nbsp; Type of Identifier ("inchi", "inchikey" or "smiles"). |  
+  
+| **function**  |  get_database_id |   
+|---|---|
+|  **parameter**  | all_dict : *dict*  |
+|   | &nbsp;&nbsp; Name of the dictionary with the imported SDFiles. |
+|   | id_name : *str*  |
+|   | &nbsp;&nbsp; Name of the database ID in the SDFiles. |
 
 ### Molecule comparision
 
-With 'get_shared_molecules_key' one get the number and identifier string for those molecules which are present in all of the compared datasets. If there are no more than three datasets a Venn diagramm of the intersection of the datasets can be created using 'visualize_intersection'. The image will be saved in the output folder in a chosen format (variable: data_type).
+With 'get_shared_molecules_key' one get the number and identifier string for those molecules which are present in all of the compared datasets. If there are no more than three datasets a Venn diagramm of the intersection of the datasets can be created using 'visualize_intersection'. The image will be saved in the output folder in a chosen format (variable: data_type).  
+  
+| **function**  |  get_shared_molecules_key |   
+|---|---|
+|  **parameter**  | all_dict : *dict*  |
+|   | &nbsp;&nbsp; Name of the dictionary with the imported SDFiles. |  
+  
+| **function**  |  visualize_intersection |   
+|---|---|
+|  **parameter**  | all_dict : *dict*  |
+|   | &nbsp;&nbsp; Name of the dictionary with the imported SDFiles. |
+|   | data_type : *str, default='png'*  |
+|   | &nbsp;&nbsp; Data type for the exported image. |  
+
 
 ### Descriptor and descriptor value distribution 
 
