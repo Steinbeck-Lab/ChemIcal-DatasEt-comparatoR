@@ -20,8 +20,13 @@ $ pip install matplotlib==3.5.1 seaborn==0.11.2 chemplot==1.2.0 matplotlib_venn=
 The first step after the set-up is to load the SDFiles for comparison into the notebook with the 'import_data_as_dict' function. The function will create a dictionary which content will updated with every subsequent function used. This main dictionary contains a sub-dictionary for every SDFile named after the SDFile name.  
   
 **function:** import_data_as_dict  
-**parameter:** &nbsp;&nbsp;&nbsp;&nbsp; path_to_data : *str*
-
+**parameter:** &nbsp;&nbsp;&nbsp;&nbsp; path_to_data : *str*  
+  
+| **parameter**  |   |   
+|---|---|
+|   | path_to_data : *str*  |
+|   | &nbsp;&nbsp; Path to the SDFiles which are to be compared. |
+|   | hio  |
 
 ### Overview
 
