@@ -19,18 +19,29 @@ $ pip install matplotlib==3.5.1 seaborn==0.11.2 chemplot==1.2.0 matplotlib_venn=
 
 The first step after the set-up is to load the SDFiles for comparison into the notebook with the 'import_data_as_dict' function. The function will create a dictionary which content will updated with every subsequent function used. This main dictionary contains a sub-dictionary for every SDFile named after the SDFile name.  
   
-**function:** import_data_as_dict  
-**parameter:** &nbsp;&nbsp;&nbsp;&nbsp; path_to_data : *str*  
-  
-| **parameter**  |   |   
+| **function**  |  import_data_as_dict |   
 |---|---|
-|   | path_to_data : *str*  |
+|  **parameter**  | path_to_data : *str*  |
 |   | &nbsp;&nbsp; Path to the SDFiles which are to be compared. |
-|   | hio  |
 
 ### Overview
 
-To get an overview of the datasets the number of molecules in every dataset can be determined using the 'get_number_of_molecules' function. The results for every dataset are inclued in the dataframe. Additionally one can create a grit image of molecules from each dataset with 'draw_molecules' function. The number of displayed molecules from every datasets can be specified (variable: number_of_mols) as well as the size of the images (variable: image_size). The images will also be saved in an output folder in a chosen format (variable: data_type).
+To get an overview of the datasets the number of molecules in every dataset can be determined using the 'get_number_of_molecules' function. The results for every dataset are inclued in the dataframe. Additionally one can create a grit image of molecules from each dataset with 'draw_molecules' function. The number of displayed molecules from every datasets can be specified (variable: number_of_mols) as well as the size of the images (variable: image_size). The images will also be saved in an output folder in a chosen format (variable: data_type).  
+  
+| **function**  |  get_number_of_molecules |   
+|---|---|
+|  **parameter**  | all_dict : *dict*  |
+|   | &nbsp;&nbsp; Name of the dictionary with the imported SDFiles. |
+| **function**  |  draw_molecules |   
+|---|---|
+|  **parameter**  | all_dict : *dict*  |
+|   | &nbsp;&nbsp; Name of the dictionary with the imported SDFiles. |
+|   | number_of_mols : *int, default=12*  |
+|   | &nbsp;&nbsp; Number of molecules from every dataset to be displayed. |
+|   | image_size : *int, default=200*  |
+|   | &nbsp;&nbsp; Image size for one molecule in the grid image. |
+|   | data_type : *str, default='png'*  |
+|   | &nbsp;&nbsp; Data type for the exported image. |
 
 ### Identifier
 
