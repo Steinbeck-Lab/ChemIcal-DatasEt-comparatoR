@@ -114,13 +114,51 @@ To get and visualize the distribution of the descriptor values the function 'des
 |   | &nbsp;&nbsp; Option to export the counts of the descriptor values as csv. |  
 
   
-With the database ID one can also search for the descriptor value of a specific molecule using the 'get_value_from_id' function. The function tells in which SDFile the molecule is found and the value of the descriptor.
+With the database ID one can also search for the descriptor value of a specific molecule using the 'get_value_from_id' function. The function tells in which SDFile the molecule is found and the value of the descriptor.  
+  
+| **function**  | get_value_from_id  |   
+|---|---|
+|  **parameter**  | all_dict : *dict*  |
+|   | &nbsp;&nbsp; Name of the dictionary with the imported SDFiles. |
+|   | wanted_id : *str*  |
+|   | &nbsp;&nbsp; Database ID from the molecule in question.  | 
+|   | descriptor_list_keyname : *str*  |
+|   | &nbsp;&nbsp; Name refering to descriptor values which are to be visualized.  |   
 
 ### Lipinski Rule of 5
 
-With 'get_lipinski_key' the number of broken Lipinki Rules for every molecule is calculated and a summary for every SDFile is created. Subsequently the 'lipinski_plot' function visualizes the number of broken rules. Again the results are exported as csv-file and the bar-plot is also saved with a selectable format (variable: data_type) in the output folder. 
-
+With 'get_lipinski_key' the number of broken Lipinki Rules for every molecule is calculated and a summary for every SDFile is created.  
+  
+| **function**  | get_lipinski_key  |   
+|---|---|
+|  **parameter**  | all_dict : *dict*  |
+|   | &nbsp;&nbsp; Name of the dictionary with the imported SDFiles. |  
+  
+Subsequently the 'lipinski_plot' function visualizes the number of broken rules. Again the results are exported as csv-file and the bar-plot is also saved with a selectable format (variable: data_type) in the output folder.  
+  
+| **function**  | lipinski_plot  |   
+|---|---|
+|  **parameter**  | all_dict : *dict*  |
+|   | &nbsp;&nbsp; Name of the dictionary with the imported SDFiles. |
+|   | data_type : *str, default='png'*  |
+|   | &nbsp;&nbsp; Data type for the exported image. |  
+|   | save_dataframe : *bool, default=True*  |
+|   | &nbsp;&nbsp; Option to export the counts of the descriptor values as csv. |  
+  
 ### Chemical Space Visualization
 
-For the visualization of the chemical space the chemplot module is used. The extended connectivity fingerprints can be specified with the fingerprint radius (variable: fp_radius) and the size (variable: fp_bits). For the dimension reduction PCA, t-SNE or UMAP can be chosen (variable: dimension_reduction). The chemical space plot is saved in the output folder except when choosing to create an interactive plot (variable: interactive). Then the plot will be displayed and can be manually saved.
+For the visualization of the chemical space the chemplot module is used. The extended connectivity fingerprints can be specified with the fingerprint radius (variable: fp_radius) and the size (variable: fp_bits). For the dimension reduction PCA, t-SNE or UMAP can be chosen (variable: dimension_reduction). The chemical space plot is saved in the output folder except when choosing to create an interactive plot (variable: interactive). Then the plot will be displayed and can be manually saved.  
+  
+| **function**  | lipinski_plot  |   
+|---|---|
+|  **parameter**  | all_dict : *dict*  |
+|   | &nbsp;&nbsp; Name of the dictionary with the imported SDFiles. |
+|   | fp_radius : *int, default=2*  |
+|   | &nbsp;&nbsp; Radius of the Extended Connectivity Fingerprints. |  
+|   | fp_bits : *int, default=2048*  |
+|   | &nbsp;&nbsp; Size of the Extended Connetivity Fingerprints. |  
+|   | dimension_reduction : *str, default='pca'*  |
+|   | &nbsp;&nbsp; Method of dimension reduction ("pca", "umap" or "tsne"). |  
+|   | interactive : *bool, default=True*  |
+|   | &nbsp;&nbsp; Option to create an interactive plot. |  
 
