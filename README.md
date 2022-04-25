@@ -68,12 +68,14 @@ If one uses datasets from a certain database and the database provides an own ID
 
 ### Molecule comparision
 
-With 'get_shared_molecules_key' one get the number and identifier string for those molecules which are present in all of the compared datasets. If there are no more than three datasets a Venn diagramm of the intersection of the datasets can be created using 'visualize_intersection'. The image will be saved in the output folder in a chosen format (variable: data_type).  
+With 'get_shared_molecules_key' one get the number and identifier string for those molecules which are present in all of the compared datasets.  
   
 | **function**  |  get_shared_molecules_key |   
 |---|---|
 |  **parameter**  | all_dict : *dict*  |
 |   | &nbsp;&nbsp; Name of the dictionary with the imported SDFiles. |  
+  
+If there are no more than three datasets a Venn diagramm of the intersection of the datasets can be created using 'visualize_intersection'. The image will be saved in the output folder in a chosen format (variable: data_type).  
   
 | **function**  |  visualize_intersection |   
 |---|---|
@@ -86,7 +88,32 @@ With 'get_shared_molecules_key' one get the number and identifier string for tho
 ### Descriptor and descriptor value distribution 
 
 The function 'get_descriptor_list_key' utilize a callable function (variable: descriptor) form RDKit to get descriptor values for every molecule. For example the callable functions can be from the rdkit.Chem.rdMolDescriptors module the rdkit.Chem.Descriptors module. The values are saved in the dataframe under a chosen name (variable: descriptor_list_keyname).  
+  
+| **function**  |  get_descriptor_list_key |   
+|---|---|
+|  **parameter**  | all_dict : *dict*  |
+|   | &nbsp;&nbsp; Name of the dictionary with the imported SDFiles. |
+|   | descriptor : *callable*  |
+|   | &nbsp;&nbsp; RDKit function returning a molecular descriptor value.  | 
+|   | descriptor_list_keyname : *str*  |
+|   | &nbsp;&nbsp; Name for refering to descriptor values.  | 
+  
 To get and visualize the distribution of the descriptor values the function 'descriptor_counts_and_plot' can be used. The function distinguishes between continuous and discrete distributed descriptor vales and for the continuous values one can chose the binning size (variable: width_of_bins). The distribution of values is exported as csv-file and the visualization with a selectable format (variable: data_type) is also saved in the output folder.  
+  
+| **function**  | descriptor_counts_and_plot  |   
+|---|---|
+|  **parameter**  | all_dict : *dict*  |
+|   | &nbsp;&nbsp; Name of the dictionary with the imported SDFiles. |
+|   | descriptor_list_keyname : *str*  |
+|   | &nbsp;&nbsp; Name refering to descriptor values which are to be visualized.  | 
+|   | width_of_bins : *int, default=10*  |
+|   | &nbsp;&nbsp; Intervall size for binning of continuous descriptor values.  |
+|   | data_type : *str, default='png'*  |
+|   | &nbsp;&nbsp; Data type for the exported image. |  
+|   | save_dataframe : *bool, default=True*  |
+|   | &nbsp;&nbsp; Option to export the counts of the descriptor values as csv. |  
+
+  
 With the database ID one can also search for the descriptor value of a specific molecule using the 'get_value_from_id' function. The function tells in which SDFile the molecule is found and the value of the descriptor.
 
 ### Lipinski Rule of 5
