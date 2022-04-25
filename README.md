@@ -123,7 +123,7 @@ To get and visualize the distribution of the descriptor values the function 'des
 
 ![distribution_of_LogP](https://user-images.githubusercontent.com/95417135/165087902-6788db96-7230-4829-83f3-8fd3b6f791fa.png)
 |:--:| 
-| *Example of the a descriptor value distribution. The LogP values of the three datasets are binned in intervalls of 5.* |
+| *Example of the a descriptor value distribution from the 'descriptor_counts_and_plot' function. The LogP values of the three datasets are binned in intervalls of 5.* |
 
   
 With the database ID one can also search for the descriptor value of a specific molecule using the 'get_value_from_id' function. The function tells in which SDFile the molecule is found and the value of the descriptor.  
@@ -158,13 +158,13 @@ Subsequently the 'lipinski_plot' function visualizes the number of broken rules.
 |   | &nbsp;&nbsp; Option to export the counts of the descriptor values as csv. | 
 
 ![lipinski_rules_plot](https://user-images.githubusercontent.com/95417135/165089273-82852c1d-9e50-41d3-86f1-043c30d5ebf1.png)
-| *Example of a Lipinski Plot with three datasets.* |
+| *Example of a Lipinski Plot with three datasets created with the 'lipinski_plot' function.* |
   
 ### Chemical Space Visualization
 
 For the visualization of the chemical space the chemplot module is used. The extended connectivity fingerprints can be specified with the fingerprint radius (variable: fp_radius) and the size (variable: fp_bits). For the dimension reduction PCA, t-SNE or UMAP can be chosen (variable: dimension_reduction). The chemical space plot is saved in the output folder except when choosing to create an interactive plot (variable: interactive). Then the plot will be displayed and can be manually saved.  
   
-| **function**  | lipinski_plot  |   
+| **function**  | chemical_space_visualization  |   
 |---|---|
 |  **parameter**  | all_dict : *dict*  |
 |   | &nbsp;&nbsp; Name of the dictionary with the imported SDFiles. |
@@ -180,4 +180,4 @@ For the visualization of the chemical space the chemplot module is used. The ext
 
 ![chemical_space](https://user-images.githubusercontent.com/95417135/165089065-dea082d6-2600-41dd-8c57-6e724a25f474.png)
 |:--:| 
-| *Example of the chemical space visualization with three datasets (interactive=False).* |
+| *Example of the function 'chemical_space_visualization' with three datasets (interactive=False).* |
