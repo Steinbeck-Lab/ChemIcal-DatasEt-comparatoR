@@ -31,7 +31,8 @@ To get an overview of the datasets the number of molecules in every dataset can 
 | **function**  |  get_number_of_molecules |   
 |---|---|
 |  **parameter**  | all_dict : *dict*  |
-|   | &nbsp;&nbsp; Name of the dictionary with the imported SDFiles. |
+|   | &nbsp;&nbsp; Name of the dictionary with the imported SDFiles. | 
+  
 | **function**  |  draw_molecules |   
 |---|---|
 |  **parameter**  | all_dict : *dict*  |
