@@ -181,4 +181,4 @@ For the visualization of the chemical space the chemplot module is used. The ext
 
 ![chemical_space](https://user-images.githubusercontent.com/95417135/165089065-dea082d6-2600-41dd-8c57-6e724a25f474.png)
 |:--:| 
-| *Example of the function 'chemical_space_visualization' with three datasets (interactive=False).* |
+| *Example of the function 'chemical_space_visualization' with three datasets (dimension_reduction='tsne', interactive=False).* |
