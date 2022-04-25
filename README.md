@@ -47,7 +47,14 @@ To get an overview of the datasets the number of molecules in every dataset can 
 ### Identifier
 
 For the subsequent comparison the molecules need a string representation and therefore one can use SMILES, InChI or InChIKey strings. The 'get_identifier_list_key' function gets the chosen identifier strings (variable: id_type) for every molecules and puts them in the dataframe.
-If one uses datasets from a certain database and the database provides an own ID, this dataset ID can also be extracted from the SDFiles and stored in the dataframe. Therefore one can use the function 'get_database_id' and input the ID name (variable: id_name).
+If one uses datasets from a certain database and the database provides an own ID, this dataset ID can also be extracted from the SDFiles and stored in the dataframe. Therefore one can use the function 'get_database_id' and input the ID name (variable: id_name).  
+  
+| **function**  |  get_identifier_list_key |   
+|---|---|
+|  **parameter**  | all_dict : *dict*  |
+|   | &nbsp;&nbsp; Name of the dictionary with the imported SDFiles. |
+|   | id_type : *str, default='inchi'*  |
+|   | &nbsp;&nbsp; Type of Identifier ("inchi", "inchikey" or "smiles"). |
 
 ### Molecule comparision
 
