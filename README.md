@@ -46,6 +46,11 @@ Additionally one can create a grit image of molecules from each dataset with 'dr
 |   | data_type : *str, default='png'*  |
 |   | &nbsp;&nbsp; Data type for the exported image. |
 
+![mol_grit_set_phenole](https://user-images.githubusercontent.com/95417135/165088366-00867664-d01c-4748-97fe-1337cf2bffae.png)
+|:--:| 
+| *Example of the 'draw_molecules' function with the visualization of set_phenole.sdf as grit image (number_of_molecules = 6).* |
+
+
 ### Identifier
 
 For the subsequent comparison the molecules need a string representation and therefore one can use SMILES, InChI or InChIKey strings. The 'get_identifier_list_key' function gets the chosen identifier strings (variable: id_type) for every molecules and puts them in the dataframe.  
@@ -85,6 +90,8 @@ If there are no more than three datasets a Venn diagramm of the intersection of 
 |   | &nbsp;&nbsp; Data type for the exported image. |  
 
 ![intersection](https://user-images.githubusercontent.com/95417135/165087450-b3336c13-a3bf-4da5-98e1-97e2fa91167f.png)
+|:--:| 
+| *Example of an intersection from three compared datasets created with the 'visualize_intersection' function.* |
 
 ### Descriptor and descriptor value distribution 
 
@@ -113,6 +120,10 @@ To get and visualize the distribution of the descriptor values the function 'des
 |   | &nbsp;&nbsp; Data type for the exported image. |  
 |   | save_dataframe : *bool, default=True*  |
 |   | &nbsp;&nbsp; Option to export the counts of the descriptor values as csv. |  
+
+![distribution_of_LogP](https://user-images.githubusercontent.com/95417135/165087902-6788db96-7230-4829-83f3-8fd3b6f791fa.png)
+|:--:| 
+| *Example of the a descriptor value distribution. The LogP values of the three datasets are binned in intervalls of 5.* |
 
   
 With the database ID one can also search for the descriptor value of a specific molecule using the 'get_value_from_id' function. The function tells in which SDFile the molecule is found and the value of the descriptor.  
@@ -144,7 +155,10 @@ Subsequently the 'lipinski_plot' function visualizes the number of broken rules.
 |   | data_type : *str, default='png'*  |
 |   | &nbsp;&nbsp; Data type for the exported image. |  
 |   | save_dataframe : *bool, default=True*  |
-|   | &nbsp;&nbsp; Option to export the counts of the descriptor values as csv. |  
+|   | &nbsp;&nbsp; Option to export the counts of the descriptor values as csv. | 
+
+![lipinski_rules_plot](https://user-images.githubusercontent.com/95417135/165089273-82852c1d-9e50-41d3-86f1-043c30d5ebf1.png)
+| *Example of a Lipinski Plot with three datasets.* |
   
 ### Chemical Space Visualization
 
@@ -163,3 +177,7 @@ For the visualization of the chemical space the chemplot module is used. The ext
 |   | interactive : *bool, default=True*  |
 |   | &nbsp;&nbsp; Option to create an interactive plot. |  
 
+
+![chemical_space](https://user-images.githubusercontent.com/95417135/165089065-dea082d6-2600-41dd-8c57-6e724a25f474.png)
+|:--:| 
+| *Example of the chemical space visualization with three datasets (interactive=False).* |
