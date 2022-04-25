@@ -84,6 +84,7 @@ If there are no more than three datasets a Venn diagramm of the intersection of 
 |   | data_type : *str, default='png'*  |
 |   | &nbsp;&nbsp; Data type for the exported image. |  
 
+![intersection](https://user-images.githubusercontent.com/95417135/165087450-b3336c13-a3bf-4da5-98e1-97e2fa91167f.png)
 
 ### Descriptor and descriptor value distribution 
 
