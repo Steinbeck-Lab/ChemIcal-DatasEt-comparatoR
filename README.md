@@ -186,4 +186,10 @@ For the visualization of the chemical space, the chemplot module is used. The ex
 ### Export
 
 The calculated descriptor values for every molecule can exported as a csv-file using the 'export_single_dict_values' function. For every imported dataset there will be a separate export file containing the values.  
+  
+| **function**  | export_single_dict_values  |   
+|---|---|
+|  **parameter**  | all_dict : *dict*  |
+|   | &nbsp;&nbsp; Name of the dictionary with the imported SDFiles. |
+  
 Additionally, a summary of all the created images in the form of a pdf with all images can be created with the 'export_all_picture_pdf' function. This file will not include images that are saved as pdf beforehand.
