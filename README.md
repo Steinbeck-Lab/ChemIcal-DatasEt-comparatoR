@@ -22,7 +22,9 @@ The first step after the set-up is to load the SDFiles for comparison into the n
 | **function**  |  import_data_as_dict |   
 |---|---|
 |  **parameter**  | path_to_data : *str*  |
-|   | &nbsp;&nbsp; Path to the SDFiles which are to be compared. |
+|   | &nbsp;&nbsp; Path to the SDFiles which are to be compared. |  
+  
+In the Jupyter Notebook the files from 'data2' are imported but one can also change the import function to 'data'. Using the SDFiles from 'data', one can see that the functions are also working on datasets of different lenght and how the intersection in the Venn Diagramm between all three datasets looks like.
 
 ### Overview
 
