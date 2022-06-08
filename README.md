@@ -160,7 +160,7 @@ Subsequently, the 'lipinski_plot' function visualizes the number of broken rules
 |   | save_dataframe : *bool, default=True*  |
 |   | &nbsp;&nbsp; Option to export the counts of the descriptor values as csv. | 
 
-![lipinski_rules_plot](https://user-images.githubusercontent.com/95417135/165089273-82852c1d-9e50-41d3-86f1-043c30d5ebf1.png)
+![lipinski_rules_plot](https://user-images.githubusercontent.com/95417135/172641491-cd26f37b-8c4d-468b-9471-cfaa097ea5de.png)
 |:--:| 
 | *Example of a Lipinski Plot with three datasets created with the 'lipinski_plot' function.* |
   
