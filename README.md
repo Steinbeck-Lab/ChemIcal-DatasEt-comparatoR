@@ -11,7 +11,7 @@ $ conda create -c rdkit -n new_env rdkit
 $ activate new_env
 $ conda install -c conda-forge rdkit
 $ conda install jupyter
-$ pip install matplotlib==3.5.1 seaborn==0.11.2 chemplot==1.2.0 matplotlib_venn==0.11.6
+$ pip install matplotlib==3.5.1 seaborn==0.11.2 chemplot==1.2.0 matplotlib_venn==0.11.6 FPDF==1.7.2
 ```
 ## How to use the notebook
 
@@ -92,6 +92,7 @@ If there are no more than three datasets, a Venn diagram of the intersection of 
 |   | &nbsp;&nbsp; Data type for the exported image. |  
 
 ![intersection](https://user-images.githubusercontent.com/95417135/165087450-b3336c13-a3bf-4da5-98e1-97e2fa91167f.png)
+![intersection](https://user-images.githubusercontent.com/95417135/172633857-96ec2be1-7ddd-4eb8-b12e-ff4634bf9337.png)
 |:--:| 
 | *Example of an intersection from three compared datasets created with the 'visualize_intersection' function.* |
 
