@@ -1,4 +1,9 @@
-'''Import Libraries'''
+# Import Libraries
+import os
+import seaborn as sns
+import pandas as pd
+import numpy as np
+import platform
 
 from rdkit import Chem
 from rdkit.Chem import AllChem
@@ -7,29 +12,18 @@ from rdkit.Chem import rdMolDescriptors
 from rdkit.Chem import Draw
 from rdkit import rdBase
 
-import seaborn as sns
-
-import pandas as pd
-
-import numpy as np
-
-import os
-
-import matplotlib.pyplot as plt
 import matplotlib
+import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 
 from matplotlib_venn import venn2
 from matplotlib_venn import venn3
-
-import platform
 
 import chemplot as cp
 from chemplot import Plotter
 from chemplot import descriptors
 
 from fpdf import FPDF
-
 
 # Set Global variables
 import_keyname = "SDMolSupplier_Object"
@@ -47,7 +41,7 @@ database_id_keyname = "coconut_id_keyname"
 # Data import function
 def import_as_data_dict(path_to_data: str) -> dict:
     """
-    This function returns a dictionary with the imported file names (keys) as its own dictionaries with 
+    This function returns a dictionary with the imported file names (keys) as its own dictionary with 
     the first entry as import_keyname (key) and the SDMolSupplier Objects (value).
     
     Args:
@@ -93,13 +87,13 @@ def draw_molecules(all_dicts: dict,
                    data_type: str = "png"):
     """
     This function returns the given dictionary of dictionaries updated with mol_grid_keyname
-    as a new key-value pair containing an image of a chosen number of molcules from the respecting dataset.
-    The created images are also saved in an output folder and are shown (not in-line, but in extra fenster).
+    as a new key-value pair containing an image of a chosen number of molecules from the respecting dataset.
+    The created images are also saved in an output folder and are shown (not in-line but in extra window).
     
     Args:
         all_dict (dict): dictionary of dictionaries with SDMolSupplier Objects (import_keyname).
         number_of_mols (int): number of molecules that will be displayed.
-        image_size (int): size of the image for a single molecule.
+        image_size (int): the size of the image for a single molecule.
         data_type (str): data type for the exported files (e.g. png, jpg, pdf).
         
     Returns:
@@ -133,13 +127,14 @@ def draw_molecules(all_dicts: dict,
         plt.title(title_list[j])
     return all_dicts
 
+
 # Get database ID
 def get_database_id(all_dicts : dict,
                    id_name : str) -> dict:
     """
-    This function returns the updated dictionaries in an given dictionary with a list of
-    IDs for the single molecules as new key-value pair. Depending from with database 
-    a moleculeset is coming from the id_name can be changed accordingly.
+    This function returns the updated dictionaries in a given dictionary with a list of
+    IDs for the single molecules as new key-value pairs. Depending on with database 
+    molecules coming from the id_name can be changed accordingly.
     
     Args:
         all_dicts (dict): dictionary of dictionary including SDMolSupplier Objects (import_keyname)
@@ -203,7 +198,7 @@ def get_identifier_list_key(all_dicts: dict, id_type: str = "inchi") -> dict:
         id_type (str): Type of Identifier ("inchi", "inchikey" or "smiles")
         
     Returns:
-        all_dicts (dict): Given dictionary of dictionaries updated with identifier_keyname.
+        all_dicts (dict): Given a dictionary of dictionaries updated with identifier_keyname.
     """
     for single_dict in all_dicts:
         identifier_list = get_identifier_list(all_dicts[single_dict][import_keyname], id_type)
@@ -215,13 +210,13 @@ def get_identifier_list_key(all_dicts: dict, id_type: str = "inchi") -> dict:
 def get_duplicate_key(all_dicts: dict):
     """
     This function returns the updated dictionaries in the given dictionary (created with the import_as_data_dict
-    function) with the number of duplicates in the identifier list as new key-value-Pair.
+    function) with the number of duplicates in the identifier list as a new key-value-Pair.
     
     Args:
         all_dicts (dict): Dictionary of dictionaries with list of identifiers (identifier_keyname).
         
     Returns:
-        all_dicts (dict): Given dictionary of dictionaries updated with duplicate_keyname.
+        all_dicts (dict): Given a dictionary of dictionaries updated with duplicate_keyname.
  
     """
     for single_dict in all_dicts:
@@ -237,14 +232,14 @@ def get_shared_molecules_key(all_dicts: dict) -> dict:
     """
     This function returns the updated dictionaries in the given dictionary (created with the 
     import_as_data_dict function) with the number of molecules that can be found in all of the
-    given datasets and a identifier list of these molecules as two new key-value pairs (number of 
+    given datasets and an identifier list of these molecules as two new key-value pairs (number of 
     compared datasets can be any number).
     
     Args:
         all_dicts (dict): Dictionary of dictionaries with lists of identifiers (identifier_keyname).
         
     Returns:
-        all_dicts (dict): Given dictionary of dictionaries updated with shared_keyname and shared_id_keyname.
+        all_dicts (dict): Given a dictionary of dictionaries updated with shared_keyname and shared_id_keyname.
     """
     sets = []
     for single_dict in all_dicts:
@@ -257,11 +252,10 @@ def get_shared_molecules_key(all_dicts: dict) -> dict:
     print('Number of molecules that can be found in all datasets: ' + str(len(shared_molecules)))
     return all_dicts
 
-
 def visualize_intersection(all_dicts: dict,
                           data_type : str = 'png'):
     """
-    This function returns a Venn-diagram of the identifier lists in the dicitionaries in the 
+    This function returns a Venn diagram of the identifier lists in the dictionaries in the 
     given dictionary (as long as there are not more than three dictionaries). The diagram is
     saved in an output folder.
     
@@ -273,7 +267,7 @@ def visualize_intersection(all_dicts: dict,
         Venn Diagram
         
     Raises:
-        WrongInputError: If there are one or more then three sets are to be compared a Error is raised.
+        WrongInputError: If there are one or more three sets are to be compared an error is raised.
     """
     sets = []
     for single_dict in all_dicts:
@@ -320,7 +314,6 @@ def get_descriptor_list(moleculeset : Chem.SDMolSupplier, descriptor : callable,
         descriptor_list.append(value)
     return descriptor_list
 
-
 def get_descriptor_list_key(all_dicts: dict, 
                             descriptor: callable,
                             descriptor_list_keyname: str) -> dict:
@@ -335,8 +328,8 @@ def get_descriptor_list_key(all_dicts: dict,
         descriptor_list_keyname (str): Key name for the dictionary entry (should match the descriptor)
         
     Returns:
-        all_dicts (dict): Given dictionary of dictionaries updated with the descriptor key.
-        (if function is called repeatedly with different descriptors several new Key-Value-Pairs a generated)
+        all_dicts (dict): Given a dictionary of dictionaries updated with the descriptor key.
+        (if the function is called repeatedly with different descriptors several new Key-Value-Pairs a generated)
     """
     for single_dict in all_dicts:
         descriptor_list = get_descriptor_list(all_dicts[single_dict][import_keyname], descriptor)
@@ -349,7 +342,7 @@ def get_value_from_id (all_dicts: dict,
                        wanted_id: str,
                        descriptor_list_keyname: str):
     """
-    This function returns a descriptor value for a specific molecule refered to by its database ID and
+    This function returns a descriptor value for a specific molecule referred to by its database ID and
     the dataset where the molecule has been found.
     
     Args:
@@ -382,10 +375,10 @@ def get_discrete_descriptor_counts(all_dicts: dict,
     
     Args:
         all_dicts (dict): Dictionary of dictionaries including a continuous descriptor value list.
-        descriptor_list_keyname (str): name of the descriptor list.
+        descriptor_list_keyname (str): Name of the descriptor list.
         
     Returns:
-        all_dicts (dict): Given dictionary of dictionaries updated with the binned descriptor values
+        all_dicts (dict): Given a dictionary of dictionaries updated with the binned descriptor values
                          (descriptor_list_keyname with 'binned' in front).
     """
     binned_descriptor_list_keyname = str('binned ' + descriptor_list_keyname)
@@ -399,14 +392,13 @@ def get_discrete_descriptor_counts(all_dicts: dict,
         all_dicts[single_dict][binned_descriptor_list_keyname] = counts     
     return all_dicts
 
-
 def get_continuous_descriptor_counts(all_dicts: dict, 
                                      descriptor_list_keyname: str,
                                      width_of_bins: int = 10) -> dict:
     """
     This function returns the updated dictionaries in the given dictionary with the binned 
     descriptor values for a given descriptor value list with continuous values (e.g. molecular
-    weight or logP values). The intervall size of the bins can be chosen.
+    weight or logP values). The interval size of the bins can be chosen.
     
     Args:
         all_dicts (dict): Dictionary of dictionaries including a continuous descriptor value list.
@@ -414,7 +406,7 @@ def get_continuous_descriptor_counts(all_dicts: dict,
         widht_of_bins (int, optional): Interval size for the bins (default: 10)
         
     Returns:
-        all_dicts (dict): Given dictionary of dictionaries updated with the binned descriptor values.
+        all_dicts (dict): Given a dictionary of dictionaries updated with the binned descriptor values.
     """
     binned_descriptor_list_keyname = str('binned ' + descriptor_list_keyname)
     find_min = []
@@ -440,15 +432,14 @@ def get_continuous_descriptor_counts(all_dicts: dict,
         all_dicts[single_dict][binned_descriptor_list_keyname] = counts     
     return all_dicts
 
-
 def discrete_descriptor_plot(all_dicts:dict,
                             descriptor_list_keyname: str,
                             data_type : str = 'png',
                             save_dataframe : bool = True):
     """
     This function returns a Pandas DataFrame Object and the corresponding Bar-Plot for a discrete descriptor
-    which was previously binned. The plot is saved in an output folder as image (data type can be chosen) and
-    the dataframe is also saved as csv file.
+    which was previously binned. The plot is saved in an output folder as an image (data type can be chosen) and
+    the data frame is also saved as CSV file.
     
     args:
         all_dicts (dict): Dictionary of dictionaries with descriptor_list_keyname.
@@ -487,15 +478,14 @@ def discrete_descriptor_plot(all_dicts:dict,
                 transparent = True)
     return fig
 
-
 def continuous_descriptor_plot(all_dicts: dict,
                                descriptor_list_keyname: str,
                                data_type: str = 'png',
                                save_dataframe: bool = True):
     """
     This function returns a Pandas DataFrame Object and the corresponding Bar-Plot for a continuous descriptor
-    which was previously binned. The plot is saved in an output folder as image (data type can be chosen) and
-    the dataframe is also saved as csv file
+    which was previously binned. The plot is saved in an output folder as an image (data type can be chosen) and
+    the data frame is also saved as CSV file
     
     args:
         all_dicts (dict): Dictionary of dictionaries with descriptor_list_keyname.
@@ -533,7 +523,6 @@ def continuous_descriptor_plot(all_dicts: dict,
                 transparent = True)
     return fig
 
-
 def descriptor_counts_and_plot(all_dicts: dict, 
                                descriptor_list_keyname: str,
                                width_of_bins : int = 10,
@@ -544,11 +533,11 @@ def descriptor_counts_and_plot(all_dicts: dict,
     descriptor values for a given descriptor value list. The values can either be continuous
     (binning with get_continuous_descriptor_counts and plotted with continuous_descriptor_plot)
     or discrete (binning with get_discrete_descriptor_counts and plotted with discrete_descriptor_plot).
-    The created plots are saved in an output folder and the dataframe can also be exported as csv.
+    The created plots are saved in an output folder and the data frame can also be exported as CSV.
     
     Args:
         all_dicts (dict): Dictionary of dictionaries including a descriptor value list.
-        descriptor_list_keyname (str): name of the descriptor list for binning and plotting.
+        descriptor_list_keyname (str): Name of the descriptor list for binning and plotting.
         widht_of_bins (int, optional): interval size for the bins for continuous values (default: 10).
         data_type (str): Data type for the exported image (default: png).
         save_dataframe (bool): Export dataframe as csv or not (default: True).
@@ -572,13 +561,13 @@ def descriptor_counts_and_plot(all_dicts: dict,
 def test_for_lipinski(moleculeset: Chem.SDMolSupplier) -> list:
     """
     This function returns a list with the number of Lipinski Rules broken for every molecule in the given
-    moleculeset.
+    Molecule set.
     
     Args:
         moleculeset (Chem.SDMolSupplier): SDMolSupplier Objects 
         
     Returns:
-        list[int]: List of number of broken Lipinski Rules.
+        list[int]: List of a number of broken Lipinski Rules.
     """
     num_of_break = []
     for mol in moleculeset:
@@ -599,14 +588,14 @@ def test_for_lipinski(moleculeset: Chem.SDMolSupplier) -> list:
 def get_lipinski_key (all_dicts : dict) -> dict : 
     """
     This function returns the updated dictionaries in the given dictionary with the list of the number of broken
-    Lipinski Rules (lipinski_list_keyname) using the test_for_lipinski function and a summary for the broken rules 
+    Lipinski Rules (lipinski_list_keyname) using the test_for_lipinski function and a summary of the broken rules 
     (lipinski_summary_keyname).
     
     Args:
-        all_dicts (dict): Dictionary of dictionaries with import_keyname (Value is a SDMolSupplier Object).
+        all_dicts (dict): Dictionary of dictionaries with import_keyname (Value is an SDMolSupplier Object).
         
     Returns:
-        all_dicts (dict): Given dictionary of dictionaries updated with the Lipinski Keys.
+        all_dicts (dict): Given a dictionary of dictionaries updated with the Lipinski Keys.
     """
     for single_dict in all_dicts:
         lipinski_break_list = test_for_lipinski(all_dicts[single_dict][import_keyname])
@@ -626,7 +615,7 @@ def lipinski_plot(all_dicts : dict,
     This function returns a Pandas DataFrame Object and the corresponding Bar-Plot for the number of
     molecules in every Dataset breaking 0 to 4 Lipinski Rules using the 'lipinski_summary' key in the
     given dictionaries. The plot is saved in an output folder (data type can be chosen) and the 
-    dataframe can also be exported as csv.
+    data frame can also be exported as CSV.
     
     args:
         all_dicts (dict): Dictionary of dictionaries with lipinski_summary_keyname.
@@ -670,7 +659,7 @@ def chemical_space_visualization(all_dicts: dict,
                                 interactive: bool = True
                                 ):
     """
-    This function returns a 2D-visualization of the chemical space of the molecules in all datasets using 
+    This function returns a 2D visualization of the chemical space of the molecules in all datasets using 
     the chemplot module.
     
     Args:
@@ -736,7 +725,7 @@ def chemical_space_visualization(all_dicts: dict,
 def export_single_dict_values(all_dicts:dict):
     """
     This function exports the descriptor values for each dictionary according to one imported
-    SDFile as a single csv-file in the output folder.
+    SDFile as a single CSV-file in the output folder.
     
     Args:
         all_dicts (dict): Dictionary of dictionaries with calculated descriptor values.
@@ -776,4 +765,3 @@ def export_all_picture_pdf():
             print(image + " not inclued, due to unsupported image type.")
     pdf.output('output/all_images.pdf')
     return
-
