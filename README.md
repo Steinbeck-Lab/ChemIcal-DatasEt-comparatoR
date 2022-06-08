@@ -124,7 +124,7 @@ To get and visualize the distribution of the descriptor values, the function 'de
 |   | save_dataframe : *bool, default=True*  |
 |   | &nbsp;&nbsp; Option to export the counts of the descriptor values as csv. |  
 
-![distribution_of_LogP](https://user-images.githubusercontent.com/95417135/165087902-6788db96-7230-4829-83f3-8fd3b6f791fa.png)
+![distribution_of_LogP](https://user-images.githubusercontent.com/95417135/172640194-02b2dcfa-2fd6-4407-a160-bfeb5dfb6c42.png)
 |:--:| 
 | *Example of the a descriptor value distribution from the 'descriptor_counts_and_plot' function. The LogP values of the three datasets are binned in intervals of 5.* |
 
