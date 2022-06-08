@@ -93,6 +93,7 @@ If there are no more than three datasets, a Venn diagram of the intersection of 
 
 ![intersection](https://user-images.githubusercontent.com/95417135/165087450-b3336c13-a3bf-4da5-98e1-97e2fa91167f.png)
 ![intersection](https://user-images.githubusercontent.com/95417135/172633857-96ec2be1-7ddd-4eb8-b12e-ff4634bf9337.png)
+![intersection](https://user-images.githubusercontent.com/95417135/172637671-a8ee31be-7d7b-4906-a902-d0dfd909c049.png)
 |:--:| 
 | *Example of an intersection from three compared datasets created with the 'visualize_intersection' function.* |
 
