@@ -1,4 +1,4 @@
-'''Import of imposrtant Libraries'''
+'''Import Libraries'''
 
 from rdkit import Chem
 from rdkit.Chem import AllChem
