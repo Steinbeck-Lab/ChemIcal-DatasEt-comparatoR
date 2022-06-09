@@ -1,4 +1,4 @@
-# Comparison of datasets
+# ChemIcal DatasEt compaRator (CIDER)
 
 This repository contains a Jupyter Notebook that can be used to compare SDFiles with each other and create visual output from the comparison. 
 
