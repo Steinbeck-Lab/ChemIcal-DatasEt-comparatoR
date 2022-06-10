@@ -47,7 +47,7 @@ $ todo
 - Todo
 
 ### Cite us
-- Todo
+- Busch, H., Schaub, J., Brinkhaus, H. O., Rajan, K., & Steinbeck, C. (2022). ChemIcal DatasEt comparatoR CIDER (Version 0.0.1-dev) [Computer software]. https://doi.org/10.5281/zenodo.6630494
 
 ## More information about our research group
 
