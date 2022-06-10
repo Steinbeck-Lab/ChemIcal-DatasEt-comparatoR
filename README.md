@@ -1,4 +1,4 @@
-# ChemIcal DatasEt compaRator (CIDER)
+# ChemIcal DatasEt comparatoR (CIDER)
 [![License](https://img.shields.io/badge/License-MIT%202.0-blue.svg)](https://opensource.org/licenses/MIT)
 [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-blue.svg)](https://GitHub.com/hannbus/ChemIcal_DatasEt_compaRator/graphs/commit-activity)
 [![GitHub issues](https://img.shields.io/github/issues/hannbus/ChemIcal_DatasEt_compaRator.svg)](https://GitHub.com/hannbus/ChemIcal_DatasEt_compaRator/issues/)
