@@ -130,3 +130,5 @@ dmypy.json
 
 # output folder
 /output
+
+.DS_Store
