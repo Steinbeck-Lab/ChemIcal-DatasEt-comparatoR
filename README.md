@@ -8,6 +8,8 @@
 [![GitHub release](https://img.shields.io/github/release/hannbus/ChemIcal_DatasEt_compaRator.svg)](https://GitHub.com/hannbus/ChemIcal_DatasEt_compaRator/releases/)
 [![PyPI version fury.io](https://badge.fury.io/py/cider-chem.svg)](https://pypi.python.org/pypi/cider-chem/)
 
+[![GitHub Logo](https://github.com/hannbus/ChemIcal_DatasEt_compaRator/blob/main/Tutorials/Cider.png?raw=true)](https://pypi.python.org/pypi/cider-chem/)
+
 - ChemIcal DatasEt comparatoR (CIDER) is a Python package which primarily utilizes RDKit to compare and visualize different chemical compounds from two different datasets. 
 
 ## Usage
