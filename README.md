@@ -42,7 +42,7 @@ $ pip install git+https://github.com/hannbus/ChemIcal_DatasEt_compaRator.git
 
 ### Install from PyPI
 ```shell
-$ todo
+$ pip install cider-chem
 ```
 
 ### Basic usage: 
