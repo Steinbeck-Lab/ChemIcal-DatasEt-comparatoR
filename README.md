@@ -32,7 +32,7 @@ $ conda create --name ChemIcal_DatasEt_compaRator python=3.8
 $ conda activate ChemIcal_DatasEt_compaRator
 $ conda install pip
 $ python -m pip install -U pip #Upgrade pip
-$ pip install notebook rdkit-pypi matplotlib==3.5.1 seaborn==0.11.2 chemplot==1.2.0 matplotlib_venn==0.11.6 FPDF==1.7.2
+$ pip install .
 ```
 ### Alternative
 ```shell
