@@ -527,7 +527,7 @@ class ChemicalDatasetComparator:
         for single_dict in all_dicts:
             header = single_dict
             descriptor_df_dict.update(
-                {header: list(testdict[single_dict][binned_descriptor_list_keyname])}
+                {header: list(all_dicts[single_dict][binned_descriptor_list_keyname])}
             )
         descriptor_df = pd.DataFrame(descriptor_df_dict)
         if not os.path.exists("output"):
