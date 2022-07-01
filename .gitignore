@@ -130,5 +130,6 @@ dmypy.json
 
 # output folder
 /output
+/Workflow/output
 
 .DS_Store
