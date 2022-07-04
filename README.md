@@ -45,6 +45,17 @@ $ pip install git+https://github.com/hannbus/ChemIcal_DatasEt_compaRator.git
 $ pip install cider-chem
 ```
 
+### Windows intallation
+```powershell
+$ git clone https://github.com/hannbus/ChemIcal_DatasEt_compaRator.git
+$ cd ChemIcal_DatasEt_compaRator
+$ conda create -c conda-forge -n ChemIcal_DatasEt_compaRator rdkit python=3.8
+$ conda activate ChemIcal_DatasEt_compaRator
+$ conda install pip
+$ python -m pip install -U pip
+$ pip install .
+```
+
 ### Basic usage: 
 - Todo
 
