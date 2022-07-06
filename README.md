@@ -28,7 +28,7 @@ $ bash Miniconda3-latest-Linux-x86_64.sh
 ```shell
 $ git clone https://github.com/hannbus/ChemIcal_DatasEt_compaRator.git
 $ cd ChemIcal_DatasEt_compaRator
-$ conda create --name ChemIcal_DatasEt_compaRator python=3.8
+$ conda create --name ChemIcal_DatasEt_compaRator
 $ conda activate ChemIcal_DatasEt_compaRator
 $ conda install pip
 $ python -m pip install -U pip #Upgrade pip
@@ -43,17 +43,6 @@ $ pip install git+https://github.com/hannbus/ChemIcal_DatasEt_compaRator.git
 ### Install from PyPI
 ```shell
 $ pip install cider-chem
-```
-
-### Windows intallation
-```powershell
-$ git clone https://github.com/hannbus/ChemIcal_DatasEt_compaRator.git
-$ cd ChemIcal_DatasEt_compaRator
-$ conda create -c conda-forge -n ChemIcal_DatasEt_compaRator rdkit python=3.8
-$ conda activate ChemIcal_DatasEt_compaRator
-$ conda install pip
-$ python -m pip install -U pip
-$ pip install .
 ```
 
 ### Basic usage: 
