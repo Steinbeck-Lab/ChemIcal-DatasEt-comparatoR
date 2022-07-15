@@ -743,7 +743,7 @@ class ChemicalDatasetComparator:
                 target_type="C",  # classification (classes are the datasets listed in the target_list)
                 sim_type="structural",  # similarity solely based on structure (no property is taken into account)
             )
-        elif not any(element.isdigit() for element in all_mols_list[0]):
+        elif len(all_mols_list[0]) == 27 and '-' in all_mols_list[0][14] and '-' in all_mols_list[0][25]:
             all_mols_list.clear()
             for single_dict in all_dicts:
                 for mol in all_dicts[single_dict][self.import_keyname]:
