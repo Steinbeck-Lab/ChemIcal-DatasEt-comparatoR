@@ -1,6 +1,8 @@
 from CIDER import ChemicalDatasetComparator
 from rdkit.Chem import Descriptors
 from rdkit.Chem import rdMolDescriptors
+from rdkit.Chem.Draw import IPythonConsole
+# import os
 import pytest
 
 cider = ChemicalDatasetComparator()
@@ -19,12 +21,10 @@ def test_get_number_of_molecules():
    assert testdict['set_B.sdf']['number_of_molecules'] == 4
    assert testdict['set_D.sdf']['number_of_molecules'] == 6
 
-# Test is failing! (But is working in the notebook)
-
-# def test_draw_molecules():
-#     cider.draw_molecules(testdict, number_of_mols = 2)
-#     # Assert that the function gernerates a new entry in the dictionary
-#     assert any(key == 'molecule_picture' for key in list(testdict['set_A.sdf'].keys())) == True
+def test_draw_molecules():
+    cider.draw_molecules(testdict, number_of_mols = 3)
+    # Assert that the function gernerates a new entry in the dictionary
+    assert any(key == 'molecule_picture' for key in list(testdict['set_A.sdf'].keys())) == True
 
 
 def test_get_database_id():
@@ -66,7 +66,11 @@ def test_get_shared_molecules_key():
     assert testdict['set_A.sdf']['shared_molecules'] == 'ZPQOPVIELGIULI-UHFFFAOYSA-N' or 'InChI=1S/C6H4Cl2/c7-5-2-1-3-6(8)4-5/h1-4H' or 'Clc1cccc(Cl)c1'
 
 
-# Test for 'cider.visualize_intersection()' is missing.
+# Test works in notebook but not here
+
+# def test_visualize_intersection():
+#     cider.visualize_intersection(testdict)
+#     assert os.path.exists("output/intersection.png")
 
 
 def test_get_descriptor_list_key():
