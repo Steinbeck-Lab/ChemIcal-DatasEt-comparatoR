@@ -292,7 +292,7 @@ class ChemicalDatasetComparator:
         plt.savefig(
             "output/intersection.%s" % (data_type), bbox_inches="tight", transparent=True
         )
-        return plt.show(venn)
+        return 
 
     def get_descriptor_list(self, moleculeset: Chem.SDMolSupplier, descriptor: callable,) -> list:
         """

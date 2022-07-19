@@ -2,7 +2,7 @@ from CIDER import ChemicalDatasetComparator
 from rdkit.Chem import Descriptors
 from rdkit.Chem import rdMolDescriptors
 from rdkit.Chem.Draw import IPythonConsole
-# import os
+import os
 import pytest
 
 cider = ChemicalDatasetComparator()
@@ -25,7 +25,8 @@ def test_draw_molecules():
     cider.draw_molecules(testdict, number_of_mols = 3)
     # Assert that the function gernerates a new entry in the dictionary
     assert any(key == 'molecule_picture' for key in list(testdict['set_A.sdf'].keys())) == True
-
+    # Assert that the pictures are exported
+    assert os.path.exists("output/mol_grit_set_A.png") 
 
 def test_get_database_id():
     cider.get_database_id(testdict, 'coconut_id')
@@ -65,29 +66,34 @@ def test_get_shared_molecules_key():
     assert testdict['set_A.sdf']['number_of_shared_molecules'] == 1
     assert testdict['set_A.sdf']['shared_molecules'] == 'ZPQOPVIELGIULI-UHFFFAOYSA-N' or 'InChI=1S/C6H4Cl2/c7-5-2-1-3-6(8)4-5/h1-4H' or 'Clc1cccc(Cl)c1'
 
-
-# Test works in notebook but not here
-
-# def test_visualize_intersection():
-#     cider.visualize_intersection(testdict)
-#     assert os.path.exists("output/intersection.png")
-
+def test_visualize_intersection():
+    cider.visualize_intersection(testdict)
+    assert os.path.exists("output/intersection.png") 
 
 def test_get_descriptor_list_key():
+    # Assertion for continuous values
     cider.get_descriptor_list_key(testdict,  Descriptors.MolWt, 'Molecular Weight')
     # Assert that the function generates a new entry in the dictionary
     assert any(key == 'Molecular Weight' for key in list(testdict['set_A.sdf'].keys())) == True
     # Assert that the correct values for the molecular weight are returned from rdkit.Chem Descriptors
     assert list(testdict['set_A.sdf']['Molecular Weight']) == [181.449, 147.00399999999996, 147.004]
+    # Assert that the picture and the table are exported
+    assert os.path.exists("output/distribution_of_Molecular Weight.png") 
+    assert os.path.exists("output/table_Molecular Weight.csv")
+    # Assertion for discrete values
     cider.get_descriptor_list_key(testdict, rdMolDescriptors.CalcMolFormula, 'Molecular Formula')
     # Assert that the function generates a new entries in the dictionary
     assert any(key == 'Molecular Formula' for key in list(testdict['set_A.sdf'].keys())) == True
     # Assert that the correct strings for the molecular formula are returned from rdkit.Chem rdMolDescriptors
     assert list(testdict['set_A.sdf']['Molecular Formula']) == ['C6H3Cl3', 'C6H4Cl2', 'C6H4Cl2']
+    # Assert that the picture and the table are exported
+    assert os.path.exists("output/distribution_of_Number of Rings.png") 
+    assert os.path.exists("output/table_Number of Rings.csv")
 
-
-#Test for 'cider.get_value_from_id()' is missing.
-
+def test_get_value_from_id(capfd):
+    cider.get_value_from_id(testdict, 'CNP0206286', 'Molecular Weight')
+    out, err = capfd.readouterr()
+    assert out == 'Molecule found in set_A.sdf\nMolecular Weight value for ID CNP0206286: 181.449\nMolecule not found in set_B.sdf\nMolecule not found in set_D.sdf\n'
 
 def test_descriptor_counts_and_plot():
     cider.descriptor_counts_and_plot(testdict, 'Molecular Weight', 5)
@@ -111,11 +117,24 @@ def test_get_lipinski_key():
                                                                     '3_rules_broken': 0,
                                                                     '4_rules_broken': 0}
 
+def test_lipinski_plot():
+   cider.lipinski_plot(testdict)
+   # Assert that the picture is exported
+   assert os.path.exists("output/lipinski_rules_plot.png")
 
-# Test for 'cider.get_identifier_list_key()' is missing.
+def test_chemical_space_visualization():
+   cider.chemical_space_visualization(testdict, interactive = False)
+   # Assert that the picture is exported
+   assert os.path.exists("output/chemical_space.png")
 
-# Test for 'cider.export_single_dict_values()' is missing.
+def test_export_single_dict_values():
+   cider.export_single_dict_values(testdict)
+   # Assert that the picture is exported
+   assert os.path.exists("output/descriptor_values_set_A.csv")
+   assert os.path.exists("output/descriptor_values_set_B.csv")
+   assert os.path.exists("output/descriptor_values_set_D.csv")
 
-# Test for 'cider.export_all_picture_pdf()' is missing.   
-
-   
+def test_export_all_picture_pdf():
+   cider.export_all_picture_pdf()
+   # Assert that the picture is exported
+   assert os.path.exists("output/all_images.pdf")
