@@ -776,9 +776,17 @@ class ChemicalDatasetComparator:
                 sim_type="structural",  # similarity solely based on structure (no property is taken into account)
             )
         if fp_radius != 2 or fp_bits != 2048:
-            new_fingerprint = descriptors.get_ecfp_from_inchi(
+            if all_mols_list[0].startswith("InChI="):
+                new_fingerprint = descriptors.get_ecfp_from_inchi(
                 all_mols_list, target_list, radius=fp_radius, nBits=fp_bits
             )
+            else:
+                new_fingerprint = descriptors.get_ecfp(
+                all_mols_list, target_list, radius=fp_radius, nBits=fp_bits
+            )
+            # new_fingerprint = descriptors.get_ecfp_from_inchi(
+            #     all_mols_list, target_list, radius=fp_radius, nBits=fp_bits
+            # )
             chem_space._Plotter__mols = new_fingerprint[0]
         if dimension_reduction == "pca":
             chem_space.pca()  # n_components, copy, whiten, svd_solver ...
@@ -819,7 +827,7 @@ class ChemicalDatasetComparator:
             filename = single_dict[:-4]
             to_export.to_csv("output/descriptor_values_%s.csv" % (filename))
             print(single_dict + " : " + str(counter) + " exported descriptor values")
-        return new_dict
+        return 
 
     def export_all_picture_pdf(self):
         """
