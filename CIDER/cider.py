@@ -52,6 +52,40 @@ class ChemicalDatasetComparator:
             all_dicts[dict_name] = singel_dict
         return all_dicts
 
+    # Check for invalid SDFiles
+    def check_invalid_SDF(self, all_dicts:dict, delete: bool = False):
+        """
+        This function checks if there are invalid entrys in the SDFiles that can cause errors in the subsequent 
+        functions. At choice the invalid entries can be removed.
+
+        Args:
+            all_dicts (dict): Dictionary with sub-dictionaries including SDMolSupplier Objects.
+            delete (bool): Deleting invalid entries or not (default: False).
+
+        Returns:
+            all_dicts (dict): Dictionary with SDMolSupplier Objects without invalid entris (if delete = True).
+        """
+        for single_dict in all_dicts:
+            mol_index = -1
+            invalid_index = []
+            for mol in all_dicts[single_dict][self.import_keyname]:
+                try:
+                    mol_index +=1
+                    assert mol
+                except:
+                    pass
+                    print(str(single_dict) + ' has invalid molecule at index ' + str(mol_index))
+                    invalid_index.append(mol_index)
+            if delete == True:
+                new_SDMol = list(all_dicts[single_dict][self.import_keyname])
+                for index in sorted(invalid_index, reverse=True):
+                    del new_SDMol[index]
+                all_dicts[single_dict].update({self.import_keyname: new_SDMol})
+                print(str(len(invalid_index)) + 'invalid molecule(s) are deleted from ' + str(single_dict))
+            else:
+                print('Invalid molecule(s) will remain')
+        return
+
 
     # Get overview of the datset size
     def get_number_of_molecules(self, all_dicts: dict) -> dict:

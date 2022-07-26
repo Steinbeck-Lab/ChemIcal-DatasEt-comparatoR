@@ -13,18 +13,27 @@ def test_import_as_data_dict():
    # Assert that the function generates the dictionary
    assert list(testdict.keys()) == ['set_A.sdf', 'set_B.sdf', 'set_D.sdf']
 
+def test_check_invalid_SDF(capfd):
+   invalid_testdict = cider.import_as_data_dict('unittest_data_invalid')
+   cider.check_invalid_SDF(invalid_testdict, delete=False)
+   out, err = capfd.readouterr()
+   assert out == 'set_D_invalid.sdf has invalid molecule at index 1\nset_D_invalid.sdf has invalid molecule at index 4\nInvalid molecule(s) will remain\n'
+   assert len(invalid_testdict['set_D_invalid.sdf'][cider.import_keyname]) == 7
+   cider.check_invalid_SDF(invalid_testdict, delete=True)
+   assert len(invalid_testdict['set_D_invalid.sdf'][cider.import_keyname]) == 5
+
 def test_get_number_of_molecules():
    cider.get_number_of_molecules(testdict)
    # Assert that the function generates new entries in the dictionary
    # and that the correct number of molecules are found in the datasets
-   assert testdict['set_A.sdf']['number_of_molecules'] == 3
-   assert testdict['set_B.sdf']['number_of_molecules'] == 4
-   assert testdict['set_D.sdf']['number_of_molecules'] == 7
+   assert testdict['set_A.sdf'][cider.dataset_lenght_keyname] == 3
+   assert testdict['set_B.sdf'][cider.dataset_lenght_keyname] == 4
+   assert testdict['set_D.sdf'][cider.dataset_lenght_keyname] == 7
 
 def test_draw_molecules():
     cider.draw_molecules(testdict, number_of_mols = 3)
     # Assert that the function gernerates a new entry in the dictionary
-    assert any(key == 'molecule_picture' for key in list(testdict['set_A.sdf'].keys())) == True
+    assert any(key == cider.mol_grid_keyname for key in list(testdict['set_A.sdf'].keys())) == True
     # Assert that the pictures are exported
     assert os.path.exists("output/mol_grit.png") 
 
@@ -33,10 +42,10 @@ def test_get_database_id():
     # Assert that the function gernerates a new entry in the dictionary
     assert any(key == 'coconut_id_keyname' for key in list(testdict['set_A.sdf'].keys())) == True
     # Assert that the function gets the correct IDs 
-    assert list(testdict['set_A.sdf']['coconut_id_keyname']) == ['CNP0206286', 'CNP0284887', 'CNP0080171']
+    assert list(testdict['set_A.sdf'][cider.database_id_keyname]) == ['CNP0206286', 'CNP0284887', 'CNP0080171']
 
 def test_get_identifier_list():
-    testset  = testdict['set_A.sdf']['SDMolSupplier_Object']
+    testset  = testdict['set_A.sdf'][cider.import_keyname]
     # Assert that the correct InChI strings are generated.
     expected_inchi = ['InChI=1S/C6H3Cl3/c7-4-1-2-5(8)6(9)3-4/h1-3H', 'InChI=1S/C6H4Cl2/c7-5-3-1-2-4-6(5)8/h1-4H', 'InChI=1S/C6H4Cl2/c7-5-2-1-3-6(8)4-5/h1-4H']
     inchi = cider._get_identifier_list(testset)
@@ -53,40 +62,40 @@ def test_get_identifier_list():
 def test_get_identifier_list_key():
     cider.get_identifier_list_key(testdict)
     # Assert that the function gernerates a new entry in the dictionary
-    assert any(key == 'identifier_list' for key in list(testdict['set_A.sdf'].keys())) == True
+    assert any(key == cider.identifier_keyname for key in list(testdict['set_A.sdf'].keys())) == True
     # Assert that at default configuration the correct InChI string is generated.
-    assert testdict['set_A.sdf']['identifier_list'][0] == 'InChI=1S/C6H3Cl3/c7-4-1-2-5(8)6(9)3-4/h1-3H'
+    assert testdict['set_A.sdf'][cider.identifier_keyname][0] == 'InChI=1S/C6H3Cl3/c7-4-1-2-5(8)6(9)3-4/h1-3H'
     # Assert that with id_type = 'smiles' the correct smiles string is generated.
     cider.get_identifier_list_key(testdict, 'smiles')
-    assert testdict['set_A.sdf']['identifier_list'][0] == 'Clc1ccc(Cl)c(Cl)c1'
+    assert testdict['set_A.sdf'][cider.identifier_keyname][0] == 'Clc1ccc(Cl)c(Cl)c1'
     # Assert that with id_type = 'inchikey' the correct InChIKey is generated.
     cider.get_identifier_list_key(testdict, 'inchikey')
-    assert testdict['set_A.sdf']['identifier_list'][0] == 'PBKONEOXTCPAFI-UHFFFAOYSA-N'
+    assert testdict['set_A.sdf'][cider.identifier_keyname][0] == 'PBKONEOXTCPAFI-UHFFFAOYSA-N'
 
 def test_get_duplicate_key():
     cider.get_duplicate_key(testdict)
     # Assert that the function generates a new entry in the dictionary
-    assert any(key == 'number_of_duplicates' for key in list(testdict['set_A.sdf'].keys())) == True
+    assert any(key == cider.duplicates_keyname for key in list(testdict['set_A.sdf'].keys())) == True
     # Assert that the function returns the right number of duplicates
-    assert testdict['set_A.sdf']['number_of_duplicates'] == 0
-    assert testdict['set_B.sdf']['number_of_duplicates'] == 0
-    assert testdict['set_D.sdf']['number_of_duplicates'] == 1
+    assert testdict['set_A.sdf'][cider.duplicates_keyname] == 0
+    assert testdict['set_B.sdf'][cider.duplicates_keyname] == 0
+    assert testdict['set_D.sdf'][cider.duplicates_keyname] == 1
    
 def test_get_shared_molecules_key():
     cider.get_shared_molecules_key(testdict)
     # Assert that the function generates a new entry in the dictionary
-    assert any(key == 'number_of_shared_molecules' for key in list(testdict['set_A.sdf'].keys())) == True
-    assert any(key == 'shared_molecules' for key in list(testdict['set_A.sdf'].keys())) == True
+    assert any(key == cider.shared_mols_keyname for key in list(testdict['set_A.sdf'].keys())) == True
+    assert any(key == cider.shared_mols_id_keyname for key in list(testdict['set_A.sdf'].keys())) == True
     # Assert that the correct number and identity of the shared molecules are returned 
-    assert testdict['set_A.sdf']['number_of_shared_molecules'] == 1
-    assert testdict['set_A.sdf']['shared_molecules'] == 'ZPQOPVIELGIULI-UHFFFAOYSA-N' or 'InChI=1S/C6H4Cl2/c7-5-2-1-3-6(8)4-5/h1-4H' or 'Clc1cccc(Cl)c1'
+    assert testdict['set_A.sdf'][cider.shared_mols_keyname] == 1
+    assert testdict['set_A.sdf'][cider.shared_mols_id_keyname] == 'ZPQOPVIELGIULI-UHFFFAOYSA-N' or 'InChI=1S/C6H4Cl2/c7-5-2-1-3-6(8)4-5/h1-4H' or 'Clc1cccc(Cl)c1'
 
 def test_visualize_intersection():
     cider.visualize_intersection(testdict)
     assert os.path.exists("output/intersection.png")
 
 def test_get_descriptor_list():
-    testset  = testdict['set_A.sdf']['SDMolSupplier_Object']
+    testset  = testdict['set_A.sdf'][cider.import_keyname]
     # Assert that the correct LogP values are returned
     expected_LogP = [3.6468000000000007, 2.9934000000000003, 2.993400000000001]
     LogP = cider._get_descriptor_list(testset, Descriptors.MolLogP) 
@@ -157,7 +166,7 @@ def test_descriptor_counts_and_plot():
     assert list(testdict['set_A.sdf']['binned Number of Rings']) == [0, 3]
 
 def test_test_for_lipinski():
-   testset  = testdict['set_A.sdf']['SDMolSupplier_Object']
+   testset  = testdict['set_A.sdf'][cider.import_keyname]
    # Assert the correct number of broken rules are returned
    expected_num_of_break = [0,0,0]
    num_of_break = cider._test_for_lipinski(testset)
@@ -166,11 +175,11 @@ def test_test_for_lipinski():
 def test_get_lipinski_key():
     cider.get_lipinski_key(testdict)
     # Assert that the function generates new entries in the dictionary
-    assert any(key == 'number_of_broken_Lipinski_Rules' for key in list(testdict['set_A.sdf'].keys())) == True
-    assert any(key == 'Lipinski_Rule_of_5_summary' for key in list(testdict['set_A.sdf'].keys())) == True
+    assert any(key == cider.lipinski_list_keyname for key in list(testdict['set_A.sdf'].keys())) == True
+    assert any(key == cider.lipinski_summary_keyname for key in list(testdict['set_A.sdf'].keys())) == True
     # Assert that the correct numbers are returned
-    assert testdict['set_A.sdf']['number_of_broken_Lipinski_Rules'] == [0,0,0]
-    assert testdict['set_A.sdf']['Lipinski_Rule_of_5_summary'] ==  {'lipinski_molecules': 3,
+    assert testdict['set_A.sdf'][cider.lipinski_list_keyname] == [0,0,0]
+    assert testdict['set_A.sdf'][cider.lipinski_summary_keyname] ==  {'lipinski_molecules': 3,
                                                                     '1_rule_broken': 0,
                                                                     '2_rules_broken': 0,
                                                                     '3_rules_broken': 0,
