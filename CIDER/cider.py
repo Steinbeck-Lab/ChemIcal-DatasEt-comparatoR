@@ -81,9 +81,9 @@ class ChemicalDatasetComparator:
                 for index in sorted(invalid_index, reverse=True):
                     del new_SDMol[index]
                 all_dicts[single_dict].update({self.import_keyname: new_SDMol})
-                print(str(len(invalid_index)) + 'invalid molecule(s) are deleted from ' + str(single_dict))
-            else:
-                print('Invalid molecule(s) will remain')
+                print(str(len(invalid_index)) + ' invalid molecule(s) are deleted from ' + str(single_dict))
+            elif delete == False and invalid_index:
+                print(str(len(invalid_index)) + ' invalid molecule(s) will remain in ' + str(single_dict))
         return
 
 
@@ -202,19 +202,30 @@ class ChemicalDatasetComparator:
             List[str]: List of identifiers based on given molecules.
         """
         identifier_list = []
+        failed_identifier = 0
+        # if id_type == "smiles" or id_type =="inchikey" or id_type =="inchi":
         for mol in moleculeset:
-            if id_type == "smiles":
-                identifier = Chem.MolToSmiles(mol)
-            elif id_type == "inchikey":
-                identifier = Chem.MolToInchiKey(mol)
-            elif id_type == "inchi":
-                identifier = Chem.MolToInchi(mol)
-            else:
-                raise ValueError(
-                    'id_type argument needs to be "smiles", "inchikey" or "inchi"!'
-                )
-            identifier_list.append(identifier)
-        return identifier_list
+                try:
+                    if id_type == "smiles":
+                        identifier = Chem.MolToSmiles(mol)
+                    elif id_type == "inchikey":
+                        identifier = Chem.MolToInchiKey(mol)
+                    elif id_type == "inchi":
+                        identifier = Chem.MolToInchi(mol)
+                    else:
+                        raise ValueError(
+                            'id_type argument needs to be "smiles", "inchikey" or "inchi"!'
+                     )
+                    identifier_list.append(identifier)
+                except:
+                    pass
+                    identifier_list.append('Failed')
+                    failed_identifier += 1
+        # else: # id_type != "smiles" or id_type !="inchikey" or id_type !="inchi":
+        #     raise ValueError(
+        #             'id_type argument needs to be "smiles", "inchikey" or "inchi"!'
+        #         )
+        return identifier_list, failed_identifier
 
     def get_identifier_list_key(self, all_dicts: dict, id_type: str = "inchi") -> dict:
         """
@@ -233,7 +244,10 @@ class ChemicalDatasetComparator:
             identifier_list = self._get_identifier_list(
                 all_dicts[single_dict][self.import_keyname], id_type
             )
-            all_dicts[single_dict][self.identifier_keyname] = identifier_list
+            all_dicts[single_dict][self.identifier_keyname] = identifier_list[0]
+            failed_identifier = identifier_list[1]
+            if failed_identifier != 0:
+                print(str(single_dict) + ' failed to get ' + str(failed_identifier) + ' identifier(s)!')
         return pd.DataFrame(all_dicts).loc[self.identifier_keyname] , print("Updated dictionary with '" + self.identifier_keyname + "'")
 
 

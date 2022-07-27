@@ -17,7 +17,7 @@ def test_check_invalid_SDF(capfd):
    invalid_testdict = cider.import_as_data_dict('unittest_data_invalid')
    cider.check_invalid_SDF(invalid_testdict, delete=False)
    out, err = capfd.readouterr()
-   assert out == 'set_D_invalid.sdf has invalid molecule at index 1\nset_D_invalid.sdf has invalid molecule at index 4\nInvalid molecule(s) will remain\n'
+   assert out == 'set_D_invalid.sdf has invalid molecule at index 1\nset_D_invalid.sdf has invalid molecule at index 4\n2 invalid molecule(s) will remain in set_D_invalid.sdf\n'
    assert len(invalid_testdict['set_D_invalid.sdf'][cider.import_keyname]) == 7
    cider.check_invalid_SDF(invalid_testdict, delete=True)
    assert len(invalid_testdict['set_D_invalid.sdf'][cider.import_keyname]) == 5
@@ -47,15 +47,15 @@ def test_get_database_id():
 def test_get_identifier_list():
     testset  = testdict['set_A.sdf'][cider.import_keyname]
     # Assert that the correct InChI strings are generated.
-    expected_inchi = ['InChI=1S/C6H3Cl3/c7-4-1-2-5(8)6(9)3-4/h1-3H', 'InChI=1S/C6H4Cl2/c7-5-3-1-2-4-6(5)8/h1-4H', 'InChI=1S/C6H4Cl2/c7-5-2-1-3-6(8)4-5/h1-4H']
+    expected_inchi = (['InChI=1S/C6H3Cl3/c7-4-1-2-5(8)6(9)3-4/h1-3H', 'InChI=1S/C6H4Cl2/c7-5-3-1-2-4-6(5)8/h1-4H', 'InChI=1S/C6H4Cl2/c7-5-2-1-3-6(8)4-5/h1-4H'], 0)
     inchi = cider._get_identifier_list(testset)
     assert expected_inchi == inchi
     # Assert that the correkt InChIKeys are generated.
-    expected_inchikey = ['PBKONEOXTCPAFI-UHFFFAOYSA-N', 'RFFLAFLAYFXFSW-UHFFFAOYSA-N', 'ZPQOPVIELGIULI-UHFFFAOYSA-N']
+    expected_inchikey = (['PBKONEOXTCPAFI-UHFFFAOYSA-N', 'RFFLAFLAYFXFSW-UHFFFAOYSA-N', 'ZPQOPVIELGIULI-UHFFFAOYSA-N'], 0)
     inchikey = cider._get_identifier_list(testset, 'inchikey')
     assert expected_inchikey == inchikey
     # Assert that the correct SMILES strings are generated.
-    expected_smiles = ['Clc1ccc(Cl)c(Cl)c1', 'Clc1ccccc1Cl', 'Clc1cccc(Cl)c1']
+    expected_smiles = (['Clc1ccc(Cl)c(Cl)c1', 'Clc1ccccc1Cl', 'Clc1cccc(Cl)c1'], 0)
     smiles = cider._get_identifier_list(testset, 'smiles')
     assert expected_smiles == smiles
 
