@@ -84,6 +84,8 @@ class ChemicalDatasetComparator:
                 print(str(len(invalid_index)) + ' invalid molecule(s) are deleted from ' + str(single_dict))
             elif delete == False and invalid_index:
                 print(str(len(invalid_index)) + ' invalid molecule(s) will remain in ' + str(single_dict))
+            elif delete == False and not invalid_index:
+                print('No invalid molecules found in '  + str(single_dict))
         return
 
 
@@ -184,7 +186,7 @@ class ChemicalDatasetComparator:
                 database_id = prop_dict.get(id_name)
                 database_id_list.append(database_id)
                 all_dicts[single_dict][self.database_id_keyname] = database_id_list
-        return pd.DataFrame(all_dicts).loc[self.database_id_keyname] , print("Updated dictionary with '" + self.identifier_keyname + "'")
+        return pd.DataFrame(all_dicts).loc[self.database_id_keyname] , print("Updated dictionary with '" + self.database_id_keyname + "'")
 
     def _get_identifier_list(self, moleculeset: Chem.SDMolSupplier, id_type: str = "inchi"):
         """
@@ -371,8 +373,12 @@ class ChemicalDatasetComparator:
         """
         descriptor_list = []
         for mol in moleculeset:
-            value = descriptor(mol)
-            descriptor_list.append(value)
+            try:
+                value = descriptor(mol)
+                descriptor_list.append(value)
+            except:
+                pass
+                descriptor_list.append('N/A')
         return descriptor_list
 
     def get_descriptor_list_key(
