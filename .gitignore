@@ -136,5 +136,10 @@ dmypy.json
 
 # output folder
 /output
+/Workflow/output
+/Tests/output
 
 .DS_Store
+
+# pytest
+/Tests/__pycache__
