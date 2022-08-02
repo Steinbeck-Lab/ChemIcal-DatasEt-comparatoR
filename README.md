@@ -5,10 +5,10 @@
 [![GitHub contributors](https://img.shields.io/github/contributors/hannbus/ChemIcal_DatasEt_compaRator.svg)](https://GitHub.com/hannbus/ChemIcal_DatasEt_compaRator/graphs/contributors/)
 [![DOI](https://zenodo.org/badge/501949039.svg)](https://zenodo.org/badge/latestdoi/501949039)
 [![Documentation Status](https://readthedocs.org/projects/ChemIcal_DatasEt_compaRator/badge/?version=latest)](https://ChemIcal_DatasEt_compaRator.readthedocs.io/en/latest/?badge=latest)
-[![GitHub release](https://img.shields.io/github/release/hannbus/ChemIcal_DatasEt_compaRator.svg)](https://GitHub.com/hannbus/ChemIcal_DatasEt_compaRator/releases/)
+[![GitHub release](https://img.shields.io/github/release/hannbus/ChemIcal_DatasEt_compaRator.svg)](https://github.com/hannbus/ChemIcal_DatasEt_compaRator/releases/)
 [![PyPI version fury.io](https://badge.fury.io/py/cider-chem.svg)](https://pypi.python.org/pypi/cider-chem/)
 
-[![GitHub Logo](https://github.com/hannbus/ChemIcal_DatasEt_compaRator/blob/main/Tutorials/Cider.png?raw=true)](https://pypi.python.org/pypi/cider-chem/)
+[![GitHub Logo](https://github.com/hannbus/ChemIcal_DatasEt_compaRator/blob/main/Workflow/Cider.png?raw=true)](https://pypi.python.org/pypi/cider-chem/)
 
 - ChemIcal DatasEt comparatoR (CIDER) is a Python package and ready-to-use Jupyter Notebook workflow which primarily utilizes RDKit to compare two or more chemical structure datasets (SD files) in different aspects, e.g. size, overlap, molecular descriptor distributions, chemical space clustering, etc., most of which can be visually inspected in the notebook.
 
