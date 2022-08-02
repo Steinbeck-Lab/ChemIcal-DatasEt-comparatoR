@@ -26,9 +26,9 @@ def test_get_number_of_molecules():
    cider.get_number_of_molecules(testdict)
    # Assert that the function generates new entries in the dictionary
    # and that the correct number of molecules are found in the datasets
-   assert testdict['set_A.sdf'][cider.dataset_lenght_keyname] == 3
-   assert testdict['set_B.sdf'][cider.dataset_lenght_keyname] == 4
-   assert testdict['set_D.sdf'][cider.dataset_lenght_keyname] == 7
+   assert testdict['set_A.sdf'][cider.dataset_length_keyname] == 3
+   assert testdict['set_B.sdf'][cider.dataset_length_keyname] == 4
+   assert testdict['set_D.sdf'][cider.dataset_length_keyname] == 7
 
 def test_draw_molecules():
     cider.draw_molecules(testdict, number_of_mols = 3)

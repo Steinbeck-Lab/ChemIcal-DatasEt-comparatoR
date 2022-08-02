@@ -21,7 +21,7 @@ class ChemicalDatasetComparator:
     """Wrapper class around all Cider functionalities"""
     def __init__(self):
         self.import_keyname = "SDMolSupplier_Object"
-        self.dataset_lenght_keyname = "number_of_molecules"
+        self.dataset_length_keyname = "number_of_molecules"
         self.identifier_keyname = "identifier_list"
         self.duplicates_keyname = "number_of_duplicates"
         self.duplicates_id_keyname = "duplicates"
@@ -100,15 +100,15 @@ class ChemicalDatasetComparator:
         """
         for single_dict in all_dicts:
             number_of_molecules = len(all_dicts[single_dict][self.import_keyname])
-            all_dicts[single_dict][self.dataset_lenght_keyname] = number_of_molecules
+            all_dicts[single_dict][self.dataset_length_keyname] = number_of_molecules
         for single_dict in all_dicts:
             print(
                 "Number of molecules in "
                 + single_dict
                 + ": "
-                + str(all_dicts[single_dict][self.dataset_lenght_keyname])
+                + str(all_dicts[single_dict][self.dataset_length_keyname])
             )
-        return print("Updated dictionary with '" + self.dataset_lenght_keyname + "'")
+        return print("Updated dictionary with '" + self.dataset_length_keyname + "'")
 
     def draw_molecules(
         self,
