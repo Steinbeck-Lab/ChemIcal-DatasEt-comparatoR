@@ -1,0 +1,255 @@
+
+Actelion Java MolfileCreator 2.0
+
+  0  0  0  0  0  0              0 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS 9 9 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 Br 1.299 0 0 0
+M  V30 2 C 0 -0.75 0 0
+M  V30 3 C -1.299 0 0 0
+M  V30 4 C -2.598 -0.7499 0 0
+M  V30 5 C -2.598 -2.2499 0 0
+M  V30 6 O -3.8971 -2.9999 0 0
+M  V30 7 C -1.299 -2.9999 0 0
+M  V30 8 Br -1.299 -4.4999 0 0
+M  V30 9 C 0 -2.25 0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 2 2 3
+M  V30 3 1 3 4
+M  V30 4 2 4 5
+M  V30 5 1 5 6
+M  V30 6 1 5 7
+M  V30 7 1 7 8
+M  V30 8 2 7 9
+M  V30 9 1 2 9
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+> <coconut_id> 
+CNP0216116
+
+> <SMILES> 
+BrC1=CC=C(O)C(Br)=C1
+
+$$$$
+
+Actelion Java MolfileCreator 2.0
+
+  0  0  0  0  0  0              0 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS 8 8 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 Br 1.299 0 0 0
+M  V30 2 C 0 -0.75 0 0
+M  V30 3 C -1.299 0 0 0
+M  V30 4 C -2.598 -0.7499 0 0
+M  V30 5 C -2.598 -2.2499 0 0
+M  V30 6 O -3.8971 -2.9999 0 0
+M  V30 7 C -1.299 -2.9999 0 0
+M  V30 8 C 0 -2.25 0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 2 2 3
+M  V30 3 1 3 4
+M  V30 4 2 4 5
+M  V30 5 1 5 6
+M  V30 6 1 5 7
+M  V30 7 2 7 8
+M  V30 8 1 2 8
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+> <coconut_id> 
+CNP0085593
+
+> <SMILES> 
+BrC1=CC=C(O)C=C1
+
+$$$$
+
+Actelion Java MolfileCreator 2.0
+
+  0  0  0  0  0  0              0 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS 9 9 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 Cl 1.299 0 0 0
+M  V30 2 C 0 -0.75 0 0
+M  V30 3 C -1.299 0 0 0
+M  V30 4 C -2.598 -0.7499 0 0
+M  V30 5 C -2.598 -2.2499 0 0
+M  V30 6 O -3.8971 -2.9999 0 0
+M  V30 7 C -1.299 -2.9999 0 0
+M  V30 8 Cl -1.299 -4.4999 0 0
+M  V30 9 C 0 -2.25 0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 2 2 3
+M  V30 3 1 3 4
+M  V30 4 2 4 5
+M  V30 5 1 5 6
+M  V30 6 1 5 7
+M  V30 7 1 7 8
+M  V30 8 2 7 9
+M  V30 9 1 2 9
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+> <coconut_id> 
+CNP0401033
+
+> <SMILES> 
+ClC1=CC=C(O)C(Cl)=C1
+
+$$$$
+
+Actelion Java MolfileCreator 2.0
+
+  0  0  0  0  0  0              0 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS 8 8 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 Br 1.299 0 0 0
+M  V30 2 C 0 -0.75 0 0
+M  V30 3 C -1.299 0 0 0
+M  V30 4 C -2.598 -0.7499 0 0
+M  V30 5 C -2.598 -2.2499 0 0
+M  V30 6 O -3.8971 -2.9999 0 0
+M  V30 7 C -1.299 -2.9999 0 0
+M  V30 8 C 0 -2.25 0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 2 2 3
+M  V30 3 1 3 4
+M  V30 4 2 4 5
+M  V30 5 1 5 6
+M  V30 6 1 5 7
+M  V30 7 2 7 8
+M  V30 8 1 2 8
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+> <coconut_id> 
+CNP0085593
+
+> <SMILES> 
+BrC1=CC=C(O)C=C1
+
+$$$$
+
+Actelion Java MolfileCreator 2.0
+
+  0  0  0  0  0  0              0 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS 8 8 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 Cl 1.299 0 0 0
+M  V30 2 C 0 -0.75 0 0
+M  V30 3 C -1.299 0 0 0
+M  V30 4 C -2.598 -0.7499 0 0
+M  V30 5 C -2.598 -2.2499 0 0
+M  V30 6 C -1.299 -2.9999 0 0
+M  V30 7 Cl -1.299 -4.4999 0 0
+M  V30 8 C 0 -2.25 0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 2 2 3
+M  V30 3 1 3 4
+M  V30 4 2 4 5
+M  V30 5 1 5 6
+M  V30 6 1 6 7
+M  V30 7 2 6 8
+M  V30 8 1 2 8
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+> <coconut_id> 
+CNP0080171
+
+> <SMILES> 
+ClC1=CC=CC(Cl)=C1
+
+$$$$
+
+Actelion Java MolfileCreator 2.0
+
+  0  0  0  0  0  0              0 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS 8 8 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 Cl 1.299 0 0 0
+M  V30 2 C 0 -0.75 0 0
+M  V30 3 C -1.299 0 0 0
+M  V30 4 C -2.598 -0.7499 0 0
+M  V30 5 C -2.598 -2.2499 0 0
+M  V30 6 C -1.299 -2.9999 0 0
+M  V30 7 C 0 -2.25 0 0
+M  V30 8 Cl 1.299 -3 0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 1 2 3
+M  V30 3 2 3 4
+M  V30 4 1 4 5
+M  V30 5 2 5 6
+M  V30 6 1 6 7
+M  V30 7 2 2 7
+M  V30 8 1 7 8
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+> <coconut_id> 
+CNP0284887
+
+> <SMILES> 
+ClC=1C=CC=CC1Cl
+
+$$$$
+
+Actelion Java MolfileCreator 2.0
+
+  0  0  0  0  0  0              0 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS 11 11 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 O 2.598 -0.75 0 0
+M  V30 2 C 1.299 0 0 0
+M  V30 3 C 0 -0.75 0 0
+M  V30 4 C -1.299 0 0 0
+M  V30 5 C -2.598 -0.7499 0 0
+M  V30 6 C -2.598 -2.2499 0 0
+M  V30 7 C -1.299 -2.9999 0 0
+M  V30 8 O -1.299 -4.4999 0 0
+M  V30 9 C 0 -2.2499 0 0
+M  V30 10 C 1.299 -3 0 0
+M  V30 11 O 2.598 -2.25 0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 2 1 2
+M  V30 2 1 2 3
+M  V30 3 1 3 4
+M  V30 4 2 4 5
+M  V30 5 1 5 6
+M  V30 6 2 6 7
+M  V30 7 1 7 8
+M  V30 8 1 7 9
+M  V30 9 2 3 9
+M  V30 10 1 9 10
+M  V30 11 2 10 11
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+> <coconut_id> 
+CNP0288393
+
+> <SMILES> 
+O=CC=1C=CC=C(O)C1C=O
+
+$$$$

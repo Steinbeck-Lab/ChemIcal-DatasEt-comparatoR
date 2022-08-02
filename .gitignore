@@ -76,6 +76,12 @@ target/
 
 # Jupyter Notebook
 .ipynb_checkpoints
+*/.ipynb_checkpoints/*
+
+# Jetbrains IDE PyCharm
+.idea
+*/.idea/*
+*iml
 
 # IPython
 profile_default/
@@ -130,5 +136,10 @@ dmypy.json
 
 # output folder
 /output
+/Workflow/output
+/Tests/output
 
 .DS_Store
+
+# pytest
+/Tests/__pycache__

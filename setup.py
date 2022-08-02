@@ -6,7 +6,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="CIDER",
+    name="cider-chem",
     version="0.0.1-dev",
     author="Hannah Busch",
     author_email="hannah.busch@uni-jena.de",
@@ -26,6 +26,7 @@ setuptools.setup(
         "matplotlib_venn==0.11.6",
         "FPDF==1.7.2",
         "rdkit-pypi",
+        "pytest"
     ],
     package_data={"CIDER": ["assets/*.*", "assets/*/*.*", "assets/*/*/*.*"]},
     classifiers=[

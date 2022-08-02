@@ -8,7 +8,9 @@
 [![GitHub release](https://img.shields.io/github/release/hannbus/ChemIcal_DatasEt_compaRator.svg)](https://GitHub.com/hannbus/ChemIcal_DatasEt_compaRator/releases/)
 [![PyPI version fury.io](https://badge.fury.io/py/cider-chem.svg)](https://pypi.python.org/pypi/cider-chem/)
 
-- ChemIcal DatasEt comparatoR (CIDER) is a Python package which primarily utilizes RDKit to compare and visualize different chemical compounds from two different datasets. 
+[![GitHub Logo](https://github.com/hannbus/ChemIcal_DatasEt_compaRator/blob/main/Tutorials/Cider.png?raw=true)](https://pypi.python.org/pypi/cider-chem/)
+
+- ChemIcal DatasEt comparatoR (CIDER) is a Python package and ready-to-use Jupyter Notebook workflow which primarily utilizes RDKit to compare two or more chemical structure datasets (SD files) in different aspects, e.g. size, overlap, molecular descriptor distributions, chemical space clustering, etc., most of which can be visually inspected in the notebook.
 
 ## Usage
 -  To use CIDER, clone the repository to your local disk and make sure you install all the necessary requirements.
@@ -26,11 +28,11 @@ $ bash Miniconda3-latest-Linux-x86_64.sh
 ```shell
 $ git clone https://github.com/hannbus/ChemIcal_DatasEt_compaRator.git
 $ cd ChemIcal_DatasEt_compaRator
-$ conda create --name ChemIcal_DatasEt_compaRator python=3.8
+$ conda create --name ChemIcal_DatasEt_compaRator python=3.10
 $ conda activate ChemIcal_DatasEt_compaRator
 $ conda install pip
 $ python -m pip install -U pip #Upgrade pip
-$ pip install notebook rdkit-pypi matplotlib==3.5.1 seaborn==0.11.2 chemplot==1.2.0 matplotlib_venn==0.11.6 FPDF==1.7.2
+$ pip install .
 ```
 ### Alternative
 ```shell
@@ -40,7 +42,7 @@ $ pip install git+https://github.com/hannbus/ChemIcal_DatasEt_compaRator.git
 
 ### Install from PyPI
 ```shell
-$ todo
+$ pip install cider-chem
 ```
 
 ### Basic usage: 
