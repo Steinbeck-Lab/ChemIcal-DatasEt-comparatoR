@@ -46,16 +46,16 @@ class ChemicalDatasetComparator:
         all_dicts = {}
         data_dir = os.path.normpath(str(path_to_data))
         for dict_name in os.listdir(data_dir):
-            singel_dict = {}
+            single_dict = {}
             dict_path = os.path.join(data_dir, dict_name)
-            singel_dict[self.import_keyname] = Chem.SDMolSupplier(dict_path)
-            all_dicts[dict_name] = singel_dict
+            single_dict[self.import_keyname] = Chem.SDMolSupplier(dict_path)
+            all_dicts[dict_name] = single_dict
         return all_dicts
 
     # Check for invalid SDFiles
-    def check_invalid_SDF(self, all_dicts:dict, delete: bool = False):
+    def check_invalid_SDF(self, all_dicts: dict, delete: bool = False):
         """
-        This function checks if there are invalid entrys in the SDFiles that can cause errors in the subsequent 
+        This function checks if there are invalid entries in the SDFiles that can cause errors in the subsequent
         functions. At choice the invalid entries can be removed.
 
         Args:
@@ -63,18 +63,18 @@ class ChemicalDatasetComparator:
             delete (bool): Deleting invalid entries or not (default: False).
 
         Returns:
-            all_dicts (dict): Dictionary with SDMolSupplier Objects without invalid entris (if delete = True).
+            all_dicts (dict): Dictionary with SDMolSupplier Objects without invalid entries (if delete = True).
         """
         for single_dict in all_dicts:
             mol_index = -1
             invalid_index = []
             for mol in all_dicts[single_dict][self.import_keyname]:
-                mol_index +=1
+                mol_index += 1
                 if not mol:
                     print(str(single_dict) + ' has invalid molecule at index ' + str(mol_index))
                     invalid_index.append(mol_index)
             if not invalid_index:
-                print('No invalid molecules found in '  + str(single_dict))
+                print('No invalid molecules found in ' + str(single_dict))
             elif delete == True and invalid_index:
                 new_SDMol = list(all_dicts[single_dict][self.import_keyname])
                 for index in sorted(invalid_index, reverse=True):
@@ -85,8 +85,7 @@ class ChemicalDatasetComparator:
                 print(str(len(invalid_index)) + ' invalid molecule(s) will remain in ' + str(single_dict))
         return
 
-
-    # Get overview of the datset size
+    # Get overview of the dataset size
     def get_number_of_molecules(self, all_dicts: dict) -> dict:
         """
         This function updates the dictionaries in the given dictionary (created from import_as_data_dict function)
@@ -96,7 +95,7 @@ class ChemicalDatasetComparator:
             all_dicts (dict): Dictionary of dictionaries with SDMolSupplier Objects.
 
         Returns:
-            all_dicts (dict): Given dictionary of dictionaries updated with dataset_lenght_key.
+            all_dicts (dict): Given dictionary of dictionaries updated with dataset_length_key.
         """
         for single_dict in all_dicts:
             number_of_molecules = len(all_dicts[single_dict][self.import_keyname])
@@ -124,7 +123,7 @@ class ChemicalDatasetComparator:
         The created images are also saved in an output folder and are shown (not in-line but in extra window).
 
         Args:
-            all_dict (dict): dictionary of dictionaries with SDMolSupplier Objects (import_keyname).
+            all_dicts (dict): dictionary of dictionaries with SDMolSupplier Objects (import_keyname).
             number_of_mols (int): number of molecules that will be displayed.
             mols_per_row (int): number of molecules per row in the grid.
             image_size (int): the size of the image for a single molecule.
@@ -166,8 +165,8 @@ class ChemicalDatasetComparator:
     def get_database_id(self, all_dicts: dict, id_name: str) -> dict:
         """
         This function returns the updated dictionaries in a given dictionary with a list of
-        IDs for the single molecules as new key-value pairs. Depending on with database
-        molecules coming from the id_name can be changed accordingly.
+        IDs for the single molecules as new key-value pairs. Depending on which database
+        the molecules are coming from, the id_name can be changed accordingly.
 
         Args:
             all_dicts (dict): dictionary of dictionary including SDMolSupplier Objects (import_keyname)
@@ -183,12 +182,12 @@ class ChemicalDatasetComparator:
                 database_id = prop_dict.get(id_name)
                 database_id_list.append(database_id)
                 all_dicts[single_dict][self.database_id_keyname] = database_id_list
-        return pd.DataFrame(all_dicts).loc[self.database_id_keyname] , print("Updated dictionary with '" + self.database_id_keyname + "'")
+        return pd.DataFrame(all_dicts).loc[self.database_id_keyname], print("Updated dictionary with '" + self.database_id_keyname + "'")
 
     def _get_identifier_list(self, moleculeset: Chem.SDMolSupplier, id_type: str = "inchi"):
         """
-        This function returns a list of Chemical InChi, InChiKeys or SMILES strings for all molecules
-        in a given SDMolSupplier object. (private methode)
+        This function returns a list of InChI, InChIKey or SMILES strings for all molecules
+        in a given SDMolSupplier object. (private method)
 
         Args:
             moleculeset (rdkit.Chem.SDMolSupplier):
@@ -223,7 +222,7 @@ class ChemicalDatasetComparator:
         """
         This function returns the updated dictionaries in the given dictionary (created with the
         import_as_data_dict function) with a list of identifiers (InChI, InChIKey, SMILES strings) as a new
-        key-value pair using the get_identifier_list function on the SDMolSupplier Objects.
+        key-value pair using the private _get_identifier_list function on the SDMolSupplier Objects.
 
         Args:
             all_dicts (dict): Dictionary of dictionaries with SDMolSupplier Objects (import_keyname).
@@ -240,8 +239,7 @@ class ChemicalDatasetComparator:
             failed_identifier = identifier_list[1]
             if failed_identifier != 0:
                 print(str(single_dict) + ' failed to get ' + str(failed_identifier) + ' identifier(s)!')
-        return pd.DataFrame(all_dicts).loc[self.identifier_keyname] , print("Updated dictionary with '" + self.identifier_keyname + "'")
-
+        return pd.DataFrame(all_dicts).loc[self.identifier_keyname], print("Updated dictionary with '" + self.identifier_keyname + "'")
 
     def get_duplicate_key(self, all_dicts: dict):
         """
@@ -260,7 +258,7 @@ class ChemicalDatasetComparator:
                 set(all_dicts[single_dict][self.identifier_keyname])
             )
             all_dicts[single_dict][self.duplicates_keyname] = number_of_duplicates
-            duplicates =[]
+            duplicates = []
             for mol in all_dicts[single_dict][self.identifier_keyname]:
                 if all_dicts[single_dict][self.identifier_keyname].count(mol) > 1:
                     duplicates.append(mol)
@@ -276,12 +274,11 @@ class ChemicalDatasetComparator:
             )
         return print("Updated dictionary with '" + self.duplicates_keyname + "' and '" + self.duplicates_id_keyname + "'")
 
-
     # Comparing molecules and visualizing them
     def get_shared_molecules_key(self, all_dicts: dict) -> dict:
         """
         This function returns the updated dictionaries in the given dictionary (created with the
-        import_as_data_dict function) with the number of molecules that can be found in all of the
+        import_as_data_dict function) with the number of molecules that can be found in all the
         given datasets and an identifier list of these molecules as two new key-value pairs (number of
         compared datasets can be any number).
 
@@ -305,8 +302,7 @@ class ChemicalDatasetComparator:
             + ", identifiers: "
             + str(shared_molecules)
         )
-        return  print("Updated dictionary with '" + self.shared_mols_keyname + "' and '" + self.shared_mols_id_keyname + "'")
-        
+        return print("Updated dictionary with '" + self.shared_mols_keyname + "' and '" + self.shared_mols_id_keyname + "'")
 
     def visualize_intersection(self, all_dicts: dict, data_type: str = "png"):
         """
@@ -322,7 +318,7 @@ class ChemicalDatasetComparator:
             Venn Diagram
 
         Raises:
-            WrongInputError: If there are one or more three sets are to be compared an error is raised.
+            WrongInputError: If there is only one or more than three sets to be compared an error is raised.
         """
         sets = []
         for single_dict in all_dicts:
@@ -352,14 +348,14 @@ class ChemicalDatasetComparator:
         """
         This function returns a list of descriptor values for all molecules
         in a given SDMolSupplier object and a descriptor (e.g. Descriptors.MolWt or
-        rdMolDescriptors.CalcExactMolWt). (private methode)
+        rdMolDescriptors.CalcExactMolWt). (private method)
 
         Args:
             moleculeset (rdkit.Chem.SDMolSupplier)
             descriptor (callable): RDKit method that returns a molecular descriptor for a given molecule.
 
         Returns:
-            List[]: List of Descriptor Values
+            List[]: List of descriptor values
         """
         descriptor_list = []
         for mol in moleculeset:
@@ -393,7 +389,7 @@ class ChemicalDatasetComparator:
                 all_dicts[single_dict][self.import_keyname], descriptor
             )
             all_dicts[single_dict][descriptor_list_keyname] = descriptor_list
-        return pd.DataFrame(all_dicts).loc[descriptor_list_keyname] , print("Updated dictionary with '" + descriptor_list_keyname + "'")
+        return pd.DataFrame(all_dicts).loc[descriptor_list_keyname], print("Updated dictionary with '" + descriptor_list_keyname + "'")
 
     def get_value_from_id(self, all_dicts: dict, wanted_id: str, descriptor_list_keyname: str):
         """
@@ -463,7 +459,7 @@ class ChemicalDatasetComparator:
         Args:
             all_dicts (dict): Dictionary of dictionaries including a continuous descriptor value list.
             descriptor_list_keyname (str): name of the descriptor list.
-            widht_of_bins (int, optional): Interval size for the bins (default: 10)
+            width_of_bins (int, optional): Interval size for the bins (default: 10)
 
         Returns:
             all_dicts (dict): Given a dictionary of dictionaries updated with the binned descriptor values.
@@ -494,7 +490,6 @@ class ChemicalDatasetComparator:
             all_dicts[single_dict][binned_descriptor_list_keyname] = counts
         return #all_dicts
 
-
     def _discrete_descriptor_plot(
         self,
         all_dicts: dict,
@@ -511,10 +506,10 @@ class ChemicalDatasetComparator:
             all_dicts (dict): Dictionary of dictionaries with descriptor_list_keyname.
             descriptor_list_keyname (str): Name of descriptor list for plotting.
             data_type (str): Data type for the exported image (default: png).
-            save_dataframe (bool): Export dataframe as csv or not (default: True).
+            save_dataframe (bool): Export dataframe as csv file or not (default: True).
 
         returns:
-            fig (mathplotlib.figure): Plot
+            fig (matplotlib.figure): Plot
         """
         binned_descriptor_list_keyname = str("binned " + descriptor_list_keyname)
         first_dict = list(all_dicts.keys())[0]
@@ -570,10 +565,10 @@ class ChemicalDatasetComparator:
             all_dicts (dict): Dictionary of dictionaries with descriptor_list_keyname.
             descriptor_list_keyname (str): Name of descriptor list for plotting.
             data_type (str): Data type for the exported image (default: png).
-            save_dataframe (bool): Export dataframe as csv or not (default: True).
+            save_dataframe (bool): Export dataframe as csv file or not (default: True).
 
         returns:
-            fig (mathplotlib.figure): Plot
+            fig (matplotlib.figure): Plot
         """
         binned_descriptor_list_keyname = str("binned " + descriptor_list_keyname)
         first_dict = list(all_dicts.keys())[0]
@@ -633,16 +628,16 @@ class ChemicalDatasetComparator:
         Args:
             all_dicts (dict): Dictionary of dictionaries including a descriptor value list.
             descriptor_list_keyname (str): Name of the descriptor list for binning and plotting.
-            widht_of_bins (int, optional): interval size for the bins for continuous values (default: 10).
+            width_of_bins (int, optional): interval size for the bins for continuous values (default: 10).
             data_type (str): Data type for the exported image (default: png).
-            save_dataframe (bool): Export dataframe as csv or not (default: True).
+            save_dataframe (bool): Export dataframe as csv file or not (default: True).
 
         Returns:
-            descriptor_df (mathplotlib.figure): plot
+            descriptor_df (matplotlib.figure): plot
         """
         first_dict = list(all_dicts.keys())[0]
         if any(key == descriptor_list_keyname for key in list(all_dicts[first_dict].keys())) == False:
-            raise KeyError (
+            raise KeyError(
                 'Descriptor (' + str(descriptor_list_keyname) + ') needs to be calculated before plotting!'
             )
         elif type(all_dicts[first_dict][descriptor_list_keyname][0]) == int:
@@ -666,12 +661,11 @@ class ChemicalDatasetComparator:
             )
         return descriptor_df
 
-
     # Visualizing compounds that follow Lipinsky's Rule of 5
     def _test_for_lipinski(self, moleculeset: Chem.SDMolSupplier) -> list:
         """
         This function returns a list with the number of Lipinski Rules broken for every molecule in the given
-        Molecule set.
+        molecule set.
 
         Args:
             moleculeset (Chem.SDMolSupplier): SDMolSupplier Objects
@@ -694,7 +688,6 @@ class ChemicalDatasetComparator:
                 rule_break += 0
             num_of_break.append(rule_break)
         return num_of_break
-
 
     def get_lipinski_key(self, all_dicts: dict) -> dict:
         """
@@ -719,13 +712,12 @@ class ChemicalDatasetComparator:
                 "4_rules_broken": lipinski_break_list.count(4),
             }
             all_dicts[single_dict][self.lipinski_summary_keyname] = lipinski_summary
-        return  pd.DataFrame(all_dicts).loc[self.lipinski_summary_keyname] , print("Updated dictionary with '" + self.lipinski_summary_keyname + "' and '" + self.lipinski_list_keyname + "'")
-
+        return pd.DataFrame(all_dicts).loc[self.lipinski_summary_keyname], print("Updated dictionary with '" + self.lipinski_summary_keyname + "' and '" + self.lipinski_list_keyname + "'")
 
     def lipinski_plot(self, all_dicts: dict, data_type: str = "png", save_dataframe: bool = True):
         """
-        This function returns a Pandas DataFrame Object and the corresponding Bar-Plot for the number of
-        molecules in every Dataset breaking 0 to 4 Lipinski Rules using the 'lipinski_summary' key in the
+        This function returns a Pandas DataFrame Object and the corresponding bar plot for the number of
+        molecules in every dataset breaking 0 to 4 Lipinski rules using the 'lipinski_summary' key in the
         given dictionaries. The plot is saved in an output folder (data type can be chosen) and the
         data frame can also be exported as CSV.
 
@@ -735,7 +727,7 @@ class ChemicalDatasetComparator:
             save_dataframe (bool): Export dataframe as csv or not (default: True).
 
         returns:
-            fig (mathplotlib.figure): Plot
+            fig (matplotlib.figure): Plot
         """
         lipinski_df_dict = {"Number of broken rules": [0, 1, 2, 3, 4]}
         for single_dict in all_dicts:
@@ -782,11 +774,11 @@ class ChemicalDatasetComparator:
         the chemplot module.
 
         Args:
-            all_dicts (dict): Dictionary of dictionaries including an inchi identifier list.
+            all_dicts (dict): Dictionary of dictionaries including an InChI identifier list.
             fp_radius (int): Radius of the Extended Connectivity Fingerprints (default: 2).
-            fp_bits (int): Size of the Extended Connetivity Fingerprints (default: 2048).
-            dimentsion_reduction (str): Methode of dimension reduction (default: pca).
-            interactive (bool): Creating a interactive plot or not (default: True).
+            fp_bits (int): Size of the Extended Connectivity Fingerprints (default: 2048).
+            dimension_reduction (str): Method of dimension reduction (default: pca).
+            interactive (bool): Creating an interactive plot or not (default: True).
 
         Returns:
             Chemical space visualization
@@ -800,7 +792,7 @@ class ChemicalDatasetComparator:
         if all_mols_list[0].startswith("InChI="):
             chem_space = cp.Plotter.from_inchi(
                 all_mols_list,  # list of inchi strings which are used to get Extended Connectivity Fingerprint (alternative: smiles),
-                target=target_list,  # corresponding list for inchi_list, shows which dataset the molecules are belonging to
+                target=target_list,  # corresponding list for inchi_list, shows which dataset the molecules belong to
                 target_type="C",  # classification (classes are the datasets listed in the target_list)
                 sim_type="structural",  # similarity solely based on structure (no property is taken into account)
             )
@@ -812,26 +804,26 @@ class ChemicalDatasetComparator:
                     all_mols_list.append(inchi)
             chem_space = cp.Plotter.from_inchi(
                 all_mols_list,  # list of inchi strings which are used to get Extended Connectivity Fingerprint (alternative: smiles),
-                target=target_list,  # corresponding list for inchi_list, shows which dataset the molecules are belonging to
+                target=target_list,  # corresponding list for inchi_list, shows which dataset the molecules belong to
                 target_type="C",  # classification (classes are the datasets listed in the target_list)
                 sim_type="structural",  # similarity solely based on structure (no property is taken into account)
             )
         else:
             chem_space = cp.Plotter.from_smiles(
                 all_mols_list,  # list of smiles strings which are used to get Extended Connectivity Fingerprint (alternative: smiles),
-                target=target_list,  # corresponding list for inchi_list, shows which dataset the molecules are belonging to
+                target=target_list,  # corresponding list for inchi_list, shows which dataset the molecules belong to
                 target_type="C",  # classification (classes are the datasets listed in the target_list)
                 sim_type="structural",  # similarity solely based on structure (no property is taken into account)
             )
         if fp_radius != 2 or fp_bits != 2048:
             if all_mols_list[0].startswith("InChI="):
                 new_fingerprint = descriptors.get_ecfp_from_inchi(
-                all_mols_list, target_list, radius=fp_radius, nBits=fp_bits
-            )
+                    all_mols_list, target_list, radius=fp_radius, nBits=fp_bits
+                )
             else:
                 new_fingerprint = descriptors.get_ecfp(
-                all_mols_list, target_list, radius=fp_radius, nBits=fp_bits
-            )
+                    all_mols_list, target_list, radius=fp_radius, nBits=fp_bits
+                )
             # new_fingerprint = descriptors.get_ecfp_from_inchi(
             #     all_mols_list, target_list, radius=fp_radius, nBits=fp_bits
             # )
@@ -839,7 +831,7 @@ class ChemicalDatasetComparator:
         if dimension_reduction == "pca":
             chem_space.pca()  # n_components, copy, whiten, svd_solver ...
         elif dimension_reduction == "tsne":
-            chem_space.tsne()  # n_components, perplexity, learing_rate, n_iter, init, random_state ...
+            chem_space.tsne()  # n_components, perplexity, learning_rate, n_iter, init, random_state ...
         elif dimension_reduction == "umap":
             chem_space.umap()  # n_neighbors, min_dist, pca, random_state ...
         else:
@@ -855,7 +847,7 @@ class ChemicalDatasetComparator:
     def export_single_dict_values(self, all_dicts: dict):
         """
         This function exports the descriptor values for each dictionary according to one imported
-        SDFile as a single CSV-file in the output folder.
+        SDFile as a single CSV file in the output folder.
 
         Args:
             all_dicts (dict): Dictionary of dictionaries with calculated descriptor values.
@@ -892,6 +884,6 @@ class ChemicalDatasetComparator:
             elif image[-3:] == "csv":
                 pass
             else:
-                print(image + " not inclued, due to unsupported image type.")
+                print(image + " not included, due to unsupported image type.")
         pdf.output("output/all_images.pdf")
         return
