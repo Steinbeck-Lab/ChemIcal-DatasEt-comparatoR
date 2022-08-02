@@ -69,14 +69,13 @@ class ChemicalDatasetComparator:
             mol_index = -1
             invalid_index = []
             for mol in all_dicts[single_dict][self.import_keyname]:
-                try:
-                    mol_index +=1
-                    assert mol
-                except:
-                    pass
+                mol_index +=1
+                if not mol:
                     print(str(single_dict) + ' has invalid molecule at index ' + str(mol_index))
                     invalid_index.append(mol_index)
-            if delete == True:
+            if not invalid_index:
+                print('No invalid molecules found in '  + str(single_dict))
+            elif delete == True and invalid_index:
                 new_SDMol = list(all_dicts[single_dict][self.import_keyname])
                 for index in sorted(invalid_index, reverse=True):
                     del new_SDMol[index]
@@ -84,8 +83,6 @@ class ChemicalDatasetComparator:
                 print(str(len(invalid_index)) + ' invalid molecule(s) are deleted from ' + str(single_dict))
             elif delete == False and invalid_index:
                 print(str(len(invalid_index)) + ' invalid molecule(s) will remain in ' + str(single_dict))
-            elif delete == False and not invalid_index:
-                print('No invalid molecules found in '  + str(single_dict))
         return
 
 
@@ -205,28 +202,21 @@ class ChemicalDatasetComparator:
         """
         identifier_list = []
         failed_identifier = 0
-        # if id_type == "smiles" or id_type =="inchikey" or id_type =="inchi":
         for mol in moleculeset:
-                try:
-                    if id_type == "smiles":
-                        identifier = Chem.MolToSmiles(mol)
-                    elif id_type == "inchikey":
-                        identifier = Chem.MolToInchiKey(mol)
-                    elif id_type == "inchi":
-                        identifier = Chem.MolToInchi(mol)
-                    else:
-                        raise ValueError(
-                            'id_type argument needs to be "smiles", "inchikey" or "inchi"!'
-                     )
-                    identifier_list.append(identifier)
-                except:
-                    pass
-                    identifier_list.append('Failed')
-                    failed_identifier += 1
-        # else: # id_type != "smiles" or id_type !="inchikey" or id_type !="inchi":
-        #     raise ValueError(
-        #             'id_type argument needs to be "smiles", "inchikey" or "inchi"!'
-        #         )
+            if not mol:
+                identifier = 'Failed'
+                failed_identifier += 1
+            elif id_type == "smiles":
+                identifier = Chem.MolToSmiles(mol)
+            elif id_type == "inchikey":
+                identifier = Chem.MolToInchiKey(mol)
+            elif id_type == "inchi":
+                identifier = Chem.MolToInchi(mol)
+            else:
+                raise ValueError(
+                    'id_type argument needs to be "smiles", "inchikey" or "inchi"!'
+                )
+            identifier_list.append(identifier)
         return identifier_list, failed_identifier
 
     def get_identifier_list_key(self, all_dicts: dict, id_type: str = "inchi") -> dict:
@@ -651,7 +641,11 @@ class ChemicalDatasetComparator:
             descriptor_df (mathplotlib.figure): plot
         """
         first_dict = list(all_dicts.keys())[0]
-        if type(all_dicts[first_dict][descriptor_list_keyname][0]) == int:
+        if any(key == descriptor_list_keyname for key in list(all_dicts[first_dict].keys())) == False:
+            raise KeyError (
+                'Descriptor (' + str(descriptor_list_keyname) + ') needs to be calculated before plotting!'
+            )
+        elif type(all_dicts[first_dict][descriptor_list_keyname][0]) == int:
             self._get_discrete_descriptor_counts(all_dicts, descriptor_list_keyname)
             descriptor_df = self._discrete_descriptor_plot(
                 all_dicts, descriptor_list_keyname, data_type, save_dataframe
