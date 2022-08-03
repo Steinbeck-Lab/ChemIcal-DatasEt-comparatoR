@@ -57,7 +57,7 @@ class ChemicalDatasetComparator:
     # Check for invalid SDFiles
     def check_invalid_SDF(self, all_dicts: dict, delete: bool = False):
         """
-        This function checks if there are invalid entries in the SDFiles that can cause errors in the subsequent 
+        This function checks if there are invalid entries in the SDFiles that can cause errors in the subsequent
         functions. At choice the invalid entries can be removed.
 
         Args:
@@ -80,7 +80,7 @@ class ChemicalDatasetComparator:
                     )
                     invalid_index.append(mol_index)
             if not invalid_index:
-                print("No invalid molecules found in "  + str(single_dict))
+                print("No invalid molecules found in " + str(single_dict))
             elif delete == True and invalid_index:
                 new_SDMol = list(all_dicts[single_dict][self.import_keyname])
                 for index in sorted(invalid_index, reverse=True):
@@ -200,6 +200,7 @@ class ChemicalDatasetComparator:
             pd.DataFrame(all_dicts).loc[self.database_id_keyname],
             print("Updated dictionary with '" + self.database_id_keyname + "'"),
         )
+
     def _get_identifier_list(
         self, moleculeset: Chem.SDMolSupplier, id_type: str = "inchi"
     ):
@@ -789,7 +790,6 @@ class ChemicalDatasetComparator:
                 + "'"
             ),
         )
-
 
     def lipinski_plot(
         self, all_dicts: dict, data_type: str = "png", save_dataframe: bool = True
