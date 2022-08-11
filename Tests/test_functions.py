@@ -12,32 +12,28 @@ def test_import_as_data_dict():
     # Assert that the function generates the dictionary
     assert list(testdict.keys()) == ["set_A.sdf", "set_B.sdf", "set_D.sdf"]
 
-def test_check_invalid_SDF(capfd):
+def test_check_invalid_mols_in_SDF(capfd):
     invalid_testdict = cider.import_as_data_dict("unittest_data_invalid")
-    cider.check_invalid_SDF(invalid_testdict, delete=False)
-    out, err = capfd.readouterr()
-    assert (
-        out
-        == "set_D_invalid.sdf has invalid molecule at index 1\nset_D_invalid.sdf has invalid molecule at index 4\n2 invalid molecule(s) will remain in set_D_invalid.sdf\n"
-    )
+    cider._check_invalid_mols_in_SDF(invalid_testdict, delete=False)
+    # out, err = capfd.readouterr()
+    # assert (
+    #     out
+    #     == "set_D_invalid.sdf has invalid molecule at index 1\nset_D_invalid.sdf has invalid molecule at index 4\n2 invalid molecule(s) will remain in set_D_invalid.sdf\n"
+    # )
     assert len(invalid_testdict["set_D_invalid.sdf"][cider.import_keyname]) == 7
-    cider.check_invalid_SDF(invalid_testdict, delete=True)
+    cider._check_invalid_mols_in_SDF(invalid_testdict, delete=True)
     assert len(invalid_testdict["set_D_invalid.sdf"][cider.import_keyname]) == 5
 
 def test_get_number_of_molecules():
     cider.get_number_of_molecules(testdict)
     # Assert that the function generates new entries in the dictionary
     # and that the correct number of molecules are found in the datasets
-    assert testdict["set_A.sdf"][cider.dataset_lenght_keyname] == 3
-    assert testdict["set_B.sdf"][cider.dataset_lenght_keyname] == 4
-    assert testdict["set_D.sdf"][cider.dataset_lenght_keyname] == 7
+    assert testdict["set_A.sdf"][cider.dataset_length_keyname] == 3
+    assert testdict["set_B.sdf"][cider.dataset_length_keyname] == 4
+    assert testdict["set_D.sdf"][cider.dataset_length_keyname] == 7
 
 def test_draw_molecules():
-    cider.draw_molecules(testdict, number_of_mols=3)
-    # Assert that the function generates a new entry in the dictionary
-    assert (
-        any(key == cider.mol_grid_keyname for key in list(testdict["set_A.sdf"].keys())) == True
-    )
+    cider.draw_molecules(testdict)
     # Assert that the pictures are exported
     assert os.path.exists("output/mol_grit.png")
 
@@ -195,15 +191,6 @@ def test_get_descriptor_list_key_2():
         "C6H4Cl2",
     ]
 
-def test_get_value_from_id(capfd):
-    cider.get_value_from_id(testdict, "CNP0206286", "Molecular Weight")
-    out, err = capfd.readouterr()
-    assert (
-        out
-        == "Molecule found in set_A.sdf\nMolecular Weight value for ID CNP0206286: 181.449\nMolecule not found in set_B.sdf\nMolecule not found in set_D.sdf\n"
-    )
-
-
 def test_get_discrete_descriptor_counts():
     cider.get_descriptor_list_key(
         testdict, Descriptors.NumHDonors, "Number of H-Donors"
@@ -211,18 +198,18 @@ def test_get_discrete_descriptor_counts():
     cider._get_discrete_descriptor_counts(testdict, "Number of H-Donors")
     # Assert that the function gerenates a new entry in the dictionary
     assert any(
-        key == "binned Number of H-Donors" for key in list(testdict["set_A.sdf"].keys())
+        key == "binned_Number of H-Donors" for key in list(testdict["set_A.sdf"].keys())
     )
     # Assert the correct values for the bins
-    assert list(testdict["set_A.sdf"]["binned Number of H-Donors"]) == [3, 0]
+    assert list(testdict["set_A.sdf"]["binned_Number of H-Donors"]) == [3, 0]
 
 def test_get_continuous_descriptor_counts():
     cider.get_descriptor_list_key(testdict, Descriptors.MolLogP, "LogP")
     cider._get_continuous_descriptor_counts(testdict, "LogP", 2)
     # Assert that the function gerenates a new entry in the dictionary
-    assert any(key == "binned LogP" for key in list(testdict["set_A.sdf"].keys()))
+    assert any(key == "binned_LogP" for key in list(testdict["set_A.sdf"].keys()))
     # Assert the correct values for the bins
-    assert list(testdict["set_A.sdf"]["binned LogP"]) == [0, 3, 0, 0, 0]
+    assert list(testdict["set_A.sdf"]["binned_LogP"]) == [0, 3, 0, 0, 0]
 
 def test_discrete_descriptor_plot():
     cider._discrete_descriptor_plot(testdict, "Number of H-Donors")
@@ -241,10 +228,10 @@ def test_descriptor_counts_and_plot():
     cider.descriptor_counts_and_plot(testdict, "Molecular Weight", 10)
     # Assert that the function generates a new entry in the dictionary for binned continuous values
     assert any(
-        key == "binned Molecular Weight" for key in list(testdict["set_A.sdf"].keys())
+        key == "binned_Molecular Weight" for key in list(testdict["set_A.sdf"].keys())
     )
     # Assert the correct values for the bins
-    assert list(testdict["set_A.sdf"]["binned Molecular Weight"]) == [
+    assert list(testdict["set_A.sdf"]["binned_Molecular Weight"]) == [
         2,
         0,
         0,
@@ -263,10 +250,10 @@ def test_descriptor_counts_and_plot():
     cider.descriptor_counts_and_plot(testdict, "Number of Rings", 2)
     # Assert that the function generates a new entry in the dictionary for binned discrete values
     assert any(
-        key == "binned Number of Rings" for key in list(testdict["set_A.sdf"].keys())
+        key == "binned_Number of Rings" for key in list(testdict["set_A.sdf"].keys())
     )
     # Assert the correct values for the bins
-    assert list(testdict["set_A.sdf"]["binned Number of Rings"]) == [0, 3]
+    assert list(testdict["set_A.sdf"]["binned_Number of Rings"]) == [0, 3]
 
 def test_test_for_lipinski():
     testset = testdict["set_A.sdf"][cider.import_keyname]
