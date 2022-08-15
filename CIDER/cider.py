@@ -96,6 +96,7 @@ class ChemicalDatasetComparator:
 
         Args:
             path_to_data (str): Path to the directory where the SDFiles are stored.
+            delete (bool): Delete faulty molecules from imported dataset.
 
         Returns:
             all_dicts (dict): Dictionary with subdictionaries for every dataset, updated with the SDMolSupplier Objects.
@@ -103,10 +104,17 @@ class ChemicalDatasetComparator:
         all_dicts = {}
         data_dir = os.path.normpath(str(path_to_data))
         for dict_name in os.listdir(data_dir):
-            single_dict = {}
-            dict_path = os.path.join(data_dir, dict_name)
-            single_dict[self.import_keyname] = Chem.SDMolSupplier(dict_path)
-            all_dicts[dict_name] = single_dict
+            if dict_name[-3:] == "sdf":
+                single_dict = {}
+                dict_path = os.path.join(data_dir, dict_name)
+                single_dict[self.import_keyname] = Chem.SDMolSupplier(dict_path)
+                all_dicts[dict_name] = single_dict
+        if not all_dicts:
+            print(
+                "No SDFiles in "
+                + str(data_dir)
+                + " found!"
+            )
         self._check_invalid_mols_in_SDF(all_dicts, delete)
         return all_dicts
 
@@ -508,6 +516,12 @@ class ChemicalDatasetComparator:
         descriptor_list_keyname: str,
         data_type: str = "png",
         save_dataframe: bool = True,
+        figsize: (float, float) = (15.0, 7.0),
+        fontsize_tick_lables: int = 15,
+        fontsize_legend: int = 15,
+        fontsize_ylable: int = 20,
+        fontsize_xlable: int = 20,
+        fontsize_title: int = 24,
     ):
         """
         This function returns a bar-plot for a discrete descriptor with was previously
@@ -545,14 +559,14 @@ class ChemicalDatasetComparator:
             kind="bar",
             stacked=False,
             rot=0,
-            figsize=(15, 7),
-            fontsize=15,
+            figsize=figsize,
+            fontsize=fontsize_tick_lables,
         )
-        descriptor_plot.legend(bbox_to_anchor=(1, 1), loc="upper left", fontsize=15)
-        descriptor_plot.set_ylabel("Number of molecules", fontsize=20)
-        descriptor_plot.set_xlabel(str(descriptor_list_keyname), fontsize=20)
+        descriptor_plot.legend(bbox_to_anchor=(1, 1), loc="upper left", fontsize=fontsize_legend)
+        descriptor_plot.set_ylabel("Number of molecules", fontsize=fontsize_ylable)
+        descriptor_plot.set_xlabel(str(descriptor_list_keyname), fontsize=fontsize_xlable)
         descriptor_plot.set_title(
-            str("Distribution of " + descriptor_list_keyname), pad=20, fontsize=24
+            str("Distribution of " + descriptor_list_keyname), pad=20, fontsize=fontsize_title
         )
         fig = descriptor_plot.figure
         fig.savefig(
@@ -569,6 +583,12 @@ class ChemicalDatasetComparator:
         descriptor_list_keyname: str,
         data_type: str = "png",
         save_dataframe: bool = True,
+        figsize: (float, float) = (15.0, 7.0),
+        fontsize_tick_lables: int = 15,
+        fontsize_legend: int = 15,
+        fontsize_ylable: int = 20,
+        fontsize_xlable: int = 20,
+        fontsize_title: int = 24,
     ):
         """
         This function returns bar-plot for a continuous descriptor which was previously
@@ -606,16 +626,16 @@ class ChemicalDatasetComparator:
             x=str(descriptor_list_keyname + " Intervals"),
             kind="bar",
             stacked=False,
-            figsize=(15, 7),
-            fontsize=15,
+            figsize=figsize,
+            fontsize=fontsize_tick_lables,
         )
-        descriptor_plot.legend(bbox_to_anchor=(1, 1), loc="upper left", fontsize=15)
-        descriptor_plot.set_ylabel("Number of molecules", fontsize=20)
+        descriptor_plot.legend(bbox_to_anchor=(1, 1), loc="upper left", fontsize=fontsize_legend)
+        descriptor_plot.set_ylabel("Number of molecules", fontsize=fontsize_ylable)
         descriptor_plot.set_xlabel(
-            str(descriptor_list_keyname + " Intervals"), fontsize=20
+            str(descriptor_list_keyname + " Intervals"), fontsize=fontsize_xlable
         )
         descriptor_plot.set_title(
-            str("Distribution of " + descriptor_list_keyname), pad=20, fontsize=24
+            str("Distribution of " + descriptor_list_keyname), pad=20, fontsize=fontsize_title
         )
         fig = descriptor_plot.figure
         fig.savefig(
@@ -633,6 +653,12 @@ class ChemicalDatasetComparator:
         width_of_bins: float = 10.0,
         data_type: str = "png",
         save_dataframe: bool = True,
+        figsize: (float, float) = (15.0, 7.0),
+        fontsize_tick_lables: int = 15,
+        fontsize_legend: int = 15,
+        fontsize_ylable: int = 20,
+        fontsize_xlable: int = 20,
+        fontsize_title: int = 24,
     ):
         """
         This function updates the subdictionaries in the given dictionary with the binned
@@ -666,7 +692,7 @@ class ChemicalDatasetComparator:
         elif type(all_dicts[first_dict][descriptor_list_keyname][0]) == int:
             self._get_discrete_descriptor_counts(all_dicts, descriptor_list_keyname)
             fig = self._discrete_descriptor_plot(
-                all_dicts, descriptor_list_keyname, data_type, save_dataframe
+                all_dicts, descriptor_list_keyname, data_type, save_dataframe, figsize, fontsize_tick_lables, fontsize_legend, fontsize_ylable, fontsize_xlable, fontsize_title
             )
         elif (
             type(all_dicts[first_dict][descriptor_list_keyname][0]) == float
@@ -676,7 +702,7 @@ class ChemicalDatasetComparator:
                 all_dicts, descriptor_list_keyname, width_of_bins
             )
             fig = self._continuous_descriptor_plot(
-                all_dicts, descriptor_list_keyname, data_type, save_dataframe
+                all_dicts, descriptor_list_keyname, data_type, save_dataframe, figsize, fontsize_tick_lables, fontsize_legend, fontsize_ylable, fontsize_xlable, fontsize_title
             )
         else:
             raise ValueError(
@@ -699,6 +725,9 @@ class ChemicalDatasetComparator:
         num_of_break = []
         for mol in moleculeset:
             rule_break = 0
+            if not mol:
+                num_of_break.append(None)
+                continue
             if Descriptors.MolLogP(mol) > 5:
                 rule_break += 1
             if Descriptors.MolWt(mol) > 500:
@@ -707,22 +736,17 @@ class ChemicalDatasetComparator:
                 rule_break += 1
             if Descriptors.NumHDonors(mol) > 5:
                 rule_break += 1
-            else:
-                rule_break += 0
             num_of_break.append(rule_break)
         return num_of_break
 
-    def get_lipinski_key(self, all_dicts: dict) -> dict:
+    def get_lipinski_key(self, all_dicts: dict):
         """
-        This function returns the updated dictionaries in the given dictionary with the list of the number of broken
-        Lipinski Rules (lipinski_list_keyname) using the _test_for_lipinski function and a summary of the broken rules
-        (lipinski_summary_keyname).
+        This function updates the subdictionaries in the given dictionary with the list of the number of broken
+        Lipinski Rules for every molecule (lipinski_list_keyname) and a summary of the broken rules
+        (lipinski_summary_keyname) using _test_for_lipinski.
 
         Args:
             all_dicts (dict): Dictionary of dictionaries with import_keyname (Value is an SDMolSupplier Object).
-
-        Returns:
-            all_dicts (dict): Given a dictionary of dictionaries updated with the Lipinski Keys.
         """
         for single_dict in all_dicts:
             lipinski_break_list = self._test_for_lipinski(
@@ -737,25 +761,31 @@ class ChemicalDatasetComparator:
                 "4_rules_broken": lipinski_break_list.count(4),
             }
             all_dicts[single_dict][self.lipinski_summary_keyname] = lipinski_summary
-        return (
-            pd.DataFrame(all_dicts).loc[self.lipinski_summary_keyname],
-            print(
-                "Updated dictionary with '"
-                + self.lipinski_summary_keyname
-                + "' and '"
-                + self.lipinski_list_keyname
-                + "'"
-            ),
+        print(
+            "Updated dictionary with '"
+            + self.lipinski_summary_keyname
+            + "' and '"
+            + self.lipinski_list_keyname
+            + "'"
         )
+        return
 
     def lipinski_plot(
-        self, all_dicts: dict, data_type: str = "png", save_dataframe: bool = True
+        self,
+        all_dicts: dict,
+        data_type: str = "png",
+        save_dataframe: bool = True,
+        figsize: (float, float) = (15.0, 7.0),
+        fontsize_tick_lables: int = 15,
+        fontsize_legend: int = 15,
+        fontsize_ylable: int = 20,
+        fontsize_xlable: int = 20,
+        fontsize_title: int = 24,
     ):
         """
-        This function returns a Pandas DataFrame Object and the corresponding bar plot for the number of
-        molecules in every dataset breaking 0 to 4 Lipinski rules using the 'lipinski_summary' key in the
-        given dictionaries. The plot is saved in an output folder (data type can be chosen) and the
-        data frame can also be exported as CSV.
+        This function returns a bar plot for the number of molecules in every subdictionary breaking 0 to 4 Lipinski
+        rules using the 'lipinski_summary' key in the given dictionary. The plot is saved in an output folder (data
+        type can be chosen) and the created data frame can also be exported as CSV.
 
         args:
             all_dicts (dict): Dictionary of dictionaries with lipinski_summary_keyname.
@@ -767,6 +797,17 @@ class ChemicalDatasetComparator:
         """
         lipinski_df_dict = {"Number of broken rules": [0, 1, 2, 3, 4]}
         for single_dict in all_dicts:
+            if not (
+                any(
+                    key == self.lipinski_summary_keyname
+                    for key in list(all_dicts[single_dict].keys())
+                )
+            ):
+                raise KeyError(
+                    "Lipinski summary ("
+                    + str(self.lipinski_summary_keyname)
+                    + ") needs to be calculated before plotting! Use 'get_lipinski_key'!"
+                )
             header = single_dict
             lipinski_df_dict.update(
                 {
@@ -778,28 +819,30 @@ class ChemicalDatasetComparator:
         lipinski_df = pd.DataFrame(lipinski_df_dict)
         if not os.path.exists("output"):
             os.makedirs("output")
-        if save_dataframe is True:
+        if save_dataframe:
             lipinski_df.to_csv("output/table_lipinski_rules.csv")
         lipinski_plot = lipinski_df.plot(
             x="Number of broken rules",
             kind="bar",
             stacked=False,
             rot=0,
-            figsize=(15, 7),
-            fontsize=15,
+            figsize=figsize,
+            fontsize=fontsize_tick_lables,
         )
-        lipinski_plot.legend(bbox_to_anchor=(1, 1), loc="upper left", fontsize=15)
-        lipinski_plot.set_ylabel("Number of molecules", fontsize=20)
-        lipinski_plot.set_xlabel("Number of broken rules", fontsize=20)
+        lipinski_plot.legend(bbox_to_anchor=(1, 1), loc="upper left", fontsize=fontsize_legend)
+        lipinski_plot.set_ylabel("Number of molecules", fontsize=fontsize_ylable)
+        lipinski_plot.set_xlabel("Number of broken rules", fontsize=fontsize_xlable)
         lipinski_plot.set_title(
-            "Distribution of the number of broken Lipinski Rules", pad=20, fontsize=24
+            "Distribution of the number of broken Lipinski Rules", pad=20, fontsize=fontsize_title
         )
-        lipinski_plot.figure.savefig(
+        fig = lipinski_plot.figure
+        fig.savefig(
             "output/lipinski_rules_plot.%s" % (data_type),
             bbox_inches="tight",
             transparent=True,
         )
-        return  # lipinski_plot.figure
+        plt.close(fig)
+        return lipinski_plot.figure
 
     def chemical_space_visualization(
         self,
@@ -812,9 +855,13 @@ class ChemicalDatasetComparator:
         """
         This function returns a 2D visualization of the chemical space of the molecules in all datasets using
         the chemplot module.
+        On basis of the calculated identifier (self.identifier_keyname) for every molecule a Extended Connectivity
+        Fingerprint (ECFP) will be calculated with a definable fingerprint radius (fp_radius) and lenght (fp_size).
+        Subsequent, the fingerprints are reduced to 2D for plotting. The dimension reduction can be done with
+        PCA, UMAP or t-SNE and the plot can be interactive.
 
         Args:
-            all_dicts (dict): Dictionary of dictionaries including an InChI identifier list.
+            all_dicts (dict): Dictionary with subdictionaries including an identifier list (self.identifier_keyname).
             fp_radius (int): Radius of the Extended Connectivity Fingerprints (default: 2).
             fp_bits (int): Size of the Extended Connectivity Fingerprints (default: 2048).
             dimension_reduction (str): Method of dimension reduction (default: pca).
@@ -829,7 +876,7 @@ class ChemicalDatasetComparator:
             for mol in all_dicts[single_dict][self.identifier_keyname]:
                 all_mols_list.append(mol)
                 target_list.append(single_dict)
-        if all_mols_list[0].startswith("InChI="):
+        if all_mols_list[0].startswith("InChI="):  # check if identifier is InChI
             chem_space = cp.Plotter.from_inchi(
                 all_mols_list,  # list of inchi strings which are used to get Extended Connectivity Fingerprint (alternative: smiles),
                 target=target_list,  # corresponding list for inchi_list, shows which dataset the molecules belong to
@@ -837,7 +884,7 @@ class ChemicalDatasetComparator:
                 sim_type="structural",  # similarity solely based on structure (no property is taken into account)
             )
         elif (
-            len(all_mols_list[0]) == 27
+            len(all_mols_list[0]) == 27  # check if identifier is InChIKey
             and "-" in all_mols_list[0][14]
             and "-" in all_mols_list[0][25]
         ):
@@ -868,9 +915,6 @@ class ChemicalDatasetComparator:
                 new_fingerprint = descriptors.get_ecfp(
                     all_mols_list, target_list, radius=fp_radius, nBits=fp_bits
                 )
-            # new_fingerprint = descriptors.get_ecfp_from_inchi(
-            #     all_mols_list, target_list, radius=fp_radius, nBits=fp_bits
-            # )
             chem_space._Plotter__mols = new_fingerprint[0]
         if dimension_reduction == "pca":
             chem_space.pca()  # n_components, copy, whiten, svd_solver ...
@@ -882,7 +926,7 @@ class ChemicalDatasetComparator:
             raise ValueError('dimension_reduction should be "pca", "tsne" or "umap"!')
         if not os.path.exists("output"):
             os.makedirs("output")
-        if interactive is False:
+        if not interactive:
             chem_space.visualize_plot(filename="output/chemical_space")
         else:
             chem_space.interactive_plot(show_plot=True)
@@ -895,15 +939,12 @@ class ChemicalDatasetComparator:
 
         Args:
             all_dicts (dict): Dictionary of dictionaries with calculated descriptor values.
-
-        Returns:
-            csv-files for each dictionary.
         """
         for single_dict in all_dicts:
             new_dict = all_dicts[single_dict].copy()
             counter = 0
             for key in new_dict.copy():
-                if type(new_dict[key]) == list and len(new_dict[key]) == 100:
+                if type(new_dict[key]) == list:  # and len(new_dict[key]) == 100:
                     counter += 1
                 else:
                     new_dict.pop(key)
@@ -913,7 +954,7 @@ class ChemicalDatasetComparator:
             print(single_dict + " : " + str(counter) + " exported descriptor values")
         return
 
-    def export_all_picture_pdf(self):
+    def export_all_figures_pdf(self):
         """
         This function returns a pdf including all created images from the output folder.
 

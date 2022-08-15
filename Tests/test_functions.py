@@ -307,7 +307,7 @@ def test_export_single_dict_values():
     assert os.path.exists("output/descriptor_values_set_B.csv")
     assert os.path.exists("output/descriptor_values_set_D.csv")
 
-def test_export_all_picture_pdf():
-    cider.export_all_picture_pdf()
+def test_export_all_figures_pdf():
+    cider.export_all_figures_pdf()
     # Assert that the picture is exported
     assert os.path.exists("output/all_images.pdf")
