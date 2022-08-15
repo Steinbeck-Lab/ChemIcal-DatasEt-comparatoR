@@ -310,4 +310,4 @@ def test_export_single_dict_values():
 def test_export_all_figures_pdf():
     cider.export_all_figures_pdf()
     # Assert that the picture is exported
-    assert os.path.exists("output/all_images.pdf")
+    assert os.path.exists("output/all_figures.pdf")

@@ -457,7 +457,10 @@ class ChemicalDatasetComparator:
         binned_descriptor_list_keyname = str("binned_" + descriptor_list_keyname)
         find_max = []
         for single_dict in all_dicts:
-            find_max.append(max(all_dicts[single_dict][descriptor_list_keyname]))
+            if None in all_dicts[single_dict][descriptor_list_keyname]:
+                find_max.append(max([descriptor_value for descriptor_value in all_dicts[single_dict][descriptor_list_keyname] if descriptor_value is not None]))
+            else:
+                find_max.append(max(all_dicts[single_dict][descriptor_list_keyname]))
         maximum = max(find_max) + 1
         bins = pd.interval_range(start=0, end=maximum, freq=1, closed="left")
         for single_dict in all_dicts:
@@ -485,8 +488,8 @@ class ChemicalDatasetComparator:
         find_min = []
         find_max = []
         for single_dict in all_dicts:
-            find_min.append(min(all_dicts[single_dict][descriptor_list_keyname]))
-            find_max.append(max(all_dicts[single_dict][descriptor_list_keyname]))
+            find_min.append(min([descriptor_value for descriptor_value in all_dicts[single_dict][descriptor_list_keyname] if descriptor_value is not None]))
+            find_max.append(max([descriptor_value for descriptor_value in all_dicts[single_dict][descriptor_list_keyname] if descriptor_value is not None]))
         if min(find_min) < round(min(find_min), ndigits=-1):
             lower = round(min(find_min), ndigits=-1) - 10
         else:
@@ -970,5 +973,5 @@ class ChemicalDatasetComparator:
                 pass
             else:
                 print(image + " not included, due to unsupported image type.")
-        pdf.output("output/all_images.pdf")
+        pdf.output("output/all_figures.pdf")
         return
