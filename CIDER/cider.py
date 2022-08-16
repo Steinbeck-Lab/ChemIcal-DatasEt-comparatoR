@@ -6,6 +6,7 @@ import numpy as np
 from rdkit import Chem
 from rdkit.Chem import Descriptors
 from rdkit.Chem import Draw
+from rdkit.Chem.Scaffolds import MurckoScaffold
 
 import matplotlib.pyplot as plt
 
@@ -38,7 +39,6 @@ class ChemicalDatasetComparator:
         self.shared_mols_id_keyname = "shared_molecules"
         self.lipinski_list_keyname = "number_of_broken_Lipinski_Rules"
         self.lipinski_summary_keyname = "Lipinski_Rule_of_5_summary"
-        self.mol_grid_keyname = "molecule_picture"
         self.database_id_keyname = "coconut_id"
 
     # Check for invalid SDFiles
@@ -179,7 +179,6 @@ class ChemicalDatasetComparator:
                 returnPNG=False,
             )
             image_list.append(mol_grid)
-            all_dicts[single_dict][self.mol_grid_keyname] = mol_grid
         rows = len(image_list)
         fig = plt.figure(figsize=(20, 20))
         for j in range(0, rows):
@@ -537,6 +536,12 @@ class ChemicalDatasetComparator:
             descriptor_list_keyname (str): Name of descriptor list for plotting.
             data_type (str): Data type for the exported image (default: png).
             save_dataframe (bool): Export dataframe as csv file or not (default: True).
+            fig_size (float, float): Width, height of the image in inches (default: 15, 7).
+            fontsize_tick_lables (int): Fontsize of the lables on the ticks of the axis (default: 15).
+            fontsize_legend (int): Fontsize of the legend (default: 15).
+            fontsize_ylable (int): Fontsize of the lable of the y-axis (default: 20).
+            fontsize_xlable (int): Fontsize of the lable of the x-axis (default: 20).
+            fontsize_title (int): Fontsize of the title (default: 20).
 
         returns:
             fig (matplotlib.figure): Plot
@@ -604,6 +609,12 @@ class ChemicalDatasetComparator:
             descriptor_list_keyname (str): Name of descriptor list for plotting.
             data_type (str): Data type for the exported image (default: png).
             save_dataframe (bool): Export dataframe as csv file or not (default: True).
+            fig_size (float, float): Width, height of the image in inches (default: 15, 7).
+            fontsize_tick_lables (int): Fontsize of the lables on the ticks of the axis (default: 15).
+            fontsize_legend (int): Fontsize of the legend (default: 15).
+            fontsize_ylable (int): Fontsize of the lable of the y-axis (default: 20).
+            fontsize_xlable (int): Fontsize of the lable of the x-axis (default: 20).
+            fontsize_title (int): Fontsize of the title (default: 20).
 
         returns:
             fig (matplotlib.figure): Plot
@@ -671,11 +682,17 @@ class ChemicalDatasetComparator:
         The created plots are saved in an output folder and the data frame can also be exported as CSV.
 
         Args:
-            all_dicts (dict): Dictionary of dictionaries including a descriptor value list.
+            all_dicts (dict): Dictionary with subdictionaries including a descriptor value list.
             descriptor_list_keyname (str): Name of the descriptor list for binning and plotting.
             width_of_bins (int, optional): interval size for the bins for continuous values (default: 10).
             data_type (str): Data type for the exported image (default: png).
             save_dataframe (bool): Export dataframe as csv file or not (default: True).
+            fig_size (float, float): Width, height of the image in inches (default: 15, 7).
+            fontsize_tick_lables (int): Fontsize of the lables on the ticks of the axis (default: 15).
+            fontsize_legend (int): Fontsize of the legend (default: 15).
+            fontsize_ylable (int): Fontsize of the lable of the y-axis (default: 20).
+            fontsize_xlable (int): Fontsize of the lable of the x-axis (default: 20).
+            fontsize_title (int): Fontsize of the title (default: 24).
 
         Returns:
             fig (matplotlib.figure): Plot
@@ -749,7 +766,7 @@ class ChemicalDatasetComparator:
         (lipinski_summary_keyname) using _test_for_lipinski.
 
         Args:
-            all_dicts (dict): Dictionary of dictionaries with import_keyname (Value is an SDMolSupplier Object).
+            all_dicts (dict): Dictionary with subdictionaries including the key 'self.import_keyname'.
         """
         for single_dict in all_dicts:
             lipinski_break_list = self._test_for_lipinski(
@@ -791,9 +808,15 @@ class ChemicalDatasetComparator:
         type can be chosen) and the created data frame can also be exported as CSV.
 
         args:
-            all_dicts (dict): Dictionary of dictionaries with lipinski_summary_keyname.
+            all_dicts (dict): Dictionary with subdictionaries including the key 'self.lipinski_summary_keyname'.
             data_type (str): Data type for the exported image (default: png).
             save_dataframe (bool): Export dataframe as csv or not (default: True).
+            fig_size (float, float): Width, height of the image in inches (default: 15, 7).
+            fontsize_tick_lables (int): Fontsize of the lables on the ticks of the axis (default: 15).
+            fontsize_legend (int): Fontsize of the legend (default: 15).
+            fontsize_ylable (int): Fontsize of the lable of the y-axis (default: 20).
+            fontsize_xlable (int): Fontsize of the lable of the x-axis (default: 20).
+            fontsize_title (int): Fontsize of the title (default: 24).
 
         returns:
             fig (matplotlib.figure): Plot
@@ -846,6 +869,98 @@ class ChemicalDatasetComparator:
         )
         plt.close(fig)
         return lipinski_plot.figure
+
+    # Scaffold analysis
+    def _get_Murcko_scaffold(
+        self,
+        moleculeset: Chem.SDMolSupplier,
+        number_of_scaffolds: int = 5,
+        scaffolds_per_row: int = 5,
+        image_size: int = 200
+    ):
+        """
+        This function creates a grid images of a chosen number of Murcko scaffolds for the
+        molecules in a given SDMolSupplier Object. The scaffolds are sorted by their frequency.
+        The absolute number of occurrence of a scaffold in the dataset is shown below each image.
+
+        args:
+            moleculeset (Chem.SDMolSupplier): SDMolSupplier Objects
+            number_of_scaffolds (int): Number of scaffolds displayed in the grid images (default: 5).
+            scaffolds_per_row (int): Number of scaffolds in every row of the grid image (default: 5).
+            image_size (int): Size of the image for a single molecule (defaut: 200).
+
+        returns:
+            scaffold_grid (PIL.PngImageFile): Grid image with most frequent scaffolds.
+        """
+        scaffold_list = []
+        for mol in moleculeset:
+            scaffold = Chem.MolToSmiles(Chem.Scaffolds.MurckoScaffold.GetScaffoldForMol(mol))
+            scaffold_list.append(scaffold)
+        scaffold_counts = pd.Index(scaffold_list).value_counts()
+        if len(scaffold_counts) < number_of_scaffolds:
+            number_of_scaffolds = len(scaffold_counts)
+        legend = [str(integer) for integer in (list(scaffold_counts)[: number_of_scaffolds])]
+        smiles_list = list(scaffold_counts.keys())
+        to_draw = []
+        for mol in range(number_of_scaffolds):
+            to_draw.append(Chem.MolFromSmiles(smiles_list[mol]))
+        scaffold_grid = Draw.MolsToGridImage(
+            to_draw,
+            molsPerRow=scaffolds_per_row,
+            subImgSize=(image_size, image_size),
+            legends=legend,
+            returnPNG=False,
+        )
+        return scaffold_grid
+
+    def draw_scaffolds(
+        self,
+        all_dicts: dict,
+        number_of_scaffolds: int = 5,
+        scaffolds_per_row : int = 5,
+        image_size: int = 200,
+        data_type: str = 'png'
+    ):
+        """
+        This function creates a grid images of a chosen number of Murcko scaffolds for each
+        subdictionary in the given dictionary and shows them together. The scaffolds in each
+        gird image are sorted by their frequency. The absolute number of occurrence of a
+        scaffold in the dataset of the respective subdictionary is shown below each scaffold image.
+
+        args:
+            all_dicts (dict): Dictionary with subdictionaries including the key 'self.import_keyname'.
+            number_of_scaffolds (int): Number of scaffolds displayed in the grid images (default: 5).
+            scaffolds_per_row (int): Number of scaffolds in every row of the grid image (default: 5).
+            image_size (int): Size of the image for a single molecule (defaut: 200).
+            data_type (str): Data type for the exported image (default: png).
+
+        returns:
+            scaffold_grid (PIL.PngImageFile): Grid image with most frequent scaffolds.
+        """
+        image_list = []
+        title_list = []
+        for single_dict in all_dicts:
+            title_list.append(single_dict)
+            scaffold_grid = self._get_Murcko_scaffold(
+                all_dicts[single_dict][self.import_keyname],
+                number_of_scaffolds,
+                scaffolds_per_row,
+                image_size,
+            )
+            image_list.append(scaffold_grid)
+        rows = len(image_list)
+        fig = plt.figure(figsize=(20, 20))
+        for j in range(0, rows):
+            fig.add_subplot(rows, 1, j + 1)
+            plt.axis("off")
+            plt.imshow(image_list[j])
+            plt.title(title_list[j])
+        fig.suptitle("Most frequent Murcko scaffolds from the datasets", fontsize=20)
+        if not os.path.exists("output"):
+            os.makedirs("output")
+        fig.savefig("output/scaffold_grit.%s" % (data_type))
+        plt.close(fig)
+        return fig
 
     def chemical_space_visualization(
         self,

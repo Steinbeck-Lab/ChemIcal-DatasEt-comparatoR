@@ -41,7 +41,7 @@ def test_get_database_id():
     cider.get_database_id(testdict, "coconut_id")
     # Assert that the function generates a new entry in the dictionary
     assert (
-        any(key == "coconut_id_keyname" for key in list(testdict["set_A.sdf"].keys()))
+        any(key == "coconut_id" for key in list(testdict["set_A.sdf"].keys()))
         == True
     )
     # Assert that the function gets the correct IDs
