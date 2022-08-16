@@ -39,7 +39,7 @@ class ChemicalDatasetComparator:
         self.lipinski_list_keyname = "number_of_broken_Lipinski_Rules"
         self.lipinski_summary_keyname = "Lipinski_Rule_of_5_summary"
         self.mol_grid_keyname = "molecule_picture"
-        self.database_id_keyname = "coconut_id_keyname"
+        self.database_id_keyname = "coconut_id"
 
     # Check for invalid SDFiles
     def _check_invalid_mols_in_SDF(self, all_dicts: dict, delete: bool = False):
