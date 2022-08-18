@@ -40,6 +40,8 @@ class ChemicalDatasetComparator:
         self.lipinski_list_keyname = "number_of_broken_Lipinski_Rules"
         self.lipinski_summary_keyname = "Lipinski_Rule_of_5_summary"
         self.database_id_keyname = "coconut_id"
+        self.scaffold_list_keyname = "scaffold_list"
+        self.scaffold_summary_keyname = "scaffold_summary"
 
     # Check for invalid SDFiles
     def _check_invalid_mols_in_SDF(self, all_dicts: dict, delete: bool = False):
@@ -147,6 +149,9 @@ class ChemicalDatasetComparator:
         mols_per_row: int = 3,
         image_size: int = 200,
         data_type: str = "png",
+        figsize: (float, float) = (20.0, 20.0),
+        fontsize_title: int = 24,
+        fontsize_subtitle: int = 20
     ):
         """
         This function creates an grid image of the first molecules of each dataset and exports the image to an output
@@ -158,6 +163,9 @@ class ChemicalDatasetComparator:
             mols_per_row (int): number of molecules per row in the grid (default: 3).
             image_size (int): the size of the image for a single molecule (defaut: 200).
             data_type (str): data type for the exported files (e.g. png, jpg, pdf, default: png).
+            figsize (float, float): Width, height of the image in inches (default: 20, 20)
+            fontsize_title (int): Fontsize of the title (default: 24).
+            fontsize_subtitle (int): Fontsize of the subtitles (default: 20).
 
         Returns:
             fig (matplotlib.figure): grid image of molecules
@@ -180,13 +188,13 @@ class ChemicalDatasetComparator:
             )
             image_list.append(mol_grid)
         rows = len(image_list)
-        fig = plt.figure(figsize=(20, 20))
+        fig = plt.figure(figsize=figsize)
         for j in range(0, rows):
             fig.add_subplot(rows, 1, j + 1)
             plt.axis("off")
             plt.imshow(image_list[j])
-            plt.title(title_list[j])
-        fig.suptitle("Exemplary molecules from the datasets", fontsize=20)
+            plt.title(title_list[j], fontsize=fontsize_subtitle)
+        fig.suptitle("Exemplary molecules from the datasets", fontsize=fontsize_title)
         if not os.path.exists("output"):
             os.makedirs("output")
         fig.savefig("output/mol_grit.%s" % (data_type))
@@ -881,7 +889,7 @@ class ChemicalDatasetComparator:
         """
         This function creates a grid images of a chosen number of Murcko scaffolds for the
         molecules in a given SDMolSupplier Object. The scaffolds are sorted by their frequency.
-        The absolute number of occurrence of a scaffold in the dataset is shown below each image.
+        The relative number of occurrence of a scaffold in the dataset is shown below each image.
 
         args:
             moleculeset (Chem.SDMolSupplier): SDMolSupplier Objects
@@ -896,7 +904,7 @@ class ChemicalDatasetComparator:
         for mol in moleculeset:
             scaffold = Chem.MolToSmiles(Chem.Scaffolds.MurckoScaffold.GetScaffoldForMol(mol))
             scaffold_list.append(scaffold)
-        scaffold_counts = pd.Index(scaffold_list).value_counts()
+        scaffold_counts = pd.Index(scaffold_list).value_counts(normalize=True)
         if len(scaffold_counts) < number_of_scaffolds:
             number_of_scaffolds = len(scaffold_counts)
         legend = [str(integer) for integer in (list(scaffold_counts)[: number_of_scaffolds])]
@@ -911,7 +919,7 @@ class ChemicalDatasetComparator:
             legends=legend,
             returnPNG=False,
         )
-        return scaffold_grid
+        return scaffold_grid, scaffold_list, scaffold_counts
 
     def draw_scaffolds(
         self,
@@ -919,12 +927,15 @@ class ChemicalDatasetComparator:
         number_of_scaffolds: int = 5,
         scaffolds_per_row : int = 5,
         image_size: int = 200,
-        data_type: str = 'png'
+        data_type: str = 'png',
+        figsize: (float, float) = (20.0, 20.0),
+        fontsize_title: int = 24,
+        fontsize_subtitle: int = 20
     ):
         """
-        This function creates a grid images of a chosen number of Murcko scaffolds for each
+        This function creates a grid images of a chosen number of Murcko scaffolds for evey
         subdictionary in the given dictionary and shows them together. The scaffolds in each
-        gird image are sorted by their frequency. The absolute number of occurrence of a
+        gird image are sorted by their frequency. The relative number of occurrence of a
         scaffold in the dataset of the respective subdictionary is shown below each scaffold image.
 
         args:
@@ -933,6 +944,9 @@ class ChemicalDatasetComparator:
             scaffolds_per_row (int): Number of scaffolds in every row of the grid image (default: 5).
             image_size (int): Size of the image for a single molecule (defaut: 200).
             data_type (str): Data type for the exported image (default: png).
+            figsize (float, float): Width, height of the image in inches (default: 20, 20)
+            fontsize_title (int): Fontsize of the title (default: 24).
+            fontsize_subtitle (int): Fontsize of the subtitles (default: 20).
 
         returns:
             scaffold_grid (PIL.PngImageFile): Grid image with most frequent scaffolds.
@@ -941,21 +955,30 @@ class ChemicalDatasetComparator:
         title_list = []
         for single_dict in all_dicts:
             title_list.append(single_dict)
-            scaffold_grid = self._get_Murcko_scaffold(
+            scaffolds = self._get_Murcko_scaffold(
                 all_dicts[single_dict][self.import_keyname],
                 number_of_scaffolds,
                 scaffolds_per_row,
                 image_size,
             )
-            image_list.append(scaffold_grid)
+            image_list.append(scaffolds[0])
+            all_dicts[single_dict][self.scaffold_list_keyname] = scaffolds[1]
+            all_dicts[single_dict][self.scaffold_summary_keyname] = (scaffolds[2].to_frame('frequency')).rename_axis('scaffold SMILES')
+        print(
+            "Updated dictionary with '"
+            + self.scaffold_list_keyname
+            + "' and '"
+            + self.scaffold_summary_keyname
+            + "'"
+        )
         rows = len(image_list)
-        fig = plt.figure(figsize=(20, 20))
+        fig = plt.figure(figsize=figsize)
         for j in range(0, rows):
             fig.add_subplot(rows, 1, j + 1)
             plt.axis("off")
             plt.imshow(image_list[j])
-            plt.title(title_list[j])
-        fig.suptitle("Most frequent Murcko scaffolds from the datasets", fontsize=20)
+            plt.title(title_list[j], fontsize=fontsize_subtitle)
+        fig.suptitle("Most frequent Murcko scaffolds from the datasets", fontsize=fontsize_title)
         if not os.path.exists("output"):
             os.makedirs("output")
         fig.savefig("output/scaffold_grit.%s" % (data_type))

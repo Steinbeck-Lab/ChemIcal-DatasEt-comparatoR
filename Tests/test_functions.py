@@ -42,7 +42,6 @@ def test_get_database_id():
     # Assert that the function generates a new entry in the dictionary
     assert (
         any(key == "coconut_id" for key in list(testdict["set_A.sdf"].keys()))
-        == True
     )
     # Assert that the function gets the correct IDs
     assert list(testdict["set_A.sdf"][cider.database_id_keyname]) == [
@@ -89,7 +88,6 @@ def test_get_identifier_list_key():
             key == cider.identifier_keyname
             for key in list(testdict["set_A.sdf"].keys())
         )
-        == True
     )
     # Assert that at default configuration the correct InChI string is generated.
     assert (
@@ -115,7 +113,6 @@ def test_get_duplicate_key():
             key == cider.duplicates_keyname
             for key in list(testdict["set_A.sdf"].keys())
         )
-        == True
     )
     # Assert that the function returns the right number of duplicates
     assert testdict["set_A.sdf"][cider.duplicates_keyname] == 0
@@ -130,14 +127,12 @@ def test_get_shared_molecules_key():
             key == cider.shared_mols_keyname
             for key in list(testdict["set_A.sdf"].keys())
         )
-        == True
     )
     assert (
         any(
             key == cider.shared_mols_id_keyname
             for key in list(testdict["set_A.sdf"].keys())
         )
-        == True
     )
     # Assert that the correct number and identity of the shared molecules are returned
     assert testdict["set_A.sdf"][cider.shared_mols_keyname] == 1
@@ -165,7 +160,6 @@ def test_get_descriptor_list_key_1():
     # Assert that the function generates a new entry in the dictionary
     assert (
         any(key == "Molecular Weight" for key in list(testdict["set_A.sdf"].keys()))
-        == True
     )
     # Assert that the correct values for the molecular weight are returned from rdkit.Chem Descriptors
     assert list(testdict["set_A.sdf"]["Molecular Weight"]) == [
@@ -182,7 +176,6 @@ def test_get_descriptor_list_key_2():
     # Assert that the function generates a new entry in the dictionary
     assert (
         any(key == "Molecular Formula" for key in list(testdict["set_A.sdf"].keys()))
-        == True
     )
     # Assert that the correct strings for the molecular formula are returned from rdkit.Chem rdMolDescriptors
     assert list(testdict["set_A.sdf"]["Molecular Formula"]) == [
@@ -270,14 +263,12 @@ def test_get_lipinski_key():
             key == cider.lipinski_list_keyname
             for key in list(testdict["set_A.sdf"].keys())
         )
-        == True
     )
     assert (
         any(
             key == cider.lipinski_summary_keyname
             for key in list(testdict["set_A.sdf"].keys())
         )
-        == True
     )
     # Assert that the correct numbers are returned
     assert testdict["set_A.sdf"][cider.lipinski_list_keyname] == [0, 0, 0]
@@ -294,6 +285,32 @@ def test_lipinski_plot():
     # Assert that the picture is exported
     assert os.path.exists("output/lipinski_rules_plot.png")
 
+def test_get_Murcko_scaffold():
+    testset = testdict["set_A.sdf"][cider.import_keyname]
+    scaffolds = cider._get_Murcko_scaffold(testset)
+    # Assert that the correct scaffold list is generated
+    expected_scaffold_list = ['c1ccccc1', 'c1ccccc1', 'c1ccccc1']
+    assert scaffolds[1] == expected_scaffold_list
+    # Assert that the correct scaffold counts are calculated
+    assert (scaffolds[2])[0] == 1.0
+
+def test_draw_scaffolds():
+    cider.draw_scaffolds(testdict)
+    # Assert that the function generates new keys in the dictionary
+    assert (
+        any(
+            key == cider.scaffold_list_keyname
+            for key in list(testdict["set_A.sdf"].keys())
+        )
+    )
+    assert (
+        any(
+            key == cider.scaffold_summary_keyname
+            for key in list(testdict["set_A.sdf"].keys())
+        )
+    )
+    # Assert that the picture is exported
+    assert os.path.exists("output/scaffold_grit.png")
 
 def test_chemical_space_visualization():
     cider.chemical_space_visualization(testdict, interactive=False)
