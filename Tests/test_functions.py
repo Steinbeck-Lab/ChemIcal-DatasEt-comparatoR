@@ -4,16 +4,22 @@ from rdkit.Chem import rdMolDescriptors
 import os
 
 cider = ChemicalDatasetComparator()
-testdict = cider.import_as_data_dict("unittest_data")
+test_dict_path = os.path.join(os.path.split(__file__)[0],
+                              "unittest_data")
+testdict = cider.import_as_data_dict(test_dict_path)
 
 
 def test_import_as_data_dict():
-    testdict = cider.import_as_data_dict("unittest_data")
+    test_dict_path = os.path.join(os.path.split(__file__)[0],
+                                  "unittest_data")
+    testdict = cider.import_as_data_dict(test_dict_path)
     # Assert that the function generates the dictionary
     assert list(testdict.keys()) == ["set_A.sdf", "set_B.sdf", "set_D.sdf"]
 
 def test_check_invalid_mols_in_SDF(capfd):
-    invalid_testdict = cider.import_as_data_dict("unittest_data_invalid")
+    test_dict_path = os.path.join(os.path.split(__file__)[0],
+                              "unittest_data_invalid")
+    invalid_testdict = cider.import_as_data_dict(test_dict_path)
     cider._check_invalid_mols_in_SDF(invalid_testdict, delete=False)
     # out, err = capfd.readouterr()
     # assert (
@@ -145,7 +151,9 @@ def test_get_shared_molecules_key():
 
 def test_visualize_intersection():
     cider.visualize_intersection(testdict)
-    assert os.path.exists("output/intersection.png")
+    test_path = os.path.join(os.path.split(__file__)[0],
+                                  "output/intersection.png")
+    assert os.path.exists(test_path)
 
 def test_get_descriptor_list():
     testset = testdict["set_A.sdf"][cider.import_keyname]
@@ -213,8 +221,12 @@ def test_discrete_descriptor_plot():
 def test_continuous_descriptor_plot():
     cider._continuous_descriptor_plot(testdict, "LogP")
     # Assert that the image and the table are exported
-    assert os.path.exists("output/distribution_of_LogP.png")
-    assert os.path.exists("output/table_LogP.csv")
+    test_path_logppng = os.path.join(os.path.split(__file__)[0],
+                                     "output", "distribution_of_LogP.png")
+    test_path_logpcsv = os.path.join(os.path.split(__file__)[0],
+                                     "output", "table_LogP.csv")
+    assert os.path.exists(test_path_logppng)
+    assert os.path.exists(test_path_logpcsv)
 
 def test_descriptor_counts_and_plot():
     # Assertion for continuous descriptor
