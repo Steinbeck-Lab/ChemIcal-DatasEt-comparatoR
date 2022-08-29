@@ -1,4 +1,29 @@
-# Import Libraries
+"""MIT License
+
+Copyright (c) 2022 Hannah Busch, Jonas Schaub, Otto Brinkhaus, Kohulan Rajan
+and Christoph Steinbeck
+
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE."""
+
+# Section: Import Libraries
+
 import os
 import pandas as pd
 import numpy as np
@@ -6,6 +31,7 @@ import numpy as np
 from rdkit import Chem
 from rdkit.Chem import Descriptors
 from rdkit.Chem import Draw
+from rdkit.Chem.Draw import IPythonConsole
 from rdkit.Chem.Scaffolds import MurckoScaffold
 
 import matplotlib.pyplot as plt
@@ -43,7 +69,8 @@ class ChemicalDatasetComparator:
         self.scaffold_list_keyname = "scaffold_list"
         self.scaffold_summary_keyname = "scaffold_summary"
 
-    # Check for invalid SDFiles
+    # Section: Import data and check for faulty SDFiles
+
     def _check_invalid_mols_in_SDF(self, all_dicts: dict, delete: bool = False):
         """
         This function checks if there are invalid entries in the SDFiles that can cause errors in the subsequent
@@ -120,12 +147,13 @@ class ChemicalDatasetComparator:
         self._check_invalid_mols_in_SDF(all_dicts, delete)
         return all_dicts
 
-    # Get overview of the dataset size
+    # Section: Get overview of the dataset size and molecules
+
     def get_number_of_molecules(self, all_dicts: dict):
         """
         This function updates the subdictionaries in the given dictionary (created from import_as_data_dict function)
         with the number of molecules in every dataset as new key-value pair. The key is the class variable
-        'cider.dataset_lenght_keyname'.
+        'cider.dataset_length_keyname'.
 
         Args:
             all_dicts (dict): Dictionary with subdictionaries with SDMolSupplier Objects.
@@ -181,7 +209,7 @@ class ChemicalDatasetComparator:
                 to_draw.append(all_dicts[single_dict][self.import_keyname][i])
             mol_grid = Draw.MolsToGridImage(
                 to_draw,
-                # maxMols=number_of_mols,
+                maxMols=number_of_mols,
                 molsPerRow=mols_per_row,
                 subImgSize=(image_size, image_size),
                 returnPNG=False,
@@ -197,9 +225,11 @@ class ChemicalDatasetComparator:
         fig.suptitle("Exemplary molecules from the datasets", fontsize=fontsize_title)
         if not os.path.exists("output"):
             os.makedirs("output")
-        fig.savefig("output/mol_grit.%s" % (data_type))
+        fig.savefig("output/mol_grid.%s" % (data_type))
         plt.close(fig)
         return fig
+
+    # Section: Get database ID
 
     def get_database_id(self, all_dicts: dict, id_name: str):
         """
@@ -222,6 +252,8 @@ class ChemicalDatasetComparator:
                 all_dicts[single_dict][self.database_id_keyname] = database_id_list
         print("Updated dictionary with '" + self.database_id_keyname + "'")
         return
+
+    # Section: Get string identifier
 
     def _get_identifier_list(
         self, moleculeset: Chem.SDMolSupplier, id_type: str = "inchi"
@@ -287,6 +319,8 @@ class ChemicalDatasetComparator:
         print("Updated dictionary with '" + self.identifier_keyname + "'")
         return
 
+    # Section: Check for duplicates
+
     def get_duplicate_key(self, all_dicts: dict):
         """
         This function updates the subdictionaries in the given dictionary with the number
@@ -323,7 +357,8 @@ class ChemicalDatasetComparator:
         )
         return
 
-    # Comparing molecules and visualizing them
+    # Section: Dataset comparison and visualization
+
     def get_shared_molecules_key(self, all_dicts: dict):
         """
         This function updates the subdictionaries in the given dictionary (created with the
@@ -404,6 +439,8 @@ class ChemicalDatasetComparator:
         )
         plt.close(fig)
         return fig
+
+    # Section: Get descriptors and create plots
 
     def _get_descriptor_list(
         self, moleculeset: Chem.SDMolSupplier, descriptor: callable,
@@ -738,7 +775,8 @@ class ChemicalDatasetComparator:
             )
         return fig
 
-    # Visualizing compounds that follow Lipinsky's Rule of 5
+    # Section: Check Lipinski Rule of 5 and visualization
+
     def _test_for_lipinski(self, moleculeset: Chem.SDMolSupplier) -> list:
         """
         This function returns a list with the number of Lipinski Rules broken for every molecule in the given
@@ -878,7 +916,8 @@ class ChemicalDatasetComparator:
         plt.close(fig)
         return lipinski_plot.figure
 
-    # Scaffold analysis
+    # Section: Scaffold analysis and plotting
+
     def _get_Murcko_scaffold(
         self,
         moleculeset: Chem.SDMolSupplier,
@@ -981,9 +1020,11 @@ class ChemicalDatasetComparator:
         fig.suptitle("Most frequent Murcko scaffolds from the datasets", fontsize=fontsize_title)
         if not os.path.exists("output"):
             os.makedirs("output")
-        fig.savefig("output/scaffold_grit.%s" % (data_type))
+        fig.savefig("output/scaffold_grid.%s" % (data_type))
         plt.close(fig)
         return fig
+
+    # Section: Chemical space visulaization
 
     def chemical_space_visualization(
         self,
@@ -1072,6 +1113,8 @@ class ChemicalDatasetComparator:
         else:
             chem_space.interactive_plot(show_plot=True)
         return chem_space
+
+    # Section: Data export
 
     def export_single_dict_values(self, all_dicts: dict):
         """
