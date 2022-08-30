@@ -10,9 +10,6 @@ testdict = cider.import_as_data_dict(test_dict_path)
 
 
 def test_import_as_data_dict():
-    # test_dict_path = os.path.join(os.path.split(__file__)[0],
-    #                               "unittest_data")
-    # testdict = cider.import_as_data_dict(test_dict_path)
     # Assert that the function generates the dictionary
     assert list(testdict.keys()) == ["set_A.sdf", "set_B.sdf", "set_D.sdf"]
 
@@ -40,7 +37,9 @@ def test_get_number_of_molecules():
 def test_draw_molecules():
     cider.draw_molecules(testdict)
     # Assert that the pictures are exported
-    assert os.path.exists("output/mol_grit.png")
+    test_path = os.path.join(os.path.split(__file__)[0],
+                             "output", "mol_grid.png")
+    assert os.path.exists(test_path)
 
 def test_get_database_id():
     cider.get_database_id(testdict, "coconut_id")
@@ -351,9 +350,9 @@ def test_export_single_dict_values():
     assert os.path.exists(test_path_setB)
     assert os.path.exists(test_path_setD)
 
-def test_export_all_figures_pdf():
-    cider.export_all_figures_pdf()
-    # Assert that the picture is exported
-    test_path = os.path.join(os.path.split(__file__)[0],
-                             "output", "all_figures.pdf")
-    assert os.path.exists(test_path)
+# def test_export_all_figures_pdf():
+#     cider.export_all_figures_pdf()
+#     # Assert that the picture is exported
+#     test_path = os.path.join(os.path.split(__file__)[0],
+#                              "output", "all_figures.pdf")
+#     assert os.path.exists(test_path)
