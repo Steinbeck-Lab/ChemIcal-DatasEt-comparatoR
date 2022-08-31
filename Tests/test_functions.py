@@ -11,7 +11,7 @@ testdict = cider.import_as_data_dict(test_dict_path)
 
 def test_import_as_data_dict():
     # Assert that the function generates the dictionary
-    assert list(testdict.keys()) == ["set_A.sdf", "set_B.sdf", "set_D.sdf"]
+    assert list(testdict.keys()) == ["set_A.sdf", "set_B.sdf", "set_D.sdf", cider.figure_dict_keyname]
 
 def test_check_invalid_mols_in_SDF(capfd):
     test_dict_path = os.path.join(os.path.split(__file__)[0], "unittest_data_invalid")
@@ -298,7 +298,7 @@ def test_lipinski_plot():
     cider.lipinski_plot(testdict)
     # Assert that the picture is exported
     test_path = os.path.join(os.path.split(__file__)[0],
-                             "output", "lipinski_rules_plot.png")
+                             "output", "lipinski_plot.png")
     assert os.path.exists(test_path)
 
 def test_get_Murcko_scaffold():
@@ -350,9 +350,9 @@ def test_export_single_dict_values():
     assert os.path.exists(test_path_setB)
     assert os.path.exists(test_path_setD)
 
-# def test_export_all_figures_pdf():
-#     cider.export_all_figures_pdf()
-#     # Assert that the picture is exported
-#     test_path = os.path.join(os.path.split(__file__)[0],
-#                              "output", "all_figures.pdf")
-#     assert os.path.exists(test_path)
+def test_export_all_figures_pdf():
+    cider.export_all_figures_pdf(testdict)
+    # Assert that the picture is exported
+    test_path = os.path.join(os.path.split(__file__)[0],
+                             "output", "all_figures.pdf")
+    assert os.path.exists(test_path)

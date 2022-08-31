@@ -35,14 +35,14 @@ from rdkit.Chem.Draw import IPythonConsole
 from rdkit.Chem.Scaffolds import MurckoScaffold
 
 import matplotlib.pyplot as plt
-
 from matplotlib_venn import venn2
 from matplotlib_venn import venn3
+from matplotlib.backends.backend_pdf import PdfPages
 
 import chemplot as cp
 from chemplot import descriptors
 
-from fpdf import FPDF
+# from fpdf import FPDF
 
 from typing import List, Tuple, Dict
 from itertools import count
@@ -59,6 +59,7 @@ class ChemicalDatasetComparator:
         The class variables of CIDER function as keys for the dictionary in which all calculated and plotted data will be stored.
         """
         self.import_keyname = "SDMolSupplier_Object"
+        self.figure_dict_keyname = "figures"
         self.dataset_length_keyname = "number_of_molecules"
         self.identifier_keyname = "identifier_list"
         self.duplicates_keyname = "number_of_duplicates"
@@ -82,6 +83,8 @@ class ChemicalDatasetComparator:
             delete (bool): Deleting invalid entries or not (default: False).
         """
         for single_dict in all_dicts:
+            if single_dict == self.figure_dict_keyname:
+                continue
             mol_index = -1
             invalid_index = []
             for mol in all_dicts[single_dict][self.import_keyname]:
@@ -142,6 +145,8 @@ class ChemicalDatasetComparator:
                 + str(data_dir)
                 + " found!"
             )
+        figure_dict = {}
+        all_dicts[self.figure_dict_keyname] = figure_dict
         self._check_invalid_mols_in_SDF(all_dicts, delete)
         return all_dicts
 
@@ -155,6 +160,8 @@ class ChemicalDatasetComparator:
             all_dicts (dict): Dictionary with subdictionaries with SDMolSupplier Objects.
         """
         for single_dict in all_dicts:
+            if single_dict == self.figure_dict_keyname:
+                continue
             number_of_molecules = len(all_dicts[single_dict][self.import_keyname])
             all_dicts[single_dict][self.dataset_length_keyname] = number_of_molecules
             print(
@@ -196,6 +203,8 @@ class ChemicalDatasetComparator:
         image_list = []
         title_list = []
         for single_dict in all_dicts:
+            if single_dict == self.figure_dict_keyname:
+                continue
             title_list.append(single_dict)
             to_draw = []
             if len(all_dicts[single_dict][self.import_keyname]) < number_of_mols:
@@ -221,6 +230,7 @@ class ChemicalDatasetComparator:
         if not os.path.exists("output"):
             os.makedirs("output")
         fig.savefig("output/mol_grid.%s" % (data_type))
+        all_dicts[self.figure_dict_keyname]['mol_grid'] = fig
         plt.close(fig)
         return fig
 
@@ -236,6 +246,8 @@ class ChemicalDatasetComparator:
             id_name (str): ID name in the original SDFile.
         """
         for single_dict in all_dicts:
+            if single_dict == self.figure_dict_keyname:
+                continue
             database_id_list = []
             for mol in all_dicts[single_dict][self.import_keyname]:
                 prop_dict = mol.GetPropsAsDict()
@@ -292,6 +304,8 @@ class ChemicalDatasetComparator:
             id_type (str): Type of Identifier ("inchi", "inchikey" or "smiles")
         """
         for single_dict in all_dicts:
+            if single_dict == self.figure_dict_keyname:
+                continue
             identifier_list = self._get_identifier_list(
                 all_dicts[single_dict][self.import_keyname], id_type
             )
@@ -317,6 +331,8 @@ class ChemicalDatasetComparator:
             all_dicts (dict): Dictionary with subdictionaries including a list of identifiers (self.identifier_keyname).
         """
         for single_dict in all_dicts:
+            if single_dict == self.figure_dict_keyname:
+                continue
             number_of_duplicates = len(
                 all_dicts[single_dict][self.identifier_keyname]
             ) - len(set(all_dicts[single_dict][self.identifier_keyname]))
@@ -355,10 +371,14 @@ class ChemicalDatasetComparator:
         """
         sets = []
         for single_dict in all_dicts:
+            if single_dict == self.figure_dict_keyname:
+                continue
             single_set = set(all_dicts[single_dict][self.identifier_keyname])
             sets.append(single_set)
         shared_molecules = set.intersection(*sets)
         for single_dict in all_dicts:
+            if single_dict == self.figure_dict_keyname:
+                continue
             all_dicts[single_dict][self.shared_mols_keyname] = len(shared_molecules)
             all_dicts[single_dict][self.shared_mols_id_keyname] = shared_molecules
         print(
@@ -391,6 +411,8 @@ class ChemicalDatasetComparator:
         """
         sets = []
         for single_dict in all_dicts:
+            if single_dict == self.figure_dict_keyname:
+                continue
             single_set = set(all_dicts[single_dict][self.identifier_keyname])
             sets.append(single_set)
         fig = plt.figure(figsize=(10, 10))
@@ -415,6 +437,7 @@ class ChemicalDatasetComparator:
             bbox_inches="tight",
             transparent=True,
         )
+        all_dicts[self.figure_dict_keyname]['intersection'] = fig
         plt.close(fig)
         return fig
 
@@ -453,6 +476,8 @@ class ChemicalDatasetComparator:
             descriptor_list_keyname (str): Key name for the dictionary entry (should match the descriptor)
         """
         for single_dict in all_dicts:
+            if single_dict == self.figure_dict_keyname:
+                continue
             descriptor_list = self._get_descriptor_list(
                 all_dicts[single_dict][self.import_keyname], descriptor
             )
@@ -473,6 +498,8 @@ class ChemicalDatasetComparator:
         binned_descriptor_list_keyname = str("binned_" + descriptor_list_keyname)
         find_max = []
         for single_dict in all_dicts:
+            if single_dict == self.figure_dict_keyname:
+                continue
             if None in all_dicts[single_dict][descriptor_list_keyname]:
                 find_max.append(max([descriptor_value for descriptor_value in all_dicts[single_dict][descriptor_list_keyname] if descriptor_value is not None]))
             else:
@@ -480,6 +507,8 @@ class ChemicalDatasetComparator:
         maximum = max(find_max) + 1
         bins = pd.interval_range(start=0, end=maximum, freq=1, closed="left")
         for single_dict in all_dicts:
+            if single_dict == self.figure_dict_keyname:
+                continue
             counts = pd.value_counts(
                 pd.cut(all_dicts[single_dict][descriptor_list_keyname], bins),
                 sort=False,
@@ -502,6 +531,8 @@ class ChemicalDatasetComparator:
         find_min = []
         find_max = []
         for single_dict in all_dicts:
+            if single_dict == self.figure_dict_keyname:
+                continue
             find_min.append(min([descriptor_value for descriptor_value in all_dicts[single_dict][descriptor_list_keyname] if descriptor_value is not None]))
             find_max.append(max([descriptor_value for descriptor_value in all_dicts[single_dict][descriptor_list_keyname] if descriptor_value is not None]))
         if min(find_min) < round(min(find_min), ndigits=-1):
@@ -520,6 +551,8 @@ class ChemicalDatasetComparator:
                 start=lower, end=(upper + to_add), freq=width_of_bins
             )
         for single_dict in all_dicts:
+            if single_dict == self.figure_dict_keyname:
+                continue
             counts = pd.value_counts(
                 pd.cut(all_dicts[single_dict][descriptor_list_keyname], bins),
                 sort=False,
@@ -566,6 +599,8 @@ class ChemicalDatasetComparator:
             str("Number of " + descriptor_list_keyname): list(range(y_max))
         }
         for single_dict in all_dicts:
+            if single_dict == self.figure_dict_keyname:
+                continue
             header = single_dict
             descriptor_df_dict.update(
                 {header: list(all_dicts[single_dict][binned_descriptor_list_keyname])}
@@ -595,6 +630,7 @@ class ChemicalDatasetComparator:
             bbox_inches="tight",
             transparent=True,
         )
+        all_dicts[self.figure_dict_keyname]['distribution_of_%s' % (descriptor_list_keyname)] = fig
         plt.close(fig)
         return fig
 
@@ -638,6 +674,8 @@ class ChemicalDatasetComparator:
             ].keys()
         }
         for single_dict in all_dicts:
+            if single_dict == self.figure_dict_keyname:
+                continue
             header = single_dict
             descriptor_df_dict.update(
                 {header: list(all_dicts[single_dict][binned_descriptor_list_keyname])}
@@ -668,6 +706,7 @@ class ChemicalDatasetComparator:
             bbox_inches="tight",
             transparent=True,
         )
+        all_dicts[self.figure_dict_keyname]['distribution_of_%s' % (descriptor_list_keyname)] = fig
         plt.close(fig)
         return fig
 
@@ -775,6 +814,8 @@ class ChemicalDatasetComparator:
             all_dicts (dict): Dictionary with subdictionaries including the key 'self.import_keyname'.
         """
         for single_dict in all_dicts:
+            if single_dict == self.figure_dict_keyname:
+                continue
             lipinski_break_list = self._test_for_lipinski(
                 all_dicts[single_dict][self.import_keyname]
             )
@@ -827,6 +868,8 @@ class ChemicalDatasetComparator:
         """
         lipinski_df_dict = {"Number of broken rules": [0, 1, 2, 3, 4]}
         for single_dict in all_dicts:
+            if single_dict == self.figure_dict_keyname:
+                continue
             if not (
                 any(
                     key == self.lipinski_summary_keyname
@@ -867,10 +910,11 @@ class ChemicalDatasetComparator:
         )
         fig = lipinski_plot.figure
         fig.savefig(
-            "output/lipinski_rules_plot.%s" % (data_type),
+            "output/lipinski_plot.%s" % (data_type),
             bbox_inches="tight",
             transparent=True,
         )
+        all_dicts[self.figure_dict_keyname]['lipinski_plot'] = fig
         plt.close(fig)
         return lipinski_plot.figure
 
@@ -947,6 +991,8 @@ class ChemicalDatasetComparator:
         image_list = []
         title_list = []
         for single_dict in all_dicts:
+            if single_dict == self.figure_dict_keyname:
+                continue
             title_list.append(single_dict)
             scaffolds = self._get_Murcko_scaffold(
                 all_dicts[single_dict][self.import_keyname],
@@ -975,6 +1021,7 @@ class ChemicalDatasetComparator:
         if not os.path.exists("output"):
             os.makedirs("output")
         fig.savefig("output/scaffold_grid.%s" % (data_type))
+        all_dicts[self.figure_dict_keyname]['scaffold_grid'] = fig
         plt.close(fig)
         return fig
 
@@ -1006,6 +1053,8 @@ class ChemicalDatasetComparator:
         all_mols_list = []
         target_list = []
         for single_dict in all_dicts:
+            if single_dict == self.figure_dict_keyname:
+                continue
             for mol in all_dicts[single_dict][self.identifier_keyname]:
                 all_mols_list.append(mol)
                 target_list.append(single_dict)
@@ -1023,6 +1072,8 @@ class ChemicalDatasetComparator:
         ):
             all_mols_list.clear()
             for single_dict in all_dicts:
+                if single_dict == self.figure_dict_keyname:
+                    continue
                 for mol in all_dicts[single_dict][self.import_keyname]:
                     inchi = Chem.MolToInchi(mol)
                     all_mols_list.append(inchi)
@@ -1075,6 +1126,8 @@ class ChemicalDatasetComparator:
             all_dicts (dict): Dictionary of dictionaries with calculated descriptor values.
         """
         for single_dict in all_dicts:
+            if single_dict == self.figure_dict_keyname:
+                continue
             new_dict = all_dicts[single_dict].copy()
             counter = 0
             for key in new_dict.copy():
@@ -1088,21 +1141,21 @@ class ChemicalDatasetComparator:
             print(single_dict + " : " + str(counter) + " exported descriptor values")
         return
 
-    def export_all_figures_pdf(self) -> None:
+    def export_all_figures_pdf(self, all_dicts: dict) -> None:
         """
-        This function returns a pdf including all created images from the output folder.
-
-        Returns:
-            pdf containing all images created.
+        This function exports a pdf including all created figures form the figures subdictionary.
         """
-        pdf = FPDF()
-        for image in os.listdir("output"):
-            if image[-3:] == "png" or image[-3:] == "jpg":
-                pdf.add_page()
-                pdf.image("output/%s" % (image), 5, 5, 200)
-            elif image[-3:] == "csv":
-                pass
-            else:
-                print(image + " not included, due to unsupported image type.")
-        pdf.output("output/all_figures.pdf")
+        pdf = PdfPages("output/all_figures.pdf")
+        for value in all_dicts[self.figure_dict_keyname].values():
+            pdf.savefig(value, bbox_inches='tight')
+        pdf.close()
+        # for image in os.listdir("output"):
+        #     if image[-3:] == "png" or image[-3:] == "jpg":
+        #         pdf.add_page()
+        #         pdf.image("output/%s" % (image), 5, 5, 200)
+        #     elif image[-3:] == "csv":
+        #         pass
+        #     else:
+        #         print(image + " not included, due to unsupported image type.")
+        # pdf.output("output/all_figures.pdf")
         return
