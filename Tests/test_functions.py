@@ -310,8 +310,8 @@ def test_get_Murcko_scaffold():
     # Assert that the correct scaffold counts are calculated
     assert (scaffolds[2])[0] == 1.0
 
-def test_draw_scaffolds():
-    cider.draw_scaffolds(testdict)
+def test_draw_most_frequent_scaffolds():
+    cider.draw_most_frequent_scaffolds(testdict)
     # Assert that the function generates new keys in the dictionary
     assert (
         any(

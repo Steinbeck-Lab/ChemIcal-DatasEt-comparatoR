@@ -33,6 +33,7 @@ from rdkit.Chem import Descriptors
 from rdkit.Chem import Draw
 from rdkit.Chem.Draw import IPythonConsole
 from rdkit.Chem.Scaffolds import MurckoScaffold
+from rdkit.Chem import rdchem
 
 import matplotlib.pyplot as plt
 from matplotlib_venn import venn2
@@ -176,8 +177,8 @@ class ChemicalDatasetComparator:
     def draw_molecules(
         self,
         all_dicts: dict,
-        number_of_mols: int = 12,
-        mols_per_row: int = 3,
+        number_of_mols: int = 10,
+        mols_per_row: int = 5,
         image_size: int = 200,
         data_type: str = "png",
         figsize: Tuple[float, float] = [20.0, 20.0],
@@ -191,7 +192,7 @@ class ChemicalDatasetComparator:
             all_dicts (dict): dictionary with subdictionaries with SDMolSupplier Objects.
             number_of_mols (int): number of molecules form each dataset that will be displayed (default: 12).
             mols_per_row (int): number of molecules per row in the grid (default: 3).
-            image_size (int): the size of the image for a single molecule (defaut: 200).
+            image_size (int): the size of the image for a single molecule (default: 200).
             data_type (str): data type for the exported files (e.g. png, jpg, pdf, default: png).
             figsize (float, float): Width, height of the image in inches (default: 20, 20)
             fontsize_title (int): Fontsize of the title (default: 24).
@@ -923,9 +924,12 @@ class ChemicalDatasetComparator:
     def _get_Murcko_scaffold(
         self,
         moleculeset: Chem.SDMolSupplier,
-        number_of_scaffolds: int = 5,
-        scaffolds_per_row: int = 5,
-        image_size: int = 200
+        number_of_structures: int = 5,
+        structures_per_row: int = 5,
+        image_size: int = 200,
+        framework: bool = False,
+        skeleton: bool = False,
+        normalize: bool = True,
     ) -> Tuple[list, count]:  # what to use here?
         """
         This function creates a grid images of a chosen number of Murcko scaffolds for the molecules in a given SDMolSupplier Object. The scaffolds are sorted by their frequency.
@@ -940,33 +944,64 @@ class ChemicalDatasetComparator:
         returns:
             scaffold_grid (PIL.PngImageFile): Grid image with most frequent scaffolds.
         """
+        structure_list = []
         scaffold_list = []
         for mol in moleculeset:
-            scaffold = Chem.MolToSmiles(MurckoScaffold.GetScaffoldForMol(mol))
+            scaffold = MurckoScaffold.GetScaffoldForMol(mol)
             scaffold_list.append(scaffold)
-        scaffold_counts = pd.Index(scaffold_list).value_counts(normalize=True)
-        if len(scaffold_counts) < number_of_scaffolds:
-            number_of_scaffolds = len(scaffold_counts)
-        legend = [str(integer) for integer in (list(scaffold_counts)[: number_of_scaffolds])]
-        smiles_list = list(scaffold_counts.keys())
+        if framework == False and skeleton == False:
+            for mol in scaffold_list:
+                structure_list.append(Chem.MolToSmiles(mol))
+        if framework == False and skeleton == False:
+            for mol in scaffold_list:
+                structure_list.append(Chem.MolToSmiles(mol))
+        if framework == True or skeleton == True:
+            framework_list = []
+            for mol in scaffold_list:
+                to_remove = []
+                for atom in mol.GetAtoms():
+                    if len(atom.GetNeighbors()) == 1:
+                        to_remove.append(atom.GetIdx())
+                framework = rdchem.RWMol(mol)
+                for index in sorted(to_remove, reverse=True):
+                    framework.RemoveAtom(index)
+                framework_list.append(framework)
+            for mol in framework_list:
+                structure_list.append(Chem.MolToSmiles(mol))
+        if skeleton == True:
+            skeleton_list = []
+            for mol in framework_list:
+                skeleton_list.append(MurckoScaffold.MakeScaffoldGeneric(mol))
+            for mol in skeleton_list:
+                structure_list.append(Chem.MolToSmiles(mol))
+
+        structure_counts = pd.Index(structure_list).value_counts(normalize=normalize)
+        if len(structure_counts) < number_of_structures:
+            number_of_structures = len(structure_counts)
+        legend = [str(integer) for integer in (list(structure_counts)[: number_of_structures])]
+        smiles_list = list(structure_counts.keys())
         to_draw = []
-        for mol in range(number_of_scaffolds):
+        for mol in range(number_of_structures):
             to_draw.append(Chem.MolFromSmiles(smiles_list[mol]))
-        scaffold_grid = Draw.MolsToGridImage(
+        structure_grid = Draw.MolsToGridImage(
             to_draw,
-            molsPerRow=scaffolds_per_row,
+            maxMols=number_of_structures,
+            molsPerRow=structures_per_row,
             subImgSize=(image_size, image_size),
             legends=legend,
             returnPNG=False,
         )
-        return scaffold_grid, scaffold_list, scaffold_counts
+        return structure_grid, structure_list, structure_counts
 
-    def draw_scaffolds(
+    def draw_most_frequent_scaffolds(
         self,
         all_dicts: dict,
-        number_of_scaffolds: int = 5,
-        scaffolds_per_row : int = 5,
+        number_of_structures: int = 5,
+        structures_per_row : int = 5,
         image_size: int = 200,
+        normalize: bool = True,
+        framework: bool = False,
+        skeleton: bool = False,
         data_type: str = 'png',
         figsize: Tuple[float, float] = [20.0, 20.0],
         fontsize_title: int = 24,
@@ -996,9 +1031,12 @@ class ChemicalDatasetComparator:
             title_list.append(single_dict)
             scaffolds = self._get_Murcko_scaffold(
                 all_dicts[single_dict][self.import_keyname],
-                number_of_scaffolds,
-                scaffolds_per_row,
+                number_of_structures,
+                structures_per_row,
                 image_size,
+                framework,
+                skeleton,
+                normalize,
             )
             image_list.append(scaffolds[0])
             all_dicts[single_dict][self.scaffold_list_keyname] = scaffolds[1]
@@ -1137,7 +1175,7 @@ class ChemicalDatasetComparator:
                     new_dict.pop(key)
             to_export = pd.DataFrame(new_dict)
             filename = single_dict[:-4]
-            to_export.to_csv("output/descriptor_values_%s.csv" % (filename))
+            to_export.to_csv("output/descriptor_values_%s.csv" % (filename), index=False)
             print(single_dict + " : " + str(counter) + " exported descriptor values")
         return
 
