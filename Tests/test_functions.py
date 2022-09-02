@@ -12,7 +12,6 @@ def test_import_as_data_dict():
     # Assert that the function generates the dictionary
     assert list(testdict.keys()) == ["set_A.sdf", "set_B.sdf", "set_D.sdf"]
 
-
 def test_check_invalid_SDF(capfd):
     invalid_testdict = cider.import_as_data_dict("unittest_data_invalid")
     cider.check_invalid_SDF(invalid_testdict, delete=False)
@@ -25,7 +24,6 @@ def test_check_invalid_SDF(capfd):
     cider.check_invalid_SDF(invalid_testdict, delete=True)
     assert len(invalid_testdict["set_D_invalid.sdf"][cider.import_keyname]) == 5
 
-
 def test_get_number_of_molecules():
     cider.get_number_of_molecules(testdict)
     # Assert that the function generates new entries in the dictionary
@@ -34,20 +32,18 @@ def test_get_number_of_molecules():
     assert testdict["set_B.sdf"][cider.dataset_lenght_keyname] == 4
     assert testdict["set_D.sdf"][cider.dataset_lenght_keyname] == 7
 
-
 def test_draw_molecules():
     cider.draw_molecules(testdict, number_of_mols=3)
-    # Assert that the function gernerates a new entry in the dictionary
+    # Assert that the function generates a new entry in the dictionary
     assert (
         any(key == cider.mol_grid_keyname for key in list(testdict["set_A.sdf"].keys())) == True
     )
     # Assert that the pictures are exported
     assert os.path.exists("output/mol_grit.png")
 
-
 def test_get_database_id():
     cider.get_database_id(testdict, "coconut_id")
-    # Assert that the function gernerates a new entry in the dictionary
+    # Assert that the function generates a new entry in the dictionary
     assert (
         any(key == "coconut_id_keyname" for key in list(testdict["set_A.sdf"].keys()))
         == True
@@ -73,7 +69,7 @@ def test_get_identifier_list():
     )
     inchi = cider._get_identifier_list(testset)
     assert expected_inchi == inchi
-    # Assert that the correkt InChIKeys are generated.
+    # Assert that the correct InChIKeys are generated.
     expected_inchikey = (
         [
             "PBKONEOXTCPAFI-UHFFFAOYSA-N",
@@ -89,10 +85,9 @@ def test_get_identifier_list():
     smiles = cider._get_identifier_list(testset, "smiles")
     assert expected_smiles == smiles
 
-
 def test_get_identifier_list_key():
     cider.get_identifier_list_key(testdict)
-    # Assert that the function gernerates a new entry in the dictionary
+    # Assert that the function generates a new entry in the dictionary
     assert (
         any(
             key == cider.identifier_keyname
@@ -131,7 +126,6 @@ def test_get_duplicate_key():
     assert testdict["set_B.sdf"][cider.duplicates_keyname] == 0
     assert testdict["set_D.sdf"][cider.duplicates_keyname] == 1
 
-
 def test_get_shared_molecules_key():
     cider.get_shared_molecules_key(testdict)
     # Assert that the function generates a new entry in the dictionary
@@ -158,11 +152,9 @@ def test_get_shared_molecules_key():
         or "Clc1cccc(Cl)c1"
     )
 
-
 def test_visualize_intersection():
     cider.visualize_intersection(testdict)
     assert os.path.exists("output/intersection.png")
-
 
 def test_get_descriptor_list():
     testset = testdict["set_A.sdf"][cider.import_keyname]
@@ -170,7 +162,6 @@ def test_get_descriptor_list():
     expected_LogP = [3.6468000000000007, 2.9934000000000003, 2.993400000000001]
     LogP = cider._get_descriptor_list(testset, Descriptors.MolLogP)
     assert expected_LogP == LogP
-
 
 def test_get_descriptor_list_key_1():
     # Assertion for continuous values
@@ -186,7 +177,6 @@ def test_get_descriptor_list_key_1():
         147.00399999999996,
         147.004,
     ]
-
 
 def test_get_descriptor_list_key_2():
     # Assertion for discrete values
@@ -204,7 +194,6 @@ def test_get_descriptor_list_key_2():
         "C6H4Cl2",
         "C6H4Cl2",
     ]
-
 
 def test_get_value_from_id(capfd):
     cider.get_value_from_id(testdict, "CNP0206286", "Molecular Weight")
@@ -227,7 +216,6 @@ def test_get_discrete_descriptor_counts():
     # Assert the correct values for the bins
     assert list(testdict["set_A.sdf"]["binned Number of H-Donors"]) == [3, 0]
 
-
 def test_get_continuous_descriptor_counts():
     cider.get_descriptor_list_key(testdict, Descriptors.MolLogP, "LogP")
     cider._get_continuous_descriptor_counts(testdict, "LogP", 2)
@@ -236,20 +224,17 @@ def test_get_continuous_descriptor_counts():
     # Assert the correct values for the bins
     assert list(testdict["set_A.sdf"]["binned LogP"]) == [0, 3, 0, 0, 0]
 
-
 def test_discrete_descriptor_plot():
     cider._discrete_descriptor_plot(testdict, "Number of H-Donors")
     # Assert that the image and the table are exported
     assert os.path.exists("output/distribution_of_Number of H-Donors.png")
     assert os.path.exists("output/table_Number of H-Donors.csv")
 
-
 def test_continuous_descriptor_plot():
     cider._continuous_descriptor_plot(testdict, "LogP")
     # Assert that the image and the table are exported
     assert os.path.exists("output/distribution_of_LogP.png")
     assert os.path.exists("output/table_LogP.csv")
-
 
 def test_descriptor_counts_and_plot():
     # Assertion for continuous descriptor
@@ -283,14 +268,12 @@ def test_descriptor_counts_and_plot():
     # Assert the correct values for the bins
     assert list(testdict["set_A.sdf"]["binned Number of Rings"]) == [0, 3]
 
-
 def test_test_for_lipinski():
     testset = testdict["set_A.sdf"][cider.import_keyname]
     # Assert the correct number of broken rules are returned
     expected_num_of_break = [0, 0, 0]
     num_of_break = cider._test_for_lipinski(testset)
     assert expected_num_of_break == num_of_break
-
 
 def test_get_lipinski_key():
     cider.get_lipinski_key(testdict)
@@ -319,7 +302,6 @@ def test_get_lipinski_key():
         "4_rules_broken": 0,
     }
 
-
 def test_lipinski_plot():
     cider.lipinski_plot(testdict)
     # Assert that the picture is exported
@@ -331,14 +313,12 @@ def test_chemical_space_visualization():
     # Assert that the picture is exported
     assert os.path.exists("output/chemical_space.png")
 
-
 def test_export_single_dict_values():
     cider.export_single_dict_values(testdict)
     # Assert that the picture is exported
     assert os.path.exists("output/descriptor_values_set_A.csv")
     assert os.path.exists("output/descriptor_values_set_B.csv")
     assert os.path.exists("output/descriptor_values_set_D.csv")
-
 
 def test_export_all_picture_pdf():
     cider.export_all_picture_pdf()
