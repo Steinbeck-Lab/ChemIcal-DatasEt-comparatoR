@@ -43,10 +43,11 @@ from matplotlib.backends.backend_pdf import PdfPages
 import chemplot as cp
 from chemplot import descriptors
 
-# from fpdf import FPDF
-
 from typing import List, Tuple, Dict
 from itertools import count
+
+import logging
+logging.basicConfig(level=logging.INFO)
 
 class ChemicalDatasetComparator:
     """
@@ -91,30 +92,34 @@ class ChemicalDatasetComparator:
             for mol in all_dicts[single_dict][self.import_keyname]:
                 mol_index += 1
                 if not mol:
-                    print(
-                        str(single_dict)
-                        + " has invalid molecule at index "
-                        + str(mol_index)
-                    )
+                    logging.warning("%s has invalid molecule at index %d" % (single_dict, mol_index))
+                    # print(
+                    #     str(single_dict)
+                    #     + " has invalid molecule at index "
+                    #     + str(mol_index)
+                    # )
                     invalid_index.append(mol_index)
             if not invalid_index:
-                print("No invalid molecules found in " + str(single_dict))
+                logging.info("No faulty molecules found in %s" % (single_dict))
+                # print("No invalid molecules found in " + str(single_dict))
             elif delete and invalid_index:
                 new_SDMol = list(all_dicts[single_dict][self.import_keyname])
                 for index in sorted(invalid_index, reverse=True):
                     del new_SDMol[index]
                 all_dicts[single_dict].update({self.import_keyname: new_SDMol})
-                print(
-                    str(len(invalid_index))
-                    + " invalid molecule(s) are deleted from "
-                    + str(single_dict)
-                )
+                logging.info("%d invalid molecule(s) deleted from %s" % (len(invalid_index), single_dict))
+                # print(
+                #     str(len(invalid_index))
+                #     + " invalid molecule(s) are deleted from "
+                #     + str(single_dict)
+                # )
             elif not delete and invalid_index:
-                print(
-                    str(len(invalid_index))
-                    + " invalid molecule(s) will remain in "
-                    + str(single_dict)
-                )
+                logging.warning("%d invalid molecule(s) will remain in %s" % (len(invalid_index), single_dict))
+                # print(
+                #     str(len(invalid_index))
+                #     + " invalid molecule(s) will remain in "
+                #     + str(single_dict)
+                # )
         return
 
     def import_as_data_dict(self, path_to_data: str, delete: bool = False) -> Dict:
@@ -141,11 +146,12 @@ class ChemicalDatasetComparator:
                 single_dict[self.import_keyname] = Chem.SDMolSupplier(dict_path)
                 all_dicts[dict_name] = single_dict
         if not all_dicts:
-            print(
-                "No SDFiles in "
-                + str(data_dir)
-                + " found!"
-            )
+            logging.warning("No SDFiles found in %s!" % (data_dir))
+            # print(
+            #     "No SDFiles in "
+            #     + str(data_dir)
+            #     + " found!"
+            # )
         figure_dict = {}
         all_dicts[self.figure_dict_keyname] = figure_dict
         self._check_invalid_mols_in_SDF(all_dicts, delete)
@@ -165,13 +171,15 @@ class ChemicalDatasetComparator:
                 continue
             number_of_molecules = len(all_dicts[single_dict][self.import_keyname])
             all_dicts[single_dict][self.dataset_length_keyname] = number_of_molecules
-            print(
-                "Number of molecules in "
-                + single_dict
-                + ": "
-                + str(all_dicts[single_dict][self.dataset_length_keyname])
-            )
-        print("Updated dictionary with '" + self.dataset_length_keyname + "'")
+            logging.info("Number of molecules in %s: %d" % (single_dict, all_dicts[single_dict][self.dataset_length_keyname]))
+            # print(
+            #     "Number of molecules in "
+            #     + single_dict
+            #     + ": "
+            #     + str(all_dicts[single_dict][self.dataset_length_keyname])
+            # )
+        # print("Updated dictionary with '" + self.dataset_length_keyname + "'")
+        logging.info("Updated dictionary with '%s'", self.dataset_length_keyname)
         return
 
     def draw_molecules(
@@ -209,12 +217,14 @@ class ChemicalDatasetComparator:
             title_list.append(single_dict)
             to_draw = []
             if len(all_dicts[single_dict][self.import_keyname]) < number_of_mols:
-                number_of_mols = len(all_dicts[single_dict][self.import_keyname])
-            for i in range(number_of_mols):
+                number_of_mols_final = len(all_dicts[single_dict][self.import_keyname])
+            else:
+                number_of_mols_final = number_of_mols
+            for i in range(number_of_mols_final):
                 to_draw.append(all_dicts[single_dict][self.import_keyname][i])
             mol_grid = Draw.MolsToGridImage(
                 to_draw,
-                maxMols=number_of_mols,
+                maxMols=number_of_mols_final,
                 molsPerRow=mols_per_row,
                 subImgSize=(image_size, image_size),
                 returnPNG=False,
@@ -246,6 +256,7 @@ class ChemicalDatasetComparator:
             all_dicts (dict): dictionary with subdictionaries including SDMolSupplier Objects (self.import_keyname).
             id_name (str): ID name in the original SDFile.
         """
+        id_count = 0
         for single_dict in all_dicts:
             if single_dict == self.figure_dict_keyname:
                 continue
@@ -253,9 +264,14 @@ class ChemicalDatasetComparator:
             for mol in all_dicts[single_dict][self.import_keyname]:
                 prop_dict = mol.GetPropsAsDict()
                 database_id = prop_dict.get(id_name)
+                if database_id is not None:
+                    id_count += 1
                 database_id_list.append(database_id)
                 all_dicts[single_dict][self.database_id_keyname] = database_id_list
-        print("Updated dictionary with '" + self.database_id_keyname + "'")
+        # print("Updated dictionary with '" + self.database_id_keyname + "'")
+        if id_count == 0:
+            logging.info("No database IDs with '%s' found. (Maybe check for spelling mistakes)" % (id_name))
+        logging.info("Updated dictionary with '%s'", self.database_id_keyname)
         return
 
     # Section: Get string identifier
@@ -319,7 +335,8 @@ class ChemicalDatasetComparator:
                     + str(failed_identifier_counter)
                     + " identifier(s)!"
                 )
-        print("Updated dictionary with '" + self.identifier_keyname + "'")
+        # print("Updated dictionary with '" + self.identifier_keyname + "'")
+        logging.info("Updated dictionary with '%s'", self.identifier_keyname)
         return
 
     # Section: Check for duplicates
@@ -351,13 +368,14 @@ class ChemicalDatasetComparator:
                 + ",  duplicates: "
                 + str(all_dicts[single_dict][self.duplicates_id_keyname])
             )
-        print(
-            "Updated dictionary with '"
-            + self.duplicates_keyname
-            + "' and '"
-            + self.duplicates_id_keyname
-            + "'"
-        )
+        logging.info("Updated dictionary with '%s' and '%s'", self.duplicates_keyname, self.database_id_keyname)
+        # print(
+        #     "Updated dictionary with '"
+        #     + self.duplicates_keyname
+        #     + "' and '"
+        #     + self.duplicates_id_keyname
+        #     + "'"
+        # )
         return
 
     # Section: Dataset comparison and visualization
@@ -386,13 +404,15 @@ class ChemicalDatasetComparator:
             "Number of molecules that can be found in all datasets: "
             + str(len(shared_molecules))
             + ", identifiers: "
-            + str(shared_molecules), '\n'
-            "Updated dictionary with '"
-            + self.shared_mols_keyname
-            + "' and '"
-            + self.shared_mols_id_keyname
-            + "'"
-        )
+            + str(shared_molecules))
+        #     , '\n'
+        #     "Updated dictionary with '"
+        #     + self.shared_mols_keyname
+        #     + "' and '"
+        #     + self.shared_mols_id_keyname
+        #     + "'"
+        # )
+        logging.info("Updated dictionary with '%s' and '%s'", self.shared_mols_keyname, self.shared_mols_id_keyname)
         return
 
     def visualize_intersection(self, all_dicts: dict, data_type: str = "png"):
@@ -440,6 +460,7 @@ class ChemicalDatasetComparator:
         )
         all_dicts[self.figure_dict_keyname]['intersection'] = fig
         plt.close(fig)
+        logging.info("Updated dictionary with 'intersection'")
         return fig
 
     # Section: Get descriptors and create plots
@@ -483,7 +504,8 @@ class ChemicalDatasetComparator:
                 all_dicts[single_dict][self.import_keyname], descriptor
             )
             all_dicts[single_dict][descriptor_list_keyname] = descriptor_list
-        print("Updated dictionary with '" + descriptor_list_keyname + "'")
+        # print("Updated dictionary with '" + descriptor_list_keyname + "'")
+        logging.info("Updated dictionary with '%s'", descriptor_list_keyname)
         return
 
     def _get_discrete_descriptor_counts(
@@ -829,13 +851,14 @@ class ChemicalDatasetComparator:
                 "4_rules_broken": lipinski_break_list.count(4),
             }
             all_dicts[single_dict][self.lipinski_summary_keyname] = lipinski_summary
-        print(
-            "Updated dictionary with '"
-            + self.lipinski_summary_keyname
-            + "' and '"
-            + self.lipinski_list_keyname
-            + "'"
-        )
+        # print(
+        #     "Updated dictionary with '"
+        #     + self.lipinski_summary_keyname
+        #     + "' and '"
+        #     + self.lipinski_list_keyname
+        #     + "'"
+        # )
+        logging.info("Updated dictionary with '%s' and '%s'", self.lipinski_list_keyname, self.lipinski_summary_keyname)
         return
 
     def lipinski_plot(
@@ -917,6 +940,7 @@ class ChemicalDatasetComparator:
         )
         all_dicts[self.figure_dict_keyname]['lipinski_plot'] = fig
         plt.close(fig)
+        logging.info("Updated dictionary with 'lipinski_plot'")
         return lipinski_plot.figure
 
     # Section: Scaffold analysis and plotting
@@ -932,26 +956,28 @@ class ChemicalDatasetComparator:
         normalize: bool = True,
     ) -> Tuple[list, count]:  # what to use here?
         """
-        This function creates a grid images of a chosen number of Murcko scaffolds for the molecules in a given SDMolSupplier Object. The scaffolds are sorted by their frequency.
-        The relative number of occurrence of a scaffold in the dataset is shown below each image.
+        This function creates a grid images of a chosen number of scaffolds/frameworks/cyclic skeletons for the molecules in a given SDMolSupplier Object. The scaffolds/frameworks/cyclic skeletons are sorted by their frequency.
+        The relative or absolute number of occurrence of a scaffold/framework/cyclic skeleton in the dataset is shown below each image.
 
         args:
             moleculeset (Chem.SDMolSupplier): SDMolSupplier Objects
-            number_of_scaffolds (int): Number of scaffolds displayed in the grid images (default: 5).
-            scaffolds_per_row (int): Number of scaffolds in every row of the grid image (default: 5).
+            number_of_structures (int): Number of structures displayed in the grid images (default: 5).
+            structures_per_row (int): Number of structures in every row of the grid image (default: 5).
             image_size (int): Size of the image for a single molecule (default: 200).
+            framework (bool): Remove terminal atoms with double bond (default: False).
+            skeleton (bool): Creating cyclic skeleton / graph framework (default: False).
+            normalize (bool): Using relative numbers for scaffold analysis (default: True).
 
         returns:
-            scaffold_grid (PIL.PngImageFile): Grid image with most frequent scaffolds.
+            structure_grid (PIL.PngImageFile): Grid image with most frequent scaffolds/frameworks/cyclic skeletons.
+            structure_list (list): List of scaffolds/frameworks/cyclic skeletons for every molecule.
+            structure_counts (pandas.Series): Absolute or relative frequency of each scaffold/frameworks/cyclic skeletons.
         """
         structure_list = []
         scaffold_list = []
         for mol in moleculeset:
             scaffold = MurckoScaffold.GetScaffoldForMol(mol)
             scaffold_list.append(scaffold)
-        if framework == False and skeleton == False:
-            for mol in scaffold_list:
-                structure_list.append(Chem.MolToSmiles(mol))
         if framework == False and skeleton == False:
             for mol in scaffold_list:
                 structure_list.append(Chem.MolToSmiles(mol))
@@ -969,12 +995,12 @@ class ChemicalDatasetComparator:
             for mol in framework_list:
                 structure_list.append(Chem.MolToSmiles(mol))
         if skeleton == True:
+            structure_list.clear()
             skeleton_list = []
             for mol in framework_list:
                 skeleton_list.append(MurckoScaffold.MakeScaffoldGeneric(mol))
             for mol in skeleton_list:
                 structure_list.append(Chem.MolToSmiles(mol))
-
         structure_counts = pd.Index(structure_list).value_counts(normalize=normalize)
         if len(structure_counts) < number_of_structures:
             number_of_structures = len(structure_counts)
@@ -999,29 +1025,32 @@ class ChemicalDatasetComparator:
         number_of_structures: int = 5,
         structures_per_row : int = 5,
         image_size: int = 200,
-        normalize: bool = True,
         framework: bool = False,
         skeleton: bool = False,
+        normalize: bool = True,
         data_type: str = 'png',
         figsize: Tuple[float, float] = [20.0, 20.0],
         fontsize_title: int = 24,
         fontsize_subtitle: int = 20
     ):
         """
-        This function creates a grid images of a chosen number of Murcko scaffolds for every subdictionary in the given dictionary and shows them together. The scaffolds in each gird image are sorted by their frequency. The relative number of occurrence of a scaffold in the dataset of the respective subdictionary is shown below each scaffold image.
+        This function creates a grid images of a chosen number of scaffolds/frameworks/cyclic skeletons for every subdictionary in the given dictionary and shows them together. The scaffolds/frameworks/cyclic skeletons in each gird image are sorted by their frequency. The relative or absolute number of occurrence of a scaffold/framework/cyclic skeleton in the dataset of the respective subdictionary is shown below each image.
 
         args:
             all_dicts (dict): Dictionary with subdictionaries including the key 'self.import_keyname'.
             number_of_scaffolds (int): Number of scaffolds displayed in the grid images (default: 5).
             scaffolds_per_row (int): Number of scaffolds in every row of the grid image (default: 5).
             image_size (int): Size of the image for a single molecule (default: 200).
+            framework (bool): Remove terminal atoms with double bond (default: False).
+            skeleton (bool): Creating cyclic skeleton / graph framework (default: False).
+            normalize (bool): Using relative numbers for scaffold analysis (default: True).
             data_type (str): Data type for the exported image (default: png).
             figsize (float, float): Width, height of the image in inches (default: 20, 20)
             fontsize_title (int): Fontsize of the title (default: 24).
             fontsize_subtitle (int): Fontsize of the subtitles (default: 20).
 
         returns:
-            scaffold_grid (PIL.PngImageFile): Grid image with most frequent scaffolds.
+            fig (PIL.PngImageFile): Grid images with most frequent scaffolds/frameworks/cyclic skeletons for each subdictionary.
         """
         image_list = []
         title_list = []
@@ -1041,13 +1070,14 @@ class ChemicalDatasetComparator:
             image_list.append(scaffolds[0])
             all_dicts[single_dict][self.scaffold_list_keyname] = scaffolds[1]
             all_dicts[single_dict][self.scaffold_summary_keyname] = (scaffolds[2].to_frame('frequency')).rename_axis('scaffold SMILES')
-        print(
-            "Updated dictionary with '"
-            + self.scaffold_list_keyname
-            + "' and '"
-            + self.scaffold_summary_keyname
-            + "'"
-        )
+        logging.info("Updated dictionary with '%s' and '%s'", self.scaffold_list_keyname, self.scaffold_summary_keyname)
+        # print(
+        #     "Updated dictionary with '"
+        #     + self.scaffold_list_keyname
+        #     + "' and '"
+        #     + self.scaffold_summary_keyname
+        #     + "'"
+        # )
         rows = len(image_list)
         fig = plt.figure(figsize=figsize)
         for j in range(0, rows):
@@ -1176,7 +1206,8 @@ class ChemicalDatasetComparator:
             to_export = pd.DataFrame(new_dict)
             filename = single_dict[:-4]
             to_export.to_csv("output/descriptor_values_%s.csv" % (filename), index=False)
-            print(single_dict + " : " + str(counter) + " exported descriptor values")
+            # print(single_dict + " : " + str(counter) + " exported descriptor values")
+            logging.info("%s: %d exported descriptor values", single_dict, counter)
         return
 
     def export_all_figures_pdf(self, all_dicts: dict) -> None:
@@ -1187,6 +1218,7 @@ class ChemicalDatasetComparator:
         for value in all_dicts[self.figure_dict_keyname].values():
             pdf.savefig(value, bbox_inches='tight')
         pdf.close()
+        logging.info("All plots exported to 'all_figures.pdf'")
         # for image in os.listdir("output"):
         #     if image[-3:] == "png" or image[-3:] == "jpg":
         #         pdf.add_page()
