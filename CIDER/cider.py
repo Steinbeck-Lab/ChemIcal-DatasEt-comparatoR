@@ -155,6 +155,7 @@ class ChemicalDatasetComparator:
         figure_dict = {}
         all_dicts[self.figure_dict_keyname] = figure_dict
         self._check_invalid_mols_in_SDF(all_dicts, delete)
+        logging.info("Created dictionary with keys: %s", list(all_dicts.keys()))
         return all_dicts
 
     # Section: Get overview of the dataset size and molecules
@@ -243,6 +244,7 @@ class ChemicalDatasetComparator:
         fig.savefig("output/mol_grid.%s" % (data_type))
         all_dicts[self.figure_dict_keyname]['mol_grid'] = fig
         plt.close(fig)
+        logging.info("Updated dictionary with 'mol_grid'")
         return fig
 
     # Section: Get database ID
@@ -329,12 +331,13 @@ class ChemicalDatasetComparator:
             all_dicts[single_dict][self.identifier_keyname] = identifier_list[0]
             failed_identifier_counter = identifier_list[1]
             if failed_identifier_counter != 0:
-                print(
-                    str(single_dict)
-                    + " failed to get "
-                    + str(failed_identifier_counter)
-                    + " identifier(s)!"
-                )
+                logging.warning("%s failed to get %d identifier(s)!", single_dict, failed_identifier_counter)
+                # print(
+                #     str(single_dict)
+                #     + " failed to get "
+                #     + str(failed_identifier_counter)
+                #     + " identifier(s)!"
+                # )
         # print("Updated dictionary with '" + self.identifier_keyname + "'")
         logging.info("Updated dictionary with '%s'", self.identifier_keyname)
         return
@@ -360,14 +363,15 @@ class ChemicalDatasetComparator:
                 if all_dicts[single_dict][self.identifier_keyname].count(mol) > 1:
                     duplicates.append(mol)
             all_dicts[single_dict][self.duplicates_id_keyname] = set(duplicates)
-            print(
-                "Number of duplicates in "
-                + single_dict
-                + ": "
-                + str(all_dicts[single_dict][self.duplicates_keyname])
-                + ",  duplicates: "
-                + str(all_dicts[single_dict][self.duplicates_id_keyname])
-            )
+            logging.info("Number of duplicates in %s: %d, duplicate identifier(s): %s", single_dict, all_dicts[single_dict][self.duplicates_keyname], all_dicts[single_dict][self.duplicates_id_keyname])
+            # print(
+            #     "Number of duplicates in "
+            #     + single_dict
+            #     + ": "
+            #     + str(all_dicts[single_dict][self.duplicates_keyname])
+            #     + ",  duplicates: "
+            #     + str(all_dicts[single_dict][self.duplicates_id_keyname])
+            # )
         logging.info("Updated dictionary with '%s' and '%s'", self.duplicates_keyname, self.database_id_keyname)
         # print(
         #     "Updated dictionary with '"
@@ -400,11 +404,12 @@ class ChemicalDatasetComparator:
                 continue
             all_dicts[single_dict][self.shared_mols_keyname] = len(shared_molecules)
             all_dicts[single_dict][self.shared_mols_id_keyname] = shared_molecules
-        print(
-            "Number of molecules that can be found in all datasets: "
-            + str(len(shared_molecules))
-            + ", identifiers: "
-            + str(shared_molecules))
+        # print(
+        #     "Number of molecules that can be found in all datasets: "
+        #     + str(len(shared_molecules))
+        #     + ", identifiers: "
+        #     + str(shared_molecules))
+        logging.info("Number of molecules found in all datasets: %d, identifier(s): %s", len(shared_molecules), shared_molecules)
         #     , '\n'
         #     "Updated dictionary with '"
         #     + self.shared_mols_keyname
@@ -537,6 +542,7 @@ class ChemicalDatasetComparator:
                 sort=False,
             )
             all_dicts[single_dict][binned_descriptor_list_keyname] = counts
+        logging.info("Updated the dictionary with '%s'", binned_descriptor_list_keyname)
         return
 
     def _get_continuous_descriptor_counts(
@@ -581,6 +587,7 @@ class ChemicalDatasetComparator:
                 sort=False,
             )
             all_dicts[single_dict][binned_descriptor_list_keyname] = counts
+        logging.info("Updated the dictionary with '%s'", binned_descriptor_list_keyname)
         return
 
     def _discrete_descriptor_plot(
@@ -655,6 +662,7 @@ class ChemicalDatasetComparator:
         )
         all_dicts[self.figure_dict_keyname]['distribution_of_%s' % (descriptor_list_keyname)] = fig
         plt.close(fig)
+        logging.info("Updated dictionary with 'distribution_of_%s'", descriptor_list_keyname)
         return fig
 
     def _continuous_descriptor_plot(
@@ -731,6 +739,7 @@ class ChemicalDatasetComparator:
         )
         all_dicts[self.figure_dict_keyname]['distribution_of_%s' % (descriptor_list_keyname)] = fig
         plt.close(fig)
+        logging.info("Updated dictionary with 'distribution_of_%s'", descriptor_list_keyname)
         return fig
 
     def descriptor_counts_and_plot(
@@ -985,12 +994,15 @@ class ChemicalDatasetComparator:
             framework_list = []
             for mol in scaffold_list:
                 to_remove = []
-                for atom in mol.GetAtoms():
+                Chem.Kekulize(mol)
+                edit_mol = rdchem.RWMol(mol)
+                for atom in edit_mol.GetAtoms():
                     if len(atom.GetNeighbors()) == 1:
                         to_remove.append(atom.GetIdx())
-                framework = rdchem.RWMol(mol)
                 for index in sorted(to_remove, reverse=True):
-                    framework.RemoveAtom(index)
+                    edit_mol.RemoveAtom(index)
+                new_mol = edit_mol.GetMol()
+                framework = Chem.RemoveHs(new_mol)
                 framework_list.append(framework)
             for mol in framework_list:
                 structure_list.append(Chem.MolToSmiles(mol))
@@ -1091,6 +1103,7 @@ class ChemicalDatasetComparator:
         fig.savefig("output/scaffold_grid.%s" % (data_type))
         all_dicts[self.figure_dict_keyname]['scaffold_grid'] = fig
         plt.close(fig)
+        logging.info("Updated dictionary with 'scaffold_grid'")
         return fig
 
     # Section: Chemical space visualization
@@ -1188,10 +1201,10 @@ class ChemicalDatasetComparator:
 
     def export_single_dict_values(self, all_dicts: dict) -> None:
         """
-        This function exports the descriptor values for each dictionary according to one imported SDFile as a single csv file in the output folder.
+        This function exports only the (not-binned) descriptor values for each dictionary according to the imported SDFile as a single csv file in the output folder.
 
         Args:
-            all_dicts (dict): Dictionary of dictionaries with calculated descriptor values.
+            all_dicts (dict): Dictionary with subdictionaries containing the calculated descriptor values.
         """
         for single_dict in all_dicts:
             if single_dict == self.figure_dict_keyname:
@@ -1213,6 +1226,9 @@ class ChemicalDatasetComparator:
     def export_all_figures_pdf(self, all_dicts: dict) -> None:
         """
         This function exports a pdf including all created figures form the figures subdictionary.
+
+        Args:
+            all_dicts (dict): Dictionary with subdictionary (self.figure_dict_keyname) containing all created plots
         """
         pdf = PdfPages("output/all_figures.pdf")
         for value in all_dicts[self.figure_dict_keyname].values():
