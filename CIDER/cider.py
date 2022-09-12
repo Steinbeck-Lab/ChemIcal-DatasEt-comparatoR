@@ -138,8 +138,8 @@ class ChemicalDatasetComparator:
             Statement: if no SDFiles are found
         """
         all_dicts = {}
-        data_dir = os.path.normpath(str(path_to_data))
-        # os.chdir(os.path.dirname(data_dir))
+        # data_dir = os.path.normpath(str(path_to_data))
+        data_dir = os.path.abspath(str(path_to_data))
         for dict_name in os.listdir(data_dir):
             if dict_name[-3:] == "sdf":
                 single_dict = {}
@@ -157,7 +157,12 @@ class ChemicalDatasetComparator:
         all_dicts[self.figure_dict_keyname] = figure_dict
         self._check_invalid_mols_in_SDF(all_dicts, delete)
         logging.info("Created dictionary with keys: %s", list(all_dicts.keys()))
-        os.chdir(os.path.dirname((str(path_to_data))))
+        os.chdir(os.path.dirname(data_dir))
+        if not os.path.exists("output"):
+            os.mkdir("output")
+        else:
+            if os.listdir("output"):
+                logging.warning("Already existing output folder with files! Old data will be overwritten!")
         return all_dicts
 
     # Section: Get overview of the dataset size and molecules
