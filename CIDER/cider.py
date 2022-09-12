@@ -139,6 +139,7 @@ class ChemicalDatasetComparator:
         """
         all_dicts = {}
         data_dir = os.path.normpath(str(path_to_data))
+        os.chdir(os.path.dirname(data_dir))
         for dict_name in os.listdir(data_dir):
             if dict_name[-3:] == "sdf":
                 single_dict = {}
