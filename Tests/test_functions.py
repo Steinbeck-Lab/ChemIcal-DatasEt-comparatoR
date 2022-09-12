@@ -11,7 +11,7 @@ testdict = cider.import_as_data_dict(test_dict_path)
 
 def test_import_as_data_dict():
     # Assert that the function generates the dictionary
-    assert list(testdict.keys()) == ["set_A.sdf", "set_B.sdf", "set_D.sdf", cider.figure_dict_keyname]
+    assert set(testdict.keys()) == {"set_A.sdf", "set_B.sdf", "set_D.sdf", cider.figure_dict_keyname}
 
 def test_check_invalid_mols_in_SDF():
     test_dict_path = os.path.join(os.path.split(__file__)[0], "unittest_data_invalid")
