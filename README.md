@@ -8,7 +8,7 @@
 [![GitHub release](https://img.shields.io/github/release/hannbus/ChemIcal_DatasEt_compaRator.svg)](https://github.com/hannbus/ChemIcal_DatasEt_compaRator/releases/)
 [![PyPI version fury.io](https://badge.fury.io/py/cider-chem.svg)](https://pypi.python.org/pypi/cider-chem/)
 
-[![GitHub Logo](https://github.com/hannbus/ChemIcal_DatasEt_compaRator/blob/main/Workflow/Cider.png?raw=true)](https://pypi.python.org/pypi/cider-chem/)
+[![GitHub Logo](https://github.com/hannbus/ChemIcal_DatasEt_compaRator/blob/main/Cider_white.png?raw=true)](https://pypi.python.org/pypi/cider-chem/)
 
 - ChemIcal DatasEt comparatoR (CIDER) is a Python package and ready-to-use Jupyter Notebook workflow which primarily utilizes RDKit to compare two or more chemical structure datasets (SD files) in different aspects, e.g. size, overlap, molecular descriptor distributions, chemical space clustering, etc., most of which can be visually inspected in the notebook.
 
@@ -17,7 +17,7 @@
 
 ### We recommend to use CIDER inside a Conda environment to facilitate the installation of the dependencies.
 
-- Conda can be downloaded as part of the [Anaconda](https://www.anaconda.com/) or the [Miniconda](https://conda.io/en/latest/miniconda.html) platforms (Python 3.8). We recommend to install miniconda3. Using Linux you can get it with:
+- Conda can be downloaded as part of the [Anaconda](https://www.anaconda.com/) or the [Miniconda](https://conda.io/en/latest/miniconda.html) platforms (Python 3.10). We recommend to install miniconda3. Using Linux you can get it with:
 
 ```shell
 $ wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
@@ -28,12 +28,14 @@ $ bash Miniconda3-latest-Linux-x86_64.sh
 ```shell
 $ git clone https://github.com/hannbus/ChemIcal_DatasEt_compaRator.git
 $ cd ChemIcal_DatasEt_compaRator
-$ conda create --name ChemIcal_DatasEt_compaRator python=3.10
-$ conda activate ChemIcal_DatasEt_compaRator
+$ conda create --name cider_chem python=3.10
+$ conda activate cider_chem
 $ conda install pip
 $ python -m pip install -U pip #Upgrade pip
 $ pip install .
 ```
+- Note: Make sure all installations are working correctly by running the tests. You can do this by running the pytest command in the repository root folder.
+
 ### Alternative
 ```shell
 $ python -m pip install -U pip #Upgrade pip
