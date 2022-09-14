@@ -34,7 +34,7 @@ $ conda install pip
 $ python -m pip install -U pip #Upgrade pip
 $ pip install .
 ```
-- Note: Make sure all installations are working correctly by running the tests.
+- Note: Make sure all installations are working correctly by running the tests. You can do this by running the pytest command in the repository root folder.
 
 ### Alternative
 ```shell
