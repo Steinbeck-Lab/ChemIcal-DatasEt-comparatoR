@@ -419,7 +419,7 @@ def test_export_all_figures_pdf():
                              "output", "all_figures.pdf")
     assert os.path.exists(test_path)
 
-def test_chemical_space_plot_tsne()
+def test_chemical_space_plot_tsne():
     cider.chemical_space_visualization(testdict,
                                        dimension_reduction = 'tsne',
                                        interactive = False,
