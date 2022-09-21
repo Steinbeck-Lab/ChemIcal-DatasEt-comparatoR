@@ -26,7 +26,8 @@ setuptools.setup(
         "matplotlib_venn==0.11.6",
         "FPDF==1.7.2",
         "rdkit-pypi",
-        "pytest"
+        "pytest",
+        "scikit-learn==1.1.1"
     ],
     package_data={"CIDER": ["assets/*.*", "assets/*/*.*", "assets/*/*/*.*"]},
     classifiers=[
