@@ -421,7 +421,7 @@ def test_export_all_figures_pdf():
 
 def test_chemical_space_plot_tsne():
     cider.chemical_space_visualization(testdict,
-                                       dimension_reduction = 'tsne',
-                                       interactive = False,
-                                       fp_bits = 1024,
-                                       fp_radius = 2)
+                                       dimension_reduction='tsne',
+                                       interactive=False,
+                                       fp_bits=1024,
+                                       fp_radius=2)
