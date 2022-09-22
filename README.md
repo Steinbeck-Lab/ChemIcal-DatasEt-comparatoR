@@ -53,8 +53,8 @@ from CIDER import ChemicalDatasetComparator
 cider = ChemicalDatasetComparator()
 
 testdict = cider.import_as_data_dict('data')
+cider.get_number_of_molecules(testdict)
 
-testdict
 ```
 
 ### Cite us
