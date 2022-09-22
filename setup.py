@@ -27,7 +27,7 @@ setuptools.setup(
         "FPDF==1.7.2",
         "rdkit-pypi",
         "pytest",
-        "scikit-learn==1.1.1"
+        "scikit-learn==1.1.1",
     ],
     package_data={"CIDER": ["assets/*.*", "assets/*/*.*", "assets/*/*/*.*"]},
     classifiers=[

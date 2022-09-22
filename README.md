@@ -48,7 +48,14 @@ $ pip install cider-chem
 ```
 
 ### Basic usage: 
-- Todo
+```python
+from CIDER import ChemicalDatasetComparator
+cider = ChemicalDatasetComparator()
+
+testdict = cider.import_as_data_dict('data')
+
+testdict
+```
 
 ### Cite us
 - Busch, H., Schaub, J., Brinkhaus, H. O., Rajan, K., & Steinbeck, C. (2022). ChemIcal DatasEt comparatoR CIDER (Version 0.0.1-dev) [Computer software]. https://doi.org/10.5281/zenodo.6630494
