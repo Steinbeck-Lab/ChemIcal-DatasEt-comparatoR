@@ -52,7 +52,8 @@ $ pip install cider-chem
 from CIDER import ChemicalDatasetComparator
 cider = ChemicalDatasetComparator()
 
-testdict = cider.import_as_data_dict('data')
+data_dir = './data/'  # dir with sd files containing molecules
+testdict = cider.import_as_data_dict(data_dir)
 cider.get_number_of_molecules(testdict)
 
 ```
