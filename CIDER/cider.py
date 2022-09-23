@@ -1,6 +1,7 @@
-"""MIT License
+"""
+MIT License
 
-Copyright (c) 2022 Hannah Busch, Jonas Schaub, Otto Brinkhaus, Kohulan Rajan
+Copyright (c) 2022 Hannah Busch, Jonas Schaub, Otto Brinkhaus, Kohulan Rajan,
 and Christoph Steinbeck
 
 
@@ -20,7 +21,8 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE."""
+SOFTWARE.
+"""
 
 # Section: Import Libraries
 
@@ -60,19 +62,27 @@ class ChemicalDatasetComparator:
 
     def __init__(self):
         """
-        The class variables of CIDER function as keys for the dictionary in which all calculated and plotted data will be stored.
+        The class variables of CIDER function as keys for the dictionary in which all calculated and plotted data will be stored. The keys will be generated when the CIDER method is executed.
         """
+        # from cider.import_as_data_dict
         self.import_keyname = "SDMolSupplier_Object"
         self.figure_dict_keyname = "figures"
+        # from cider.get_number_of_molecules
         self.dataset_length_keyname = "number_of_molecules"
+        # from cider.get_identifier_list_key
         self.identifier_keyname = "identifier_list"
+        # cider.get_duplicate_key
         self.duplicates_keyname = "number_of_duplicates"
         self.duplicates_id_keyname = "duplicates"
+        # from cider.get_shared_molecules_key
         self.shared_mols_keyname = "number_of_shared_molecules"
         self.shared_mols_id_keyname = "shared_molecules"
+        # from cider.get_lipinski_key
         self.lipinski_list_keyname = "number_of_broken_lipinski_rules"
         self.lipinski_summary_keyname = "lipinski_summary"
+        # from cider.get_database_id
         self.database_id_keyname = "coconut_id"
+        # from cider.draw_most_frequent_scaffolds
         self.scaffold_list_keyname = "scaffold_list"
         self.scaffold_summary_keyname = "scaffold_summary"
 
@@ -97,11 +107,6 @@ class ChemicalDatasetComparator:
                     logging.warning(
                         "%s has invalid molecule at index %d" % (single_dict, mol_index)
                     )
-                    # print(
-                    #     str(single_dict)
-                    #     + " has invalid molecule at index "
-                    #     + str(mol_index)
-                    # )
                     invalid_index.append(mol_index)
             if not invalid_index:
                 logging.info("No faulty molecules found in %s" % (single_dict))
@@ -115,21 +120,11 @@ class ChemicalDatasetComparator:
                     "%d invalid molecule(s) deleted from %s"
                     % (len(invalid_index), single_dict)
                 )
-                # print(
-                #     str(len(invalid_index))
-                #     + " invalid molecule(s) are deleted from "
-                #     + str(single_dict)
-                # )
             elif not delete and invalid_index:
                 logging.warning(
                     "%d invalid molecule(s) will remain in %s"
                     % (len(invalid_index), single_dict)
                 )
-                # print(
-                #     str(len(invalid_index))
-                #     + " invalid molecule(s) will remain in "
-                #     + str(single_dict)
-                # )
         return
 
     def import_as_data_dict(self, path_to_data: str, delete: bool = False) -> Dict:
@@ -145,10 +140,9 @@ class ChemicalDatasetComparator:
 
         Raises:
             FileNotFoundError: if the data path is invalid
-            Statement: if no SDFiles are found
+            KeyError: if no SDFiles are in the given directory
         """
         all_dicts = {}
-        # data_dir = os.path.normpath(str(path_to_data))
         data_dir = os.path.abspath(str(path_to_data))
         for dict_name in os.listdir(data_dir):
             if dict_name[-3:] == "sdf":
@@ -157,12 +151,7 @@ class ChemicalDatasetComparator:
                 single_dict[self.import_keyname] = Chem.SDMolSupplier(dict_path)
                 all_dicts[dict_name] = single_dict
         if not all_dicts:
-            logging.warning("No SDFiles found in %s!" % (data_dir))
-            # print(
-            #     "No SDFiles in "
-            #     + str(data_dir)
-            #     + " found!"
-            # )
+            raise KeyError("No SDFiles found in the given directory %s!" % (data_dir))
         figure_dict = {}
         all_dicts[self.figure_dict_keyname] = figure_dict
         self._check_invalid_mols_in_SDF(all_dicts, delete)
@@ -195,13 +184,6 @@ class ChemicalDatasetComparator:
                 "Number of molecules in %s: %d"
                 % (single_dict, all_dicts[single_dict][self.dataset_length_keyname])
             )
-            # print(
-            #     "Number of molecules in "
-            #     + single_dict
-            #     + ": "
-            #     + str(all_dicts[single_dict][self.dataset_length_keyname])
-            # )
-        # print("Updated dictionary with '" + self.dataset_length_keyname + "'")
         logging.info("Updated dictionary with '%s'", self.dataset_length_keyname)
         return
 
@@ -292,7 +274,6 @@ class ChemicalDatasetComparator:
                     id_count += 1
                 database_id_list.append(database_id)
                 all_dicts[single_dict][self.database_id_keyname] = database_id_list
-        # print("Updated dictionary with '" + self.database_id_keyname + "'")
         if id_count == 0:
             logging.info(
                 "No database IDs with '%s' found. (Maybe check for spelling mistakes)"
@@ -361,13 +342,6 @@ class ChemicalDatasetComparator:
                     single_dict,
                     failed_identifier_counter,
                 )
-                # print(
-                #     str(single_dict)
-                #     + " failed to get "
-                #     + str(failed_identifier_counter)
-                #     + " identifier(s)!"
-                # )
-        # print("Updated dictionary with '" + self.identifier_keyname + "'")
         logging.info("Updated dictionary with '%s'", self.identifier_keyname)
         return
 
@@ -398,26 +372,11 @@ class ChemicalDatasetComparator:
                 all_dicts[single_dict][self.duplicates_keyname],
                 all_dicts[single_dict][self.duplicates_id_keyname],
             )
-            # print(
-            #     "Number of duplicates in "
-            #     + single_dict
-            #     + ": "
-            #     + str(all_dicts[single_dict][self.duplicates_keyname])
-            #     + ",  duplicates: "
-            #     + str(all_dicts[single_dict][self.duplicates_id_keyname])
-            # )
         logging.info(
             "Updated dictionary with '%s' and '%s'",
             self.duplicates_keyname,
             self.database_id_keyname,
         )
-        # print(
-        #     "Updated dictionary with '"
-        #     + self.duplicates_keyname
-        #     + "' and '"
-        #     + self.duplicates_id_keyname
-        #     + "'"
-        # )
         return
 
     # Section: Dataset comparison and visualization
@@ -442,23 +401,11 @@ class ChemicalDatasetComparator:
                 continue
             all_dicts[single_dict][self.shared_mols_keyname] = len(shared_molecules)
             all_dicts[single_dict][self.shared_mols_id_keyname] = shared_molecules
-        # print(
-        #     "Number of molecules that can be found in all datasets: "
-        #     + str(len(shared_molecules))
-        #     + ", identifiers: "
-        #     + str(shared_molecules))
         logging.info(
             "Number of molecules found in all datasets: %d, identifier(s): %s",
             len(shared_molecules),
             shared_molecules,
         )
-        #     , '\n'
-        #     "Updated dictionary with '"
-        #     + self.shared_mols_keyname
-        #     + "' and '"
-        #     + self.shared_mols_id_keyname
-        #     + "'"
-        # )
         logging.info(
             "Updated dictionary with '%s' and '%s'",
             self.shared_mols_keyname,
@@ -555,7 +502,6 @@ class ChemicalDatasetComparator:
                 all_dicts[single_dict][self.import_keyname], descriptor
             )
             all_dicts[single_dict][descriptor_list_keyname] = descriptor_list
-        # print("Updated dictionary with '" + descriptor_list_keyname + "'")
         logging.info("Updated dictionary with '%s'", descriptor_list_keyname)
         return
 
@@ -860,7 +806,7 @@ class ChemicalDatasetComparator:
             width_of_bins (int, optional): interval size for the bins for continuous values (default: 10).
             data_type (str): Data type for the exported image (default: png).
             save_dataframe (bool): Export dataframe as csv file or not (default: True).
-            fig_size (float, float): Width, height of the image in inches (default: 15, 7).
+            figsize (float, float): Width, height of the image in inches (default: 15, 7).
             fontsize_tick_labels (int): Fontsize of the labels on the ticks of the axis (default: 15).
             fontsize_legend (int): Fontsize of the legend (default: 15).
             fontsize_ylabel (int): Fontsize of the label of the y-axis (default: 20).
@@ -972,13 +918,6 @@ class ChemicalDatasetComparator:
                 "4_rules_broken": lipinski_break_list.count(4),
             }
             all_dicts[single_dict][self.lipinski_summary_keyname] = lipinski_summary
-        # print(
-        #     "Updated dictionary with '"
-        #     + self.lipinski_summary_keyname
-        #     + "' and '"
-        #     + self.lipinski_list_keyname
-        #     + "'"
-        # )
         logging.info(
             "Updated dictionary with '%s' and '%s'",
             self.lipinski_list_keyname,
@@ -1083,7 +1022,8 @@ class ChemicalDatasetComparator:
         framework: bool = False,
         skeleton: bool = False,
         normalize: bool = True,
-    ) -> Tuple[list, count]:  # what to use here?
+    ):  # -> Tuple[PIL.PngImagePlugin.PngImageFile, list, pandas.core.series.Series]:  # what to use here?
+
         """
         This function creates a grid images of a chosen number of scaffolds/frameworks/cyclic skeletons for the molecules in a given SDMolSupplier Object. The scaffolds/frameworks/cyclic skeletons are sorted by their frequency.
         The relative or absolute number of occurrence of a scaffold/framework/cyclic skeleton in the dataset is shown below each image.
@@ -1107,10 +1047,12 @@ class ChemicalDatasetComparator:
         for mol in moleculeset:
             scaffold = MurckoScaffold.GetScaffoldForMol(mol)
             scaffold_list.append(scaffold)
-        if framework == False and skeleton == False:
+        # if framework == False and skeleton == False:
+        if not framework and not skeleton:
             for mol in scaffold_list:
                 structure_list.append(Chem.MolToSmiles(mol))
-        if framework == True or skeleton == True:
+        # if framework == True or skeleton == True:
+        if framework or skeleton:
             framework_list = []
             for mol in scaffold_list:
                 to_remove = []
@@ -1126,7 +1068,8 @@ class ChemicalDatasetComparator:
                 framework_list.append(framework)
             for mol in framework_list:
                 structure_list.append(Chem.MolToSmiles(mol))
-        if skeleton == True:
+        # if skeleton == True:
+        if skeleton:
             structure_list.clear()
             skeleton_list = []
             for mol in framework_list:
@@ -1166,7 +1109,7 @@ class ChemicalDatasetComparator:
         figsize: Tuple[float, float] = [20.0, 20.0],
         fontsize_title: int = 24,
         fontsize_subtitle: int = 20,
-    ):
+    ):  # -> matplotlib.figure.Figure:
         """
         This function creates a grid images of a chosen number of scaffolds/frameworks/cyclic skeletons for every subdictionary in the given dictionary and shows them together. The scaffolds/frameworks/cyclic skeletons in each gird image are sorted by their frequency. The relative or absolute number of occurrence of a scaffold/framework/cyclic skeleton in the dataset of the respective subdictionary is shown below each image.
 
@@ -1211,13 +1154,6 @@ class ChemicalDatasetComparator:
             self.scaffold_list_keyname,
             self.scaffold_summary_keyname,
         )
-        # print(
-        #     "Updated dictionary with '"
-        #     + self.scaffold_list_keyname
-        #     + "' and '"
-        #     + self.scaffold_summary_keyname
-        #     + "'"
-        # )
         rows = len(image_list)
         fig = plt.figure(figsize=figsize)
         for j in range(0, rows):
@@ -1351,7 +1287,6 @@ class ChemicalDatasetComparator:
             to_export.to_csv(
                 "output/descriptor_values_%s.csv" % (filename), index=False
             )
-            # print(single_dict + " : " + str(counter) + " exported descriptor values")
             logging.info("%s: %d exported descriptor values", single_dict, counter)
         return
 
