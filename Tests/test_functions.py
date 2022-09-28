@@ -341,31 +341,31 @@ def test_lipinski_plot():
         any(key == "lipinski_plot" for key in list(testdict[cider.figure_dict_keyname].keys()))
     )
 
-def test_get_Murcko_scaffold():
+def test_get_scaffold():
     testset = testdict["set_A.sdf"][cider.import_keyname]
-    scaffolds = cider._get_Murcko_scaffold(testset)
+    scaffolds = cider._get_scaffold(testset)
     # Assert that the correct scaffold list is generated (for default)
     expected_scaffold_list = ['c1ccccc1', 'c1ccccc1', 'c1ccccc1', 'O=c1ccoc2ccccc12']
     assert scaffolds[1] == expected_scaffold_list
     # Assert that the correct scaffold counts are calculated (for default)
     assert list(scaffolds[2]) == [0.75, 0.25]
 
-def test_get_Murcko_scaffold_2():
+def test_get_scaffold_2():
     testset = testdict["set_A.sdf"][cider.import_keyname]
-    scaffolds = cider._get_Murcko_scaffold(testset, framework=True)
+    scaffolds = cider._get_scaffold(testset, framework=True)
     # Assert that the correct scaffold list is generated (for framework=True)
     expected_scaffold_list = ['c1ccccc1', 'c1ccccc1', 'c1ccccc1', 'C1=COc2ccccc2C1']
     assert scaffolds[1] == expected_scaffold_list
     # Assert that the correct scaffold counts are calculated (for framework=True)
     assert list(scaffolds[2]) == [0.75, 0.25]
 
-def test_get_Murcko_scaffold_3():
+def test_get_scaffold_3():
     testset = testdict["set_A.sdf"][cider.import_keyname]
-    scaffolds = cider._get_Murcko_scaffold(testset, skeleton=True)
-    # Assert that the correct scaffold list is generated (for skeleton=True)
+    scaffolds = cider._get_scaffold(testset, graph_framework=True)
+    # Assert that the correct scaffold list is generated (for graph_framework=True)
     expected_scaffold_list = ['C1CCCCC1', 'C1CCCCC1', 'C1CCCCC1', 'C1CCC2CCCCC2C1']
     assert scaffolds[1] == expected_scaffold_list
-    # Assert that the correct scaffold counts are calculated (for skeleton=True)
+    # Assert that the correct scaffold counts are calculated (for graph_framework=True)
     assert list(scaffolds[2]) == [0.75, 0.25]
 
 def test_draw_most_frequent_scaffolds():
