@@ -349,7 +349,7 @@ class ChemicalDatasetComparator:
 
     # Section: Check for duplicates
 
-    def get_duplicate_key(self, all_dicts: dict) -> None:
+    def get_duplicate_key(self, all_dicts: dict, identifier: bool = False) -> None:
         """
         This function updates the subdictionaries in the given dictionary with the number of duplicates in the identifier list as a new key-value-Pair (key: self.duplicates_keyname) and a list of the duplicated identifier (key: self.duplicates_id_keyname).
 
@@ -359,15 +359,26 @@ class ChemicalDatasetComparator:
         for single_dict in all_dicts:
             if single_dict == self.figure_dict_keyname:
                 continue
+            if not any(key == self.identifier_keyname for key in list(all_dicts[single_dict].keys())):
+                raise KeyError(
+                    "A identifier list is needed, please run 'get_identifier_list_key'!"
+                )
             number_of_duplicates = len(
                 all_dicts[single_dict][self.identifier_keyname]
             ) - len(set(all_dicts[single_dict][self.identifier_keyname]))
             all_dicts[single_dict][self.duplicates_keyname] = number_of_duplicates
-            duplicates = []
-            for mol in all_dicts[single_dict][self.identifier_keyname]:
-                if all_dicts[single_dict][self.identifier_keyname].count(mol) > 1:
-                    duplicates.append(mol)
-            all_dicts[single_dict][self.duplicates_id_keyname] = set(duplicates)
+            if identifier and number_of_duplicates != 0:
+                all_duplicates = []
+                for mol in all_dicts[single_dict][self.identifier_keyname]:
+                    if all_dicts[single_dict][self.identifier_keyname].count(mol) > 1:
+                        all_duplicates.append(mol)
+                duplicates = set(all_duplicates)
+                # all_dicts[single_dict][self.duplicates_id_keyname] = set(duplicates)
+            elif identifier and number_of_duplicates == 0:
+                duplicates = set()
+            else:
+                duplicates = 'N/A'
+            all_dicts[single_dict][self.duplicates_id_keyname] = duplicates
             logger.info(
                 "Number of duplicates in %s: %d, duplicate identifier(s): %s",
                 single_dict,

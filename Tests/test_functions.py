@@ -15,7 +15,7 @@ def test_import_as_data_dict():
 
 def test_check_invalid_mols_in_SDF():
     test_dict_path = os.path.join(os.path.split(__file__)[0], "unittest_data_invalid")
-    invalid_testdict = cider.import_as_data_dict(test_dict_path)
+    invalid_testdict = cider.import_as_data_dict(test_dict_path, delete=False)
     # Assert that faulty molecules are detected and optionally deleted
     cider._check_invalid_mols_in_SDF(invalid_testdict, delete=False)
     assert len(invalid_testdict["set_D_invalid.sdf"][cider.import_keyname]) == 7
@@ -121,11 +121,17 @@ def test_get_identifier_list_key():
 
 
 def test_get_duplicate_key():
-    cider.get_duplicate_key(testdict)
-    # Assert that the function generates a new entry in the dictionary
+    cider.get_duplicate_key(testdict, identifier=True)
+    # Assert that the function generates a new entries in the dictionary
     assert (
         any(
             key == cider.duplicates_keyname
+            for key in list(testdict["set_A.sdf"].keys())
+        )
+    )
+    assert (
+        any(
+            key == cider.duplicates_id_keyname
             for key in list(testdict["set_A.sdf"].keys())
         )
     )
@@ -133,6 +139,13 @@ def test_get_duplicate_key():
     assert testdict["set_A.sdf"][cider.duplicates_keyname] == 0
     assert testdict["set_B.sdf"][cider.duplicates_keyname] == 0
     assert testdict["set_D.sdf"][cider.duplicates_keyname] == 1
+    # Assert that the function returns the right duplicate identifier
+    assert (
+        testdict["set_D.sdf"][cider.duplicates_keyname]
+        == {'GZFGOTFRPZRKDS-UHFFFAOYSA-N'}
+        or {'InChI=1S/C6H5BrO/c7-5-1-3-6(8)4-2-5/h1-4,8H'}
+        or {'Oc1ccc(Br)cc1'}
+    )
 
 def test_get_shared_molecules_key():
     cider.get_shared_molecules_key(testdict)
