@@ -51,10 +51,17 @@ import PIL
 import matplotlib
 
 import logging
+import sys
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(
+    format='%(asctime)s [%(levelname)s] %(name)s: %(message)s',
+    level=logging.INFO,
+    handlers=[
+        logging.FileHandler("output/cider_logging.log"),
+        logging.StreamHandler(sys.stdout)
+    ]
+)
 logger = logging.getLogger('CIDER')
-
 
 class ChemicalDatasetComparator:
     """
@@ -406,6 +413,10 @@ class ChemicalDatasetComparator:
         for single_dict in all_dicts:
             if single_dict == self.figure_dict_keyname:
                 continue
+            if not any(key == self.identifier_keyname for key in list(all_dicts[single_dict].keys())):
+                raise KeyError(
+                    "A identifier list is needed, please run 'get_identifier_list_key'!"
+                )
             single_set = set(all_dicts[single_dict][self.identifier_keyname])
             sets.append(single_set)
         shared_molecules = set.intersection(*sets)
@@ -445,6 +456,10 @@ class ChemicalDatasetComparator:
         for single_dict in all_dicts:
             if single_dict == self.figure_dict_keyname:
                 continue
+            if not any(key == self.identifier_keyname for key in list(all_dicts[single_dict].keys())):
+                raise KeyError(
+                    "A identifier list is needed, please run 'get_identifier_list_key'!"
+                )
             single_set = set(all_dicts[single_dict][self.identifier_keyname])
             sets.append(single_set)
         fig = plt.figure(figsize=(10, 10))
@@ -837,9 +852,9 @@ class ChemicalDatasetComparator:
             )
         ):
             raise KeyError(
-                "Descriptor ("
+                "A discriptor list ("
                 + str(descriptor_list_keyname)
-                + ") needs to be calculated before plotting!"
+                + ") is needed for plotting. Please run 'get_descriptor_list_key'!"
             )
         elif type(all_dicts[first_dict][descriptor_list_keyname][0]) == int:
             self._get_discrete_descriptor_counts(all_dicts, descriptor_list_keyname)
@@ -980,7 +995,7 @@ class ChemicalDatasetComparator:
                 raise KeyError(
                     "Lipinski summary ("
                     + str(self.lipinski_summary_keyname)
-                    + ") needs to be calculated before plotting! Use 'get_lipinski_key'!"
+                    + ") is needed for plotting! Please run 'get_lipinski_key'!"
                 )
             header = single_dict
             lipinski_df_dict.update(
@@ -1214,6 +1229,10 @@ class ChemicalDatasetComparator:
         for single_dict in all_dicts:
             if single_dict == self.figure_dict_keyname:
                 continue
+            if not any(key == self.identifier_keyname for key in list(all_dicts[single_dict].keys())):
+                raise KeyError(
+                    "A identifier list is needed, please run 'get_identifier_list_key'!"
+                )
             for mol in all_dicts[single_dict][self.identifier_keyname]:
                 all_mols_list.append(mol)
                 target_list.append(single_dict)
