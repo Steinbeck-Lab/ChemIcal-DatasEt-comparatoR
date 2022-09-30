@@ -53,6 +53,8 @@ import matplotlib
 import logging
 import sys
 
+# Section: Configuration for logging
+
 logging.basicConfig(
     format='%(asctime)s [%(levelname)s] %(name)s: %(message)s',
     level=logging.INFO,
@@ -62,6 +64,8 @@ logging.basicConfig(
     ]
 )
 logger = logging.getLogger('CIDER')
+
+# Section: Constructor
 
 class ChemicalDatasetComparator:
     """
@@ -374,29 +378,39 @@ class ChemicalDatasetComparator:
                 all_dicts[single_dict][self.identifier_keyname]
             ) - len(set(all_dicts[single_dict][self.identifier_keyname]))
             all_dicts[single_dict][self.duplicates_keyname] = number_of_duplicates
-            if identifier and number_of_duplicates != 0:
-                all_duplicates = []
-                for mol in all_dicts[single_dict][self.identifier_keyname]:
-                    if all_dicts[single_dict][self.identifier_keyname].count(mol) > 1:
-                        all_duplicates.append(mol)
-                duplicates = set(all_duplicates)
-                # all_dicts[single_dict][self.duplicates_id_keyname] = set(duplicates)
-            elif identifier and number_of_duplicates == 0:
-                duplicates = set()
+            if identifier:
+                if number_of_duplicates != 0:
+                    all_duplicates = []
+                    for mol in all_dicts[single_dict][self.identifier_keyname]:
+                        if all_dicts[single_dict][self.identifier_keyname].count(mol) > 1:
+                            all_duplicates.append(mol)
+                    duplicates = set(all_duplicates)
+                else:
+                    duplicates = set()
+                all_dicts[single_dict][self.duplicates_id_keyname] = duplicates
+                logger.info(
+                    "Number of duplicates in %s: %d, duplicate identifier(s): %s",
+                    single_dict,
+                    all_dicts[single_dict][self.duplicates_keyname],
+                    all_dicts[single_dict][self.duplicates_id_keyname],
+                )
             else:
-                duplicates = 'N/A'
-            all_dicts[single_dict][self.duplicates_id_keyname] = duplicates
+                logger.info(
+                    "Number of duplicates in %s: %d",
+                    single_dict,
+                    all_dicts[single_dict][self.duplicates_keyname],
+                )
+        if identifier:
             logger.info(
-                "Number of duplicates in %s: %d, duplicate identifier(s): %s",
-                single_dict,
-                all_dicts[single_dict][self.duplicates_keyname],
-                all_dicts[single_dict][self.duplicates_id_keyname],
+                "Updated dictionary with '%s' and '%s'",
+                self.duplicates_keyname,
+                self.duplicates_id_keyname,
             )
-        logger.info(
-            "Updated dictionary with '%s' and '%s'",
-            self.duplicates_keyname,
-            self.database_id_keyname,
-        )
+        else:
+            logger.info(
+                "Updated dictionary with '%s'",
+                self.duplicates_keyname
+            )
         return
 
     # Section: Dataset comparison and visualization
