@@ -164,7 +164,11 @@ class ChemicalDatasetComparator:
                 single_dict[self.import_keyname] = Chem.SDMolSupplier(dict_path)
                 all_dicts[dict_name] = single_dict
         if not all_dicts:
-            raise KeyError("No SDFiles found in the given directory %s!" % (data_dir))
+            try:
+                raise KeyError("No SDFiles found in the given directory %s!" % (data_dir))
+            except KeyError as e:
+                logger.error(str(e), exc_info=True)  # logger.error(str(e))
+                raise
         figure_dict = {}
         all_dicts[self.figure_dict_keyname] = figure_dict
         self._check_invalid_mols_in_SDF(all_dicts, delete)
@@ -327,9 +331,13 @@ class ChemicalDatasetComparator:
             elif id_type == "inchi":
                 identifier = Chem.MolToInchi(mol)
             else:
-                raise ValueError(
-                    'id_type argument needs to be "smiles", "inchikey" or "inchi"!'
-                )
+                try:
+                    raise ValueError(
+                        'id_type argument needs to be "smiles", "inchikey" or "inchi"!'
+                    )
+                except ValueError as e:
+                    logger.error(str(e), exc_info=True)
+                    raise
             identifier_list.append(identifier)
         return identifier_list, failed_identifier_counter
 
@@ -366,14 +374,21 @@ class ChemicalDatasetComparator:
 
         Args:
             all_dicts (dict): Dictionary with subdictionaries including a list of identifiers (self.identifier_keyname).
+
+        Raises:
+            KeyError: if there is no identifier list.
         """
         for single_dict in all_dicts:
             if single_dict == self.figure_dict_keyname:
                 continue
             if not any(key == self.identifier_keyname for key in list(all_dicts[single_dict].keys())):
-                raise KeyError(
-                    "A identifier list is needed, please run 'get_identifier_list_key'!"
-                )
+                try:
+                    raise KeyError(
+                        "A identifier list is needed, please run 'get_identifier_list_key'!"
+                    )
+                except KeyError as e:
+                    logger.error(str(e), exc_info=True)
+                    raise
             number_of_duplicates = len(
                 all_dicts[single_dict][self.identifier_keyname]
             ) - len(set(all_dicts[single_dict][self.identifier_keyname]))
@@ -422,15 +437,22 @@ class ChemicalDatasetComparator:
 
         Args:
             all_dicts (dict): Dictionary with subdictionaries including a lists of identifiers (self.identifier_keyname).
+
+        Raises:
+            KeyError: if there is no identifier list.
         """
         sets = []
         for single_dict in all_dicts:
             if single_dict == self.figure_dict_keyname:
                 continue
             if not any(key == self.identifier_keyname for key in list(all_dicts[single_dict].keys())):
-                raise KeyError(
-                    "A identifier list is needed, please run 'get_identifier_list_key'!"
-                )
+                try:
+                    raise KeyError(
+                        "A identifier list is needed, please run 'get_identifier_list_key'!"
+                    )
+                except KeyError as e:
+                    logger.error(str(e), exc_info=True)
+                    raise
             single_set = set(all_dicts[single_dict][self.identifier_keyname])
             sets.append(single_set)
         shared_molecules = set.intersection(*sets)
@@ -464,16 +486,21 @@ class ChemicalDatasetComparator:
             fig (matplotlib.figure): Venn diagram
 
         Raises:
-            ValueError: If there is only one or more than three sets to be compared an error is raised.
+            ValueError: If there is only one or more than three sets to be compared.
+            KeyError: If there is no identifier list.
         """
         sets = []
         for single_dict in all_dicts:
             if single_dict == self.figure_dict_keyname:
                 continue
             if not any(key == self.identifier_keyname for key in list(all_dicts[single_dict].keys())):
-                raise KeyError(
-                    "A identifier list is needed, please run 'get_identifier_list_key'!"
-                )
+                try:
+                    raise KeyError(
+                        "A identifier list is needed, please run 'get_identifier_list_key'!"
+                    )
+                except KeyError as e:
+                    logger.error(str(e), exc_info=True)
+                    raise
             single_set = set(all_dicts[single_dict][self.identifier_keyname])
             sets.append(single_set)
         fig = plt.figure(figsize=(10, 10))
@@ -482,7 +509,11 @@ class ChemicalDatasetComparator:
         elif len(sets) == 2:
             venn = venn2(sets, set_labels=(all_dicts.keys()), alpha=0.5)
         else:
-            raise ValueError("Visualization only possible for two or three data sets!")
+            try:
+                raise ValueError("Visualization only possible for two or three data sets!")
+            except ValueError as e:
+                logger.error(str(e), exc_info=True)
+                raise
         plt.title("Intersection as Venn diagram", fontsize=20)
         for text in venn.set_labels:
             text.set_fontsize(15)
@@ -855,6 +886,10 @@ class ChemicalDatasetComparator:
             fontsize_xlabel (int): Fontsize of the label of the x-axis (default: 20).
             fontsize_title (int): Fontsize of the title (default: 24).
 
+        Raises:
+            KeyError: if there is not the needed descriptor list.
+            ValueError: if the descriptor values are not int or float and can therefore not be plotted.
+
         Returns:
             fig (matplotlib.figure): Plot
         """
@@ -865,11 +900,15 @@ class ChemicalDatasetComparator:
                 for key in list(all_dicts[first_dict].keys())
             )
         ):
-            raise KeyError(
-                "A discriptor list ("
-                + str(descriptor_list_keyname)
-                + ") is needed for plotting. Please run 'get_descriptor_list_key'!"
-            )
+            try:
+                raise KeyError(
+                    "A descriptor list ("
+                    + str(descriptor_list_keyname)
+                    + ") is needed for plotting. Please run 'get_descriptor_list_key'!"
+                )
+            except KeyError as e:
+                logger.error(str(e), exc_info=True)
+                raise
         elif type(all_dicts[first_dict][descriptor_list_keyname][0]) == int:
             self._get_discrete_descriptor_counts(all_dicts, descriptor_list_keyname)
             fig = self._discrete_descriptor_plot(
@@ -904,9 +943,13 @@ class ChemicalDatasetComparator:
                 fontsize_title,
             )
         else:
-            raise ValueError(
-                'Descriptor values should be "int" or "float" (numpy.float64) to be binned!'
-            )
+            try:
+                raise ValueError(
+                    'Descriptor values should be "int" or "float" (numpy.float64) to be binned!'
+                )
+            except ValueError as e:
+                logger.error(str(e), exc_info=True)
+                raise
         return fig
 
     # Section: Check Lipinski Rule of 5 and visualization
@@ -993,7 +1036,10 @@ class ChemicalDatasetComparator:
             fontsize_xlabel (int): Fontsize of the label of the x-axis (default: 20).
             fontsize_title (int): Fontsize of the title (default: 24).
 
-        returns:
+        Raises:
+            KeyError: if the Lipinski key is missing and therefore no plot can be generated.
+
+        Returns:
             fig (matplotlib.figure.Figure): Plot
         """
         lipinski_df_dict = {"Number of broken rules": [0, 1, 2, 3, 4]}
@@ -1006,11 +1052,15 @@ class ChemicalDatasetComparator:
                     for key in list(all_dicts[single_dict].keys())
                 )
             ):
-                raise KeyError(
-                    "Lipinski summary ("
-                    + str(self.lipinski_summary_keyname)
-                    + ") is needed for plotting! Please run 'get_lipinski_key'!"
-                )
+                try:
+                    raise KeyError(
+                        "Lipinski summary ("
+                        + str(self.lipinski_summary_keyname)
+                        + ") is needed for plotting! Please run 'get_lipinski_key'!"
+                    )
+                except KeyError as e:
+                    logger.error(str(e), exc_info=True)
+                    raise
             header = single_dict
             lipinski_df_dict.update(
                 {
@@ -1234,6 +1284,9 @@ class ChemicalDatasetComparator:
             fp_bits (int): Size of the Extended Connectivity Fingerprints (default: 2048).
             dimension_reduction (str): Method of dimension reduction (default: pca).
             interactive (bool): Creating an interactive plot or not (default: True).
+        Raises:
+            KeyError: if the identifier list is missing.
+            ValueError: if the dimension reduction is not pca, tsne or umap.
 
         Returns:
             Chemical space visualization
@@ -1244,9 +1297,13 @@ class ChemicalDatasetComparator:
             if single_dict == self.figure_dict_keyname:
                 continue
             if not any(key == self.identifier_keyname for key in list(all_dicts[single_dict].keys())):
-                raise KeyError(
-                    "A identifier list is needed, please run 'get_identifier_list_key'!"
-                )
+                try:
+                    raise KeyError(
+                        "A identifier list is needed, please run 'get_identifier_list_key'!"
+                    )
+                except KeyError as e:
+                    logger.error(str(e), exc_info=True)
+                    raise
             for mol in all_dicts[single_dict][self.identifier_keyname]:
                 all_mols_list.append(mol)
                 target_list.append(single_dict)
@@ -1299,7 +1356,11 @@ class ChemicalDatasetComparator:
         elif dimension_reduction == "umap":
             chem_space.umap()  # n_neighbors, min_dist, pca, random_state ...
         else:
-            raise ValueError('dimension_reduction should be "pca", "tsne" or "umap"!')
+            try:
+                raise ValueError('dimension_reduction should be "pca", "tsne" or "umap"!')
+            except ValueError as e:
+                logger.error(str(e), exc_info=True)
+                raise
         if not os.path.exists("output"):
             os.makedirs("output")
         if not interactive:
