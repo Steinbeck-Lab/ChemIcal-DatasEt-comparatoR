@@ -1364,10 +1364,18 @@ class ChemicalDatasetComparator:
         if not os.path.exists("output"):
             os.makedirs("output")
         if not interactive:
-            chem_space.visualize_plot(filename="output/chemical_space")
+            fig = chem_space.visualize_plot(filename="output/chemical_space").figure
+            all_dicts[self.figure_dict_keyname]["chemical_space"] = fig
+            plt.close(fig)
+            logger.info("Updated dictionary with 'chemical_space'")
         else:
-            chem_space.interactive_plot(show_plot=True)
-        return chem_space
+            fig = chem_space.interactive_plot(show_plot=True, filename="output/chemical_space.html")
+        return fig
+        # if not interactive:
+        #     chem_space.visualize_plot(filename="output/chemical_space")
+        # else:
+        #     chem_space.interactive_plot(show_plot=True)
+        # return chem_space
 
     # Section: Data export
 
