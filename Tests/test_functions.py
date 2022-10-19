@@ -438,3 +438,14 @@ def test_chemical_space_plot_tsne():
                                        interactive=False,
                                        fp_bits=1024,
                                        fp_radius=2)
+
+def test_save_to_figure_dict():
+    cider.draw_molecules(testdict)
+    # Assert that the picture is exported
+    test_path = os.path.join(os.path.split(__file__)[0],
+                             "output", "mol_grid_1.png")
+    assert os.path.exists(test_path)
+    # Assert that a new entry in self.figure_dict_keyname is generated
+    assert (
+        any(key == "mol_grid_1" for key in list(testdict[cider.figure_dict_keyname].keys()))
+    )

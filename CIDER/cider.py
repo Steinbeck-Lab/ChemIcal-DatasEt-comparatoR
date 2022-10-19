@@ -44,6 +44,7 @@ from matplotlib.backends.backend_pdf import PdfPages
 
 import chemplot as cp
 from chemplot import descriptors
+from bokeh.plotting import output_file, save
 
 from typing import List, Tuple, Dict
 from itertools import count
@@ -54,6 +55,9 @@ import logging
 import sys
 
 # Section: Configuration for logging
+
+if not os.path.exists("output"):
+    os.mkdir("output")
 
 logging.basicConfig(
     format='%(asctime)s [%(levelname)s] %(name)s: %(message)s',
@@ -164,11 +168,12 @@ class ChemicalDatasetComparator:
                 single_dict[self.import_keyname] = Chem.SDMolSupplier(dict_path)
                 all_dicts[dict_name] = single_dict
         if not all_dicts:
-            try:
-                raise KeyError("No SDFiles found in the given directory %s!" % (data_dir))
-            except KeyError as e:
-                logger.error(str(e), exc_info=True)  # logger.error(str(e))
-                raise
+            raise KeyError("No SDFiles found in the given directory %s!" % (data_dir))
+            # try:
+            #     raise KeyError("No SDFiles found in the given directory %s!" % (data_dir))
+            # except KeyError as e:
+            #     logger.error(str(e), exc_info=True)  # logger.error(str(e))
+            #     raise
         figure_dict = {}
         all_dicts[self.figure_dict_keyname] = figure_dict
         self._check_invalid_mols_in_SDF(all_dicts, delete)
@@ -182,6 +187,47 @@ class ChemicalDatasetComparator:
                     "Already existing output folder with files! Old data will be overwritten!"
                 )
         return all_dicts
+
+    # Section: Saving figures and images
+
+    def _save_to_figure_dict(
+        self,
+        all_dicts: dict,
+        keyname: str,
+        fig,
+        data_type: str = 'png'
+    ) -> None:
+        """
+        This function stores the images and figures created by CIDER in the 'figure' (self.figure_dict_keyname) subdictionary and exports them to the output folder. When the name for a figure is already used there will be a increasing number added.
+
+        Args:
+            all_dicts (dict): Dictionary containing 'figures' subdictionary (self.figure_dict_keyname).
+            keyname (str): Name of the image/figure.
+            fig: Images or figure to be stored.
+            data_type (str): Data type for the exported file. (Default: png)
+        """
+        if not any(key == keyname for key in list(all_dicts[self.figure_dict_keyname].keys())):
+            all_dicts[self.figure_dict_keyname][keyname] = fig
+            plt.savefig(
+                "output/%s.%s" % (keyname, data_type),
+                bbox_inches="tight",
+                transparent=True,
+            )
+            logger.info("Updated dictionary with '%s'", keyname)
+        else:
+            counter = 1
+            new_keyname = (keyname + '_' + str(counter))
+            while any(key == new_keyname for key in list(all_dicts[self.figure_dict_keyname].keys())):
+                counter += 1
+                new_keyname = (keyname + '_' + str(counter))
+            all_dicts[self.figure_dict_keyname][new_keyname] = fig
+            plt.savefig(
+                "output/%s.%s" % (new_keyname, data_type),
+                bbox_inches="tight",
+                transparent=True,
+            )
+            logger.info("Updated dictionary with '%s'", new_keyname)
+        return
 
     # Section: Get overview of the dataset size and molecules
 
@@ -260,12 +306,13 @@ class ChemicalDatasetComparator:
             plt.imshow(image_list[j])
             plt.title(title_list[j], fontsize=fontsize_subtitle)
         fig.suptitle("Exemplary molecules from the datasets", fontsize=fontsize_title)
-        if not os.path.exists("output"):
-            os.makedirs("output")
-        fig.savefig("output/mol_grid.%s" % (data_type))
-        all_dicts[self.figure_dict_keyname]["mol_grid"] = fig
+        self._save_to_figure_dict(all_dicts, 'mol_grid', fig, data_type=data_type)
+        # if not os.path.exists("output"):
+        #     os.makedirs("output")
+        # fig.savefig("output/mol_grid.%s" % (data_type))
+        # all_dicts[self.figure_dict_keyname]["mol_grid"] = fig
         plt.close(fig)
-        logger.info("Updated dictionary with 'mol_grid'")
+        # logger.info("Updated dictionary with 'mol_grid'")
         return fig
 
     # Section: Get database ID
@@ -520,16 +567,17 @@ class ChemicalDatasetComparator:
         for x in range(len(venn.subset_labels)):
             if venn.subset_labels[x] is not None:
                 venn.subset_labels[x].set_fontsize(15)
-        if not os.path.exists("output"):
-            os.makedirs("output")
-        plt.savefig(
-            "output/intersection.%s" % (data_type),
-            bbox_inches="tight",
-            transparent=True,
-        )
-        all_dicts[self.figure_dict_keyname]["intersection"] = fig
+        self._save_to_figure_dict(all_dicts, 'intersection', fig, data_type=data_type)
+        # if not os.path.exists("output"):
+        #     os.makedirs("output")
+        # plt.savefig(
+        #     "output/intersection.%s" % (data_type),
+        #     bbox_inches="tight",
+        #     transparent=True,
+        # )
+        # all_dicts[self.figure_dict_keyname]["intersection"] = fig
         plt.close(fig)
-        logger.info("Updated dictionary with 'intersection'")
+        # logger.info("Updated dictionary with 'intersection'")
         return fig
 
     # Section: Get descriptors and create plots
@@ -756,18 +804,19 @@ class ChemicalDatasetComparator:
             fontsize=fontsize_title,
         )
         fig = descriptor_plot.figure
-        fig.savefig(
-            "output/distribution_of_%s.%s" % (descriptor_list_keyname, data_type),
-            bbox_inches="tight",
-            transparent=True,
-        )
-        all_dicts[self.figure_dict_keyname][
-            "distribution_of_%s" % (descriptor_list_keyname)
-        ] = fig
+        self._save_to_figure_dict(all_dicts, keyname=('distribution_of_' + str(descriptor_list_keyname)), fig=fig, data_type=data_type)
+        # fig.savefig(
+        #     "output/distribution_of_%s.%s" % (descriptor_list_keyname, data_type),
+        #     bbox_inches="tight",
+        #     transparent=True,
+        # )
+        # all_dicts[self.figure_dict_keyname][
+        #     "distribution_of_%s" % (descriptor_list_keyname)
+        # ] = fig
         plt.close(fig)
-        logger.info(
-            "Updated dictionary with 'distribution_of_%s'", descriptor_list_keyname
-        )
+        # logger.info(
+        #     "Updated dictionary with 'distribution_of_%s'", descriptor_list_keyname
+        # )
         return fig
 
     def _continuous_descriptor_plot(
@@ -841,18 +890,19 @@ class ChemicalDatasetComparator:
             fontsize=fontsize_title,
         )
         fig = descriptor_plot.figure
-        fig.savefig(
-            "output/distribution_of_%s.%s" % (descriptor_list_keyname, data_type),
-            bbox_inches="tight",
-            transparent=True,
-        )
-        all_dicts[self.figure_dict_keyname][
-            "distribution_of_%s" % (descriptor_list_keyname)
-        ] = fig
+        self._save_to_figure_dict(all_dicts, keyname=('distribution_of_' + str(descriptor_list_keyname)), fig=fig, data_type=data_type)
+        # fig.savefig(
+        #     "output/distribution_of_%s.%s" % (descriptor_list_keyname, data_type),
+        #     bbox_inches="tight",
+        #     transparent=True,
+        # )
+        # all_dicts[self.figure_dict_keyname][
+        #     "distribution_of_%s" % (descriptor_list_keyname)
+        # ] = fig
         plt.close(fig)
-        logger.info(
-            "Updated dictionary with 'distribution_of_%s'", descriptor_list_keyname
-        )
+        # logger.info(
+        #     "Updated dictionary with 'distribution_of_%s'", descriptor_list_keyname
+        # )
         return fig
 
     def descriptor_counts_and_plot(
@@ -1093,14 +1143,15 @@ class ChemicalDatasetComparator:
             fontsize=fontsize_title,
         )
         fig = lipinski_plot.figure
-        fig.savefig(
-            "output/lipinski_plot.%s" % (data_type),
-            bbox_inches="tight",
-            transparent=True,
-        )
-        all_dicts[self.figure_dict_keyname]["lipinski_plot"] = fig
+        self._save_to_figure_dict(all_dicts, 'lipinski_plot', fig, data_type=data_type)
+        # fig.savefig(
+        #     "output/lipinski_plot.%s" % (data_type),
+        #     bbox_inches="tight",
+        #     transparent=True,
+        # )
+        # all_dicts[self.figure_dict_keyname]["lipinski_plot"] = fig
         plt.close(fig)
-        logger.info("Updated dictionary with 'lipinski_plot'")
+        # logger.info("Updated dictionary with 'lipinski_plot'")
         return fig
 
     # Section: Scaffold analysis and plotting
@@ -1255,12 +1306,13 @@ class ChemicalDatasetComparator:
         fig.suptitle(
             "Most frequent scaffolds from the datasets", fontsize=fontsize_title
         )
-        if not os.path.exists("output"):
-            os.makedirs("output")
-        fig.savefig("output/scaffold_grid.%s" % (data_type))
-        all_dicts[self.figure_dict_keyname]["scaffold_grid"] = fig
+        self._save_to_figure_dict(all_dicts, 'scaffold_grid', fig, data_type=data_type)
+        # if not os.path.exists("output"):
+        #     os.makedirs("output")
+        # fig.savefig("output/scaffold_grid.%s" % (data_type))
+        # all_dicts[self.figure_dict_keyname]["scaffold_grid"] = fig
         plt.close(fig)
-        logger.info("Updated dictionary with 'scaffold_grid'")
+        # logger.info("Updated dictionary with 'scaffold_grid'")
         return fig
 
     # Section: Chemical space visualization
@@ -1364,18 +1416,22 @@ class ChemicalDatasetComparator:
         if not os.path.exists("output"):
             os.makedirs("output")
         if not interactive:
-            fig = chem_space.visualize_plot(filename="output/chemical_space").figure
-            all_dicts[self.figure_dict_keyname]["chemical_space"] = fig
+            fig = chem_space.visualize_plot().figure
+            self._save_to_figure_dict(all_dicts, 'chemical_space', fig)
             plt.close(fig)
-            logger.info("Updated dictionary with 'chemical_space'")
         else:
-            fig = chem_space.interactive_plot(show_plot=True, filename="output/chemical_space.html")
+            fig = chem_space.interactive_plot(show_plot=True)
+            if not os.path.exists("output/interactive_chemical_space.html"):
+                output_file("output/interactive_chemical_space.html")
+            else:
+                counter = 1
+                file_name = str('interactive_chemical_space_')
+                while os.path.exists("output/%s%d.html" % (file_name, counter)):
+                    counter += 1
+                output_file("output/%s%d.html" % (file_name, counter))
+            save(fig)
+            # fig = chem_space.interactive_plot(show_plot=True, filename="output/interactive_chemical_space.html")
         return fig
-        # if not interactive:
-        #     chem_space.visualize_plot(filename="output/chemical_space")
-        # else:
-        #     chem_space.interactive_plot(show_plot=True)
-        # return chem_space
 
     # Section: Data export
 
