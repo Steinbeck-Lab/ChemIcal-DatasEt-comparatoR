@@ -54,20 +54,7 @@ import matplotlib
 import logging
 import sys
 
-# Section: Configuration for logging
-
-if not os.path.exists("output"):
-    os.mkdir("output")
-
-logging.basicConfig(
-    format='%(asctime)s [%(levelname)s] %(name)s: %(message)s',
-    level=logging.INFO,
-    handlers=[
-        logging.FileHandler("output/cider_logging.log"),
-        logging.StreamHandler(sys.stdout)
-    ]
-)
-logger = logging.getLogger('CIDER')
+logger = logging.getLogger('CIDER')  # needs to be here
 
 # Section: Constructor
 
@@ -103,6 +90,63 @@ class ChemicalDatasetComparator:
         # from cider.draw_most_frequent_scaffolds
         self.scaffold_list_keyname = "scaffold_list"
         self.scaffold_summary_keyname = "scaffold_summary"
+
+    # Section: Configuration for logging
+
+    if not os.path.exists("output"):
+        os.mkdir("output")
+
+    logging.basicConfig(
+        format='%(asctime)s [%(levelname)s] %(name)s: %(message)s',
+        level=logging.INFO,
+        handlers=[
+            logging.FileHandler("output/cider_logging.log"),
+            logging.StreamHandler(sys.stdout)
+        ]
+    )
+    logger = logging.getLogger('CIDER')
+    logger.warning('Tis a warnin in class')
+
+    def exception_handler_IP(self, exc_type, exc_value, exc_tb, tb_offset=None):
+        """
+        This function is a callable exception handler when working in IPython. It logs the exception including the traceback into the log file.
+
+        Args:
+            exc_type: Type of the exception.
+            exc_value: Value of the exception.
+            exc_tb: Traceback of the exception.
+            tb_offset: Traceback offset.
+        """
+        logger.error("An Error occured while executing CIDER!", exc_info=True)
+        self.showtraceback((exc_type, exc_value, exc_tb), tb_offset=tb_offset)
+        return
+
+    def exception_handler(exc_type, exc_value, exc_tb):
+        """
+        This function is a callable exception handler when NOT working in IPython. It logs the exception including the traceback into the log file.
+
+        Args:
+            exc_type: Type of the exception.
+            exc_value: Value of the exception.
+            exc_tb: Tracback of the exception.
+            tb_offset: Traceback offset.
+        """
+        logger.exception(
+            "An Error occured while executing CIDER!",
+            exc_info=(exc_type, exc_value, exc_tb)
+        )
+        return
+
+    """
+    This function checks if CIDER is run in IPython or not and selects the corresponding exception handler for logging.
+    """
+    try:
+        __IPYTHON__
+        from IPython import get_ipython
+        ip = get_ipython()
+        ip.set_custom_exc((BaseException,), exception_handler_IP)
+    except NameError:
+        sys.excepthook = exception_handler
 
     # Section: Import data and check for faulty SDFiles
 
@@ -198,7 +242,7 @@ class ChemicalDatasetComparator:
         data_type: str = 'png'
     ) -> None:
         """
-        This function stores the images and figures created by CIDER in the 'figure' (self.figure_dict_keyname) subdictionary and exports them to the output folder. When the name for a figure is already used there will be a increasing number added.
+        This function stores the images and figures created by CIDER in the 'figure' (self.figure_dict_keyname) subdictionary and exports them to the output folder with a given data type. When the name for a figure is already used there will be a increasing number added. This only works within one analysis, after restarting CIDER the files in the output folder might be overwritten.
 
         Args:
             all_dicts (dict): Dictionary containing 'figures' subdictionary (self.figure_dict_keyname).
@@ -378,13 +422,16 @@ class ChemicalDatasetComparator:
             elif id_type == "inchi":
                 identifier = Chem.MolToInchi(mol)
             else:
-                try:
-                    raise ValueError(
-                        'id_type argument needs to be "smiles", "inchikey" or "inchi"!'
-                    )
-                except ValueError as e:
-                    logger.error(str(e), exc_info=True)
-                    raise
+                raise ValueError(
+                    'id_type argument needs to be "smiles", "inchikey" or "inchi"!'
+                )
+                # try:
+                #     raise ValueError(
+                #         'id_type argument needs to be "smiles", "inchikey" or "inchi"!'
+                #     )
+                # except ValueError as e:
+                #     logger.error(str(e), exc_info=True)
+                #     raise
             identifier_list.append(identifier)
         return identifier_list, failed_identifier_counter
 
@@ -429,13 +476,16 @@ class ChemicalDatasetComparator:
             if single_dict == self.figure_dict_keyname:
                 continue
             if not any(key == self.identifier_keyname for key in list(all_dicts[single_dict].keys())):
-                try:
-                    raise KeyError(
-                        "A identifier list is needed, please run 'get_identifier_list_key'!"
-                    )
-                except KeyError as e:
-                    logger.error(str(e), exc_info=True)
-                    raise
+                raise KeyError(
+                    "A identifier list is needed, please run 'get_identifier_list_key'!"
+                )
+                # try:
+                #     raise KeyError(
+                #         "A identifier list is needed, please run 'get_identifier_list_key'!"
+                #     )
+                # except KeyError as e:
+                #     logger.error(str(e), exc_info=True)
+                #     raise
             number_of_duplicates = len(
                 all_dicts[single_dict][self.identifier_keyname]
             ) - len(set(all_dicts[single_dict][self.identifier_keyname]))
@@ -493,13 +543,16 @@ class ChemicalDatasetComparator:
             if single_dict == self.figure_dict_keyname:
                 continue
             if not any(key == self.identifier_keyname for key in list(all_dicts[single_dict].keys())):
-                try:
-                    raise KeyError(
-                        "A identifier list is needed, please run 'get_identifier_list_key'!"
-                    )
-                except KeyError as e:
-                    logger.error(str(e), exc_info=True)
-                    raise
+                raise KeyError(
+                    "A identifier list is needed, please run 'get_identifier_list_key'!"
+                )
+                # try:
+                #     raise KeyError(
+                #         "A identifier list is needed, please run 'get_identifier_list_key'!"
+                #     )
+                # except KeyError as e:
+                #     logger.error(str(e), exc_info=True)
+                #     raise
             single_set = set(all_dicts[single_dict][self.identifier_keyname])
             sets.append(single_set)
         shared_molecules = set.intersection(*sets)
@@ -541,13 +594,16 @@ class ChemicalDatasetComparator:
             if single_dict == self.figure_dict_keyname:
                 continue
             if not any(key == self.identifier_keyname for key in list(all_dicts[single_dict].keys())):
-                try:
-                    raise KeyError(
-                        "A identifier list is needed, please run 'get_identifier_list_key'!"
-                    )
-                except KeyError as e:
-                    logger.error(str(e), exc_info=True)
-                    raise
+                raise KeyError(
+                    "A identifier list is needed, please run 'get_identifier_list_key'!"
+                )
+                # try:
+                #     raise KeyError(
+                #         "A identifier list is needed, please run 'get_identifier_list_key'!"
+                #     )
+                # except KeyError as e:
+                #     logger.error(str(e), exc_info=True)
+                #     raise
             single_set = set(all_dicts[single_dict][self.identifier_keyname])
             sets.append(single_set)
         fig = plt.figure(figsize=(10, 10))
@@ -556,11 +612,12 @@ class ChemicalDatasetComparator:
         elif len(sets) == 2:
             venn = venn2(sets, set_labels=(all_dicts.keys()), alpha=0.5)
         else:
-            try:
-                raise ValueError("Visualization only possible for two or three data sets!")
-            except ValueError as e:
-                logger.error(str(e), exc_info=True)
-                raise
+            raise ValueError("Visualization only possible for two or three data sets!")
+            # try:
+            #     raise ValueError("Visualization only possible for two or three data sets!")
+            # except ValueError as e:
+            #     logger.error(str(e), exc_info=True)
+            #     raise
         plt.title("Intersection as Venn diagram", fontsize=20)
         for text in venn.set_labels:
             text.set_fontsize(15)
@@ -950,15 +1007,20 @@ class ChemicalDatasetComparator:
                 for key in list(all_dicts[first_dict].keys())
             )
         ):
-            try:
-                raise KeyError(
-                    "A descriptor list ("
-                    + str(descriptor_list_keyname)
-                    + ") is needed for plotting. Please run 'get_descriptor_list_key'!"
-                )
-            except KeyError as e:
-                logger.error(str(e), exc_info=True)
-                raise
+            raise KeyError(
+                "A descriptor list ("
+                + str(descriptor_list_keyname)
+                + ") is needed for plotting. Please run 'get_descriptor_list_key'!"
+            )
+            # try:
+            #     raise KeyError(
+            #         "A descriptor list ("
+            #         + str(descriptor_list_keyname)
+            #         + ") is needed for plotting. Please run 'get_descriptor_list_key'!"
+            #     )
+            # except KeyError as e:
+            #     logger.error(str(e), exc_info=True)
+            #     raise
         elif type(all_dicts[first_dict][descriptor_list_keyname][0]) == int:
             self._get_discrete_descriptor_counts(all_dicts, descriptor_list_keyname)
             fig = self._discrete_descriptor_plot(
@@ -993,13 +1055,16 @@ class ChemicalDatasetComparator:
                 fontsize_title,
             )
         else:
-            try:
-                raise ValueError(
-                    'Descriptor values should be "int" or "float" (numpy.float64) to be binned!'
-                )
-            except ValueError as e:
-                logger.error(str(e), exc_info=True)
-                raise
+            raise ValueError(
+                'Descriptor values should be "int" or "float" (numpy.float64) to be binned!'
+            )
+            # try:
+            #     raise ValueError(
+            #         'Descriptor values should be "int" or "float" (numpy.float64) to be binned!'
+            #     )
+            # except ValueError as e:
+            #     logger.error(str(e), exc_info=True)
+            #     raise
         return fig
 
     # Section: Check Lipinski Rule of 5 and visualization
@@ -1102,15 +1167,20 @@ class ChemicalDatasetComparator:
                     for key in list(all_dicts[single_dict].keys())
                 )
             ):
-                try:
-                    raise KeyError(
-                        "Lipinski summary ("
-                        + str(self.lipinski_summary_keyname)
-                        + ") is needed for plotting! Please run 'get_lipinski_key'!"
-                    )
-                except KeyError as e:
-                    logger.error(str(e), exc_info=True)
-                    raise
+                raise KeyError(
+                    "Lipinski summary ("
+                    + str(self.lipinski_summary_keyname)
+                    + ") is needed for plotting! Please run 'get_lipinski_key'!"
+                )
+                # try:
+                #     raise KeyError(
+                #         "Lipinski summary ("
+                #         + str(self.lipinski_summary_keyname)
+                #         + ") is needed for plotting! Please run 'get_lipinski_key'!"
+                #     )
+                # except KeyError as e:
+                #     logger.error(str(e), exc_info=True)
+                #     raise
             header = single_dict
             lipinski_df_dict.update(
                 {
@@ -1349,13 +1419,16 @@ class ChemicalDatasetComparator:
             if single_dict == self.figure_dict_keyname:
                 continue
             if not any(key == self.identifier_keyname for key in list(all_dicts[single_dict].keys())):
-                try:
-                    raise KeyError(
-                        "A identifier list is needed, please run 'get_identifier_list_key'!"
-                    )
-                except KeyError as e:
-                    logger.error(str(e), exc_info=True)
-                    raise
+                raise KeyError(
+                    "A identifier list is needed, please run 'get_identifier_list_key'!"
+                )
+                # try:
+                #     raise KeyError(
+                #         "A identifier list is needed, please run 'get_identifier_list_key'!"
+                #     )
+                # except KeyError as e:
+                #     logger.error(str(e), exc_info=True)
+                #     raise
             for mol in all_dicts[single_dict][self.identifier_keyname]:
                 all_mols_list.append(mol)
                 target_list.append(single_dict)
@@ -1408,11 +1481,12 @@ class ChemicalDatasetComparator:
         elif dimension_reduction == "umap":
             chem_space.umap()  # n_neighbors, min_dist, pca, random_state ...
         else:
-            try:
-                raise ValueError('dimension_reduction should be "pca", "tsne" or "umap"!')
-            except ValueError as e:
-                logger.error(str(e), exc_info=True)
-                raise
+            raise ValueError('dimension_reduction should be "pca", "tsne" or "umap"!')
+            # try:
+            #     raise ValueError('dimension_reduction should be "pca", "tsne" or "umap"!')
+            # except ValueError as e:
+            #     logger.error(str(e), exc_info=True)
+            #     raise
         if not os.path.exists("output"):
             os.makedirs("output")
         if not interactive:
@@ -1465,7 +1539,7 @@ class ChemicalDatasetComparator:
         This function exports a pdf including all created figures form the figures subdictionary.
 
         Args:
-            all_dicts (dict): Dictionary with subdictionary (self.figure_dict_keyname) containing all created plots
+            all_dicts (dict): Dictionary with subdictionary (self.figure_dict_keyname: containing all created plots
         """
         pdf = PdfPages("output/all_figures.pdf")
         for value in all_dicts[self.figure_dict_keyname].values():
