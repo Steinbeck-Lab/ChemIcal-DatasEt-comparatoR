@@ -105,7 +105,6 @@ class ChemicalDatasetComparator:
         ]
     )
     logger = logging.getLogger('CIDER')
-    logger.warning('Tis a warnin in class')
 
     def exception_handler_IP(self, exc_type, exc_value, exc_tb, tb_offset=None):
         """
@@ -537,8 +536,11 @@ class ChemicalDatasetComparator:
 
         Raises:
             KeyError: if there is no identifier list.
+            ValueError: if there is only one dataset.
         """
         sets = []
+        if len(all_dicts.keys()) <= 2:
+            raise ValueError("Only one dataset is given. Shared molecules can only calculated when comparing at least 2 datasets!")
         for single_dict in all_dicts:
             if single_dict == self.figure_dict_keyname:
                 continue
@@ -1522,7 +1524,9 @@ class ChemicalDatasetComparator:
             new_dict = all_dicts[single_dict].copy()
             counter = 0
             for key in new_dict.copy():
-                if type(new_dict[key]) == list:  # and len(new_dict[key]) == 100:
+                if key == self.import_keyname:
+                    new_dict.pop(key)
+                elif type(new_dict[key]) == list:
                     counter += 1
                 else:
                     new_dict.pop(key)
