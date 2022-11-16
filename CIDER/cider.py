@@ -1259,13 +1259,17 @@ class ChemicalDatasetComparator:
         structure_list = []
         scaffold_list = []
         for mol in moleculeset:
-            scaffold = MurckoScaffold.GetScaffoldForMol(mol)
+            try:
+                Chem.Kekulize(mol)
+                scaffold = MurckoScaffold.GetScaffoldForMol(mol)
+            except BaseException:
+                logger.info('Molecule can not be kekulized and will be excluded from scaffold analysis!')
+                continue
+            # scaffold = MurckoScaffold.GetScaffoldForMol(mol)
             scaffold_list.append(scaffold)
-        # if framework == False and graph_framework == False:
         if not framework and not graph_framework:
             for mol in scaffold_list:
                 structure_list.append(Chem.MolToSmiles(mol))
-        # if framework == True or graph_framework == True:
         if framework or graph_framework:
             framework_list = []
             for mol in scaffold_list:
@@ -1282,7 +1286,6 @@ class ChemicalDatasetComparator:
                 framework_list.append(framework)
             for mol in framework_list:
                 structure_list.append(Chem.MolToSmiles(mol))
-        # if graph_framework == True:
         if graph_framework:
             structure_list.clear()
             graph_framework_list = []
@@ -1290,6 +1293,7 @@ class ChemicalDatasetComparator:
                 graph_framework_list.append(MurckoScaffold.MakeScaffoldGeneric(mol))
             for mol in graph_framework_list:
                 structure_list.append(Chem.MolToSmiles(mol))
+        structure_list = ['*' if mol == '' else mol for mol in structure_list]
         structure_counts = pd.Index(structure_list).value_counts(normalize=normalize)
         if len(structure_counts) < number_of_structures:
             number_of_structures = len(structure_counts)
@@ -1298,8 +1302,10 @@ class ChemicalDatasetComparator:
         ]
         smiles_list = list(structure_counts.keys())
         to_draw = []
-        for mol in range(number_of_structures):
-            to_draw.append(Chem.MolFromSmiles(smiles_list[mol]))
+        for index in range(number_of_structures):
+            to_draw.append(Chem.MolFromSmiles(smiles_list[index]))
+            if smiles_list[index] == '*':
+                legend[index] = legend[index] + ' (No rings/scaffolds)'
         structure_grid = Draw.MolsToGridImage(
             to_draw,
             maxMols=number_of_structures,
