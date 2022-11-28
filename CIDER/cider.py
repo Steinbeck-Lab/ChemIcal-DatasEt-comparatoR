@@ -1,6 +1,7 @@
-"""MIT License
+"""
+MIT License
 
-Copyright (c) 2022 Hannah Busch, Jonas Schaub, Otto Brinkhaus, Kohulan Rajan
+Copyright (c) 2022 Hannah Busch, Jonas Schaub, Otto Brinkhaus, Kohulan Rajan,
 and Christoph Steinbeck
 
 
@@ -20,7 +21,8 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE."""
+SOFTWARE.
+"""
 
 # Section: Import Libraries
 
@@ -34,6 +36,7 @@ from rdkit.Chem import Draw
 from rdkit.Chem.Draw import IPythonConsole
 from rdkit.Chem.Scaffolds import MurckoScaffold
 from rdkit.Chem import rdchem
+from rdkit.Chem import KekulizeException
 
 import matplotlib.pyplot as plt
 from matplotlib_venn import venn2
@@ -42,14 +45,19 @@ from matplotlib.backends.backend_pdf import PdfPages
 
 import chemplot as cp
 from chemplot import descriptors
+from bokeh.plotting import output_file, save
 
 from typing import List, Tuple, Dict
 from itertools import count
+import PIL
+import matplotlib
 
 import logging
+import sys
 
-logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger('CIDER')  # needs to be here
 
+# Section: Constructor
 
 class ChemicalDatasetComparator:
     """
@@ -60,31 +68,94 @@ class ChemicalDatasetComparator:
 
     def __init__(self):
         """
-        The class variables of CIDER function as keys for the dictionary in which all calculated and plotted data will be stored.
+        The class variables of CIDER function as keys for the dictionary in which all calculated and plotted data will be stored. The keys will be generated when the CIDER method is executed.
         """
+        # from cider.import_as_data_dict
         self.import_keyname = "SDMolSupplier_Object"
         self.figure_dict_keyname = "figures"
+        # from cider.get_number_of_molecules
         self.dataset_length_keyname = "number_of_molecules"
+        # from cider.get_identifier_list_key
         self.identifier_keyname = "identifier_list"
+        # cider.get_duplicate_key
         self.duplicates_keyname = "number_of_duplicates"
         self.duplicates_id_keyname = "duplicates"
+        # from cider.get_shared_molecules_key
         self.shared_mols_keyname = "number_of_shared_molecules"
         self.shared_mols_id_keyname = "shared_molecules"
+        # from cider.get_lipinski_key
         self.lipinski_list_keyname = "number_of_broken_lipinski_rules"
         self.lipinski_summary_keyname = "lipinski_summary"
+        # from cider.get_database_id
         self.database_id_keyname = "coconut_id"
+        # from cider.draw_most_frequent_scaffolds
         self.scaffold_list_keyname = "scaffold_list"
         self.scaffold_summary_keyname = "scaffold_summary"
 
+    # Section: Configuration for logging
+
+    if not os.path.exists("output"):
+        os.mkdir("output")
+
+    logging.basicConfig(
+        format='%(asctime)s [%(levelname)s] %(name)s: %(message)s',
+        level=logging.INFO,
+        handlers=[
+            logging.FileHandler("output/cider_logging.log"),
+            logging.StreamHandler(sys.stdout)
+        ]
+    )
+    logger = logging.getLogger('CIDER')
+
+    def exception_handler_IP(self, exc_type, exc_value, exc_tb, tb_offset=None):
+        """
+        This function is a callable exception handler when working in IPython. It logs the exception including the traceback into the log file.
+
+        Args:
+            exc_type: Type of the exception.
+            exc_value: Value of the exception.
+            exc_tb: Traceback of the exception.
+            tb_offset: Traceback offset.
+        """
+        logger.error("An Error occured while executing CIDER!", exc_info=True)
+        self.showtraceback((exc_type, exc_value, exc_tb), tb_offset=tb_offset)
+        return
+
+    def exception_handler(exc_type, exc_value, exc_tb):
+        """
+        This function is a callable exception handler when NOT working in IPython. It logs the exception including the traceback into the log file.
+
+        Args:
+            exc_type: Type of the exception.
+            exc_value: Value of the exception.
+            exc_tb: Tracback of the exception.
+            tb_offset: Traceback offset.
+        """
+        logger.exception(
+            "An Error occured while executing CIDER!",
+            exc_info=(exc_type, exc_value, exc_tb)
+        )
+        return
+
+    """
+    This function checks if CIDER is run in IPython or not and selects the corresponding exception handler for logging.
+    """
+    try:
+        __IPYTHON__
+        from IPython import get_ipython
+        ip = get_ipython()
+        ip.set_custom_exc((BaseException,), exception_handler_IP)
+    except NameError:
+        sys.excepthook = exception_handler
+
     # Section: Import data and check for faulty SDFiles
 
-    def _check_invalid_mols_in_SDF(self, all_dicts: dict, delete: bool = False) -> None:
+    def _check_invalid_mols_in_SDF(self, all_dicts: dict) -> None:
         """
-        This function checks if there are invalid entries in the SDFiles that can cause errors in the subsequent functions. At choice the invalid entries can be removed form the SDMolSupplier Object. The entry will remain in the original SDFile as it is. (private method)
+        This function checks if there are invalid entries in the SDFiles that can cause errors in the subsequent functions. Those invalid entries will be removed form the SDMolSupplier Object. The entry will remain in the original SDFile as it is. (private method)
 
         Args:
             all_dicts (dict): Dictionary with sub-dictionaries including SDMolSupplier Objects.
-            delete (bool): Deleting invalid entries or not (default: False).
         """
         for single_dict in all_dicts:
             if single_dict == self.figure_dict_keyname:
@@ -94,88 +165,111 @@ class ChemicalDatasetComparator:
             for mol in all_dicts[single_dict][self.import_keyname]:
                 mol_index += 1
                 if not mol:
-                    logging.warning(
+                    logger.warning(
                         "%s has invalid molecule at index %d" % (single_dict, mol_index)
                     )
-                    # print(
-                    #     str(single_dict)
-                    #     + " has invalid molecule at index "
-                    #     + str(mol_index)
-                    # )
                     invalid_index.append(mol_index)
             if not invalid_index:
-                logging.info("No faulty molecules found in %s" % (single_dict))
-                # print("No invalid molecules found in " + str(single_dict))
-            elif delete and invalid_index:
+                logger.info("No faulty molecules found in %s" % (single_dict))
+            else:
                 new_SDMol = list(all_dicts[single_dict][self.import_keyname])
                 for index in sorted(invalid_index, reverse=True):
                     del new_SDMol[index]
                 all_dicts[single_dict].update({self.import_keyname: new_SDMol})
-                logging.info(
+                logger.info(
                     "%d invalid molecule(s) deleted from %s"
                     % (len(invalid_index), single_dict)
                 )
-                # print(
-                #     str(len(invalid_index))
-                #     + " invalid molecule(s) are deleted from "
-                #     + str(single_dict)
-                # )
-            elif not delete and invalid_index:
-                logging.warning(
-                    "%d invalid molecule(s) will remain in %s"
-                    % (len(invalid_index), single_dict)
-                )
-                # print(
-                #     str(len(invalid_index))
-                #     + " invalid molecule(s) will remain in "
-                #     + str(single_dict)
-                # )
+            # elif not delete and invalid_index:
+            #     logger.warning(
+            #         "%d invalid molecule(s) will remain in %s. This might cause subsequent errors!"
+            #         % (len(invalid_index), single_dict)
+            #     )
         return
 
-    def import_as_data_dict(self, path_to_data: str, delete: bool = False) -> Dict:
+    def import_as_data_dict(self, path_to_data: str) -> Dict:
         """
         This function creates a dictionary with the names of the imported file as keys. The values of each of these keys is a subdictionary. The first entry of every subdictionary is self.import_keyname (class variable, can be changed) as key and a SDMolSupplier Object of the SDFile as value. To find faulty molecules every entry of the SDMolSupplier Object will be parsed once. (Parsed molecules will not be stored in the dictionary to save memory.)
 
         Args:
             path_to_data (str): Path to the directory where the SDFiles are stored.
-            delete (bool): Delete faulty molecules from imported dataset.
 
         Returns:
             all_dicts (dict): Dictionary with subdictionaries for every dataset, updated with the SDMolSupplier Objects.
 
         Raises:
             FileNotFoundError: if the data path is invalid
-            Statement: if no SDFiles are found
+            KeyError: if no SDFiles are in the given directory
         """
         all_dicts = {}
-        # data_dir = os.path.normpath(str(path_to_data))
         data_dir = os.path.abspath(str(path_to_data))
         for dict_name in os.listdir(data_dir):
-            if dict_name[-3:] == "sdf":
+            if dict_name[-3:] == "sdf" or dict_name[-3:] == "SDF":
                 single_dict = {}
                 dict_path = os.path.join(data_dir, dict_name)
                 single_dict[self.import_keyname] = Chem.SDMolSupplier(dict_path)
                 all_dicts[dict_name] = single_dict
         if not all_dicts:
-            logging.warning("No SDFiles found in %s!" % (data_dir))
-            # print(
-            #     "No SDFiles in "
-            #     + str(data_dir)
-            #     + " found!"
-            # )
+            raise KeyError("No SDFiles found in the given directory %s!" % (data_dir))
+            # try:
+            #     raise KeyError("No SDFiles found in the given directory %s!" % (data_dir))
+            # except KeyError as e:
+            #     logger.error(str(e), exc_info=True)  # logger.error(str(e))
+            #     raise
         figure_dict = {}
         all_dicts[self.figure_dict_keyname] = figure_dict
-        self._check_invalid_mols_in_SDF(all_dicts, delete)
-        logging.info("Created dictionary with keys: %s", list(all_dicts.keys()))
+        self._check_invalid_mols_in_SDF(all_dicts)
+        logger.info("Created dictionary with keys: %s", list(all_dicts.keys()))
         os.chdir(os.path.dirname(data_dir))
         if not os.path.exists("output"):
             os.mkdir("output")
         else:
             if os.listdir("output"):
-                logging.warning(
+                logger.warning(
                     "Already existing output folder with files! Old data will be overwritten!"
                 )
         return all_dicts
+
+    # Section: Saving figures and images
+
+    def _save_to_figure_dict(
+        self,
+        all_dicts: dict,
+        keyname: str,
+        fig,
+        data_type: str = 'png'
+    ) -> None:
+        """
+        This function stores the images and figures created by CIDER in the 'figure' (self.figure_dict_keyname) subdictionary and exports them to the output folder with a given data type. When the name for a figure is already used there will be a increasing number added. This only works within one analysis, after restarting CIDER the files in the output folder might be overwritten.
+
+        Args:
+            all_dicts (dict): Dictionary containing 'figures' subdictionary (self.figure_dict_keyname).
+            keyname (str): Name of the image/figure.
+            fig: Images or figure to be stored.
+            data_type (str): Data type for the exported file. (Default: png)
+        """
+        if not any(key == keyname for key in list(all_dicts[self.figure_dict_keyname].keys())):
+            all_dicts[self.figure_dict_keyname][keyname] = fig
+            plt.savefig(
+                "output/%s.%s" % (keyname, data_type),
+                bbox_inches="tight",
+                transparent=True,
+            )
+            logger.info("Updated dictionary with '%s'", keyname)
+        else:
+            counter = 1
+            new_keyname = (keyname + '_' + str(counter))
+            while any(key == new_keyname for key in list(all_dicts[self.figure_dict_keyname].keys())):
+                counter += 1
+                new_keyname = (keyname + '_' + str(counter))
+            all_dicts[self.figure_dict_keyname][new_keyname] = fig
+            plt.savefig(
+                "output/%s.%s" % (new_keyname, data_type),
+                bbox_inches="tight",
+                transparent=True,
+            )
+            logger.info("Updated dictionary with '%s'", new_keyname)
+        return
 
     # Section: Get overview of the dataset size and molecules
 
@@ -191,18 +285,11 @@ class ChemicalDatasetComparator:
                 continue
             number_of_molecules = len(all_dicts[single_dict][self.import_keyname])
             all_dicts[single_dict][self.dataset_length_keyname] = number_of_molecules
-            logging.info(
+            logger.info(
                 "Number of molecules in %s: %d"
                 % (single_dict, all_dicts[single_dict][self.dataset_length_keyname])
             )
-            # print(
-            #     "Number of molecules in "
-            #     + single_dict
-            #     + ": "
-            #     + str(all_dicts[single_dict][self.dataset_length_keyname])
-            # )
-        # print("Updated dictionary with '" + self.dataset_length_keyname + "'")
-        logging.info("Updated dictionary with '%s'", self.dataset_length_keyname)
+        logger.info("Updated dictionary with '%s'", self.dataset_length_keyname)
         return
 
     def draw_molecules(
@@ -215,7 +302,7 @@ class ChemicalDatasetComparator:
         figsize: Tuple[float, float] = [20.0, 20.0],
         fontsize_title: int = 24,
         fontsize_subtitle: int = 20,
-    ):
+    ) -> matplotlib.figure.Figure:
         """
         This function creates an grid image of the first molecules of each dataset and exports the image to an output folder.
 
@@ -261,12 +348,13 @@ class ChemicalDatasetComparator:
             plt.imshow(image_list[j])
             plt.title(title_list[j], fontsize=fontsize_subtitle)
         fig.suptitle("Exemplary molecules from the datasets", fontsize=fontsize_title)
-        if not os.path.exists("output"):
-            os.makedirs("output")
-        fig.savefig("output/mol_grid.%s" % (data_type))
-        all_dicts[self.figure_dict_keyname]["mol_grid"] = fig
+        self._save_to_figure_dict(all_dicts, 'mol_grid', fig, data_type=data_type)
+        # if not os.path.exists("output"):
+        #     os.makedirs("output")
+        # fig.savefig("output/mol_grid.%s" % (data_type))
+        # all_dicts[self.figure_dict_keyname]["mol_grid"] = fig
         plt.close(fig)
-        logging.info("Updated dictionary with 'mol_grid'")
+        # logger.info("Updated dictionary with 'mol_grid'")
         return fig
 
     # Section: Get database ID
@@ -292,13 +380,12 @@ class ChemicalDatasetComparator:
                     id_count += 1
                 database_id_list.append(database_id)
                 all_dicts[single_dict][self.database_id_keyname] = database_id_list
-        # print("Updated dictionary with '" + self.database_id_keyname + "'")
         if id_count == 0:
-            logging.info(
+            logger.info(
                 "No database IDs with '%s' found. (Maybe check for spelling mistakes)"
                 % (id_name)
             )
-        logging.info("Updated dictionary with '%s'", self.database_id_keyname)
+        logger.info("Updated dictionary with '%s'", self.database_id_keyname)
         return
 
     # Section: Get string identifier
@@ -336,6 +423,13 @@ class ChemicalDatasetComparator:
                 raise ValueError(
                     'id_type argument needs to be "smiles", "inchikey" or "inchi"!'
                 )
+                # try:
+                #     raise ValueError(
+                #         'id_type argument needs to be "smiles", "inchikey" or "inchi"!'
+                #     )
+                # except ValueError as e:
+                #     logger.error(str(e), exc_info=True)
+                #     raise
             identifier_list.append(identifier)
         return identifier_list, failed_identifier_counter
 
@@ -356,68 +450,77 @@ class ChemicalDatasetComparator:
             all_dicts[single_dict][self.identifier_keyname] = identifier_list[0]
             failed_identifier_counter = identifier_list[1]
             if failed_identifier_counter != 0:
-                logging.warning(
+                logger.warning(
                     "%s failed to get %d identifier(s)!",
                     single_dict,
                     failed_identifier_counter,
                 )
-                # print(
-                #     str(single_dict)
-                #     + " failed to get "
-                #     + str(failed_identifier_counter)
-                #     + " identifier(s)!"
-                # )
-        # print("Updated dictionary with '" + self.identifier_keyname + "'")
-        logging.info("Updated dictionary with '%s'", self.identifier_keyname)
+        logger.info("Updated dictionary with '%s'", self.identifier_keyname)
         return
 
     # Section: Check for duplicates
 
-    def get_duplicate_key(self, all_dicts: dict) -> None:
+    def get_duplicate_key(self, all_dicts: dict, identifier: bool = False) -> None:
         """
         This function updates the subdictionaries in the given dictionary with the number of duplicates in the identifier list as a new key-value-Pair (key: self.duplicates_keyname) and a list of the duplicated identifier (key: self.duplicates_id_keyname).
 
         Args:
             all_dicts (dict): Dictionary with subdictionaries including a list of identifiers (self.identifier_keyname).
+
+        Raises:
+            KeyError: if there is no identifier list.
         """
         for single_dict in all_dicts:
             if single_dict == self.figure_dict_keyname:
                 continue
+            if not any(key == self.identifier_keyname for key in list(all_dicts[single_dict].keys())):
+                raise KeyError(
+                    "A identifier list is needed, please run 'get_identifier_list_key'!"
+                )
+                # try:
+                #     raise KeyError(
+                #         "A identifier list is needed, please run 'get_identifier_list_key'!"
+                #     )
+                # except KeyError as e:
+                #     logger.error(str(e), exc_info=True)
+                #     raise
             number_of_duplicates = len(
                 all_dicts[single_dict][self.identifier_keyname]
             ) - len(set(all_dicts[single_dict][self.identifier_keyname]))
             all_dicts[single_dict][self.duplicates_keyname] = number_of_duplicates
-            duplicates = []
-            for mol in all_dicts[single_dict][self.identifier_keyname]:
-                if all_dicts[single_dict][self.identifier_keyname].count(mol) > 1:
-                    duplicates.append(mol)
-            all_dicts[single_dict][self.duplicates_id_keyname] = set(duplicates)
-            logging.info(
-                "Number of duplicates in %s: %d, duplicate identifier(s): %s",
-                single_dict,
-                all_dicts[single_dict][self.duplicates_keyname],
-                all_dicts[single_dict][self.duplicates_id_keyname],
+            if identifier:
+                if number_of_duplicates != 0:
+                    all_duplicates = []
+                    for mol in all_dicts[single_dict][self.identifier_keyname]:
+                        if all_dicts[single_dict][self.identifier_keyname].count(mol) > 1:
+                            all_duplicates.append(mol)
+                    duplicates = set(all_duplicates)
+                else:
+                    duplicates = set()
+                all_dicts[single_dict][self.duplicates_id_keyname] = duplicates
+                logger.info(
+                    "Number of duplicates in %s: %d, duplicate identifier(s): %s",
+                    single_dict,
+                    all_dicts[single_dict][self.duplicates_keyname],
+                    all_dicts[single_dict][self.duplicates_id_keyname],
+                )
+            else:
+                logger.info(
+                    "Number of duplicates in %s: %d",
+                    single_dict,
+                    all_dicts[single_dict][self.duplicates_keyname],
+                )
+        if identifier:
+            logger.info(
+                "Updated dictionary with '%s' and '%s'",
+                self.duplicates_keyname,
+                self.duplicates_id_keyname,
             )
-            # print(
-            #     "Number of duplicates in "
-            #     + single_dict
-            #     + ": "
-            #     + str(all_dicts[single_dict][self.duplicates_keyname])
-            #     + ",  duplicates: "
-            #     + str(all_dicts[single_dict][self.duplicates_id_keyname])
-            # )
-        logging.info(
-            "Updated dictionary with '%s' and '%s'",
-            self.duplicates_keyname,
-            self.database_id_keyname,
-        )
-        # print(
-        #     "Updated dictionary with '"
-        #     + self.duplicates_keyname
-        #     + "' and '"
-        #     + self.duplicates_id_keyname
-        #     + "'"
-        # )
+        else:
+            logger.info(
+                "Updated dictionary with '%s'",
+                self.duplicates_keyname
+            )
         return
 
     # Section: Dataset comparison and visualization
@@ -429,11 +532,28 @@ class ChemicalDatasetComparator:
 
         Args:
             all_dicts (dict): Dictionary with subdictionaries including a lists of identifiers (self.identifier_keyname).
+
+        Raises:
+            KeyError: if there is no identifier list.
+            ValueError: if there is only one dataset.
         """
         sets = []
+        if len(all_dicts.keys()) <= 2:
+            raise ValueError("Only one dataset is given. Shared molecules can only calculated when comparing at least 2 datasets!")
         for single_dict in all_dicts:
             if single_dict == self.figure_dict_keyname:
                 continue
+            if not any(key == self.identifier_keyname for key in list(all_dicts[single_dict].keys())):
+                raise KeyError(
+                    "A identifier list is needed, please run 'get_identifier_list_key'!"
+                )
+                # try:
+                #     raise KeyError(
+                #         "A identifier list is needed, please run 'get_identifier_list_key'!"
+                #     )
+                # except KeyError as e:
+                #     logger.error(str(e), exc_info=True)
+                #     raise
             single_set = set(all_dicts[single_dict][self.identifier_keyname])
             sets.append(single_set)
         shared_molecules = set.intersection(*sets)
@@ -442,31 +562,19 @@ class ChemicalDatasetComparator:
                 continue
             all_dicts[single_dict][self.shared_mols_keyname] = len(shared_molecules)
             all_dicts[single_dict][self.shared_mols_id_keyname] = shared_molecules
-        # print(
-        #     "Number of molecules that can be found in all datasets: "
-        #     + str(len(shared_molecules))
-        #     + ", identifiers: "
-        #     + str(shared_molecules))
-        logging.info(
+        logger.info(
             "Number of molecules found in all datasets: %d, identifier(s): %s",
             len(shared_molecules),
             shared_molecules,
         )
-        #     , '\n'
-        #     "Updated dictionary with '"
-        #     + self.shared_mols_keyname
-        #     + "' and '"
-        #     + self.shared_mols_id_keyname
-        #     + "'"
-        # )
-        logging.info(
+        logger.info(
             "Updated dictionary with '%s' and '%s'",
             self.shared_mols_keyname,
             self.shared_mols_id_keyname,
         )
         return
 
-    def visualize_intersection(self, all_dicts: dict, data_type: str = "png"):
+    def visualize_intersection(self, all_dicts: dict, data_type: str = "png") -> matplotlib.figure.Figure:
         """
         This function returns a Venn diagram of the intersection between the molecules in the subdictionaries of the given dictionary. Every subdictionary is represented as a circle and the overlaps between the circles indicate the molecules present in more than one subdictionary. (The function only works with two or three subdictionaries.)
         The intersection is based on the identifiers (string representation).
@@ -479,12 +587,24 @@ class ChemicalDatasetComparator:
             fig (matplotlib.figure): Venn diagram
 
         Raises:
-            ValueError: If there is only one or more than three sets to be compared an error is raised.
+            ValueError: If there is only one or more than three sets to be compared.
+            KeyError: If there is no identifier list.
         """
         sets = []
         for single_dict in all_dicts:
             if single_dict == self.figure_dict_keyname:
                 continue
+            if not any(key == self.identifier_keyname for key in list(all_dicts[single_dict].keys())):
+                raise KeyError(
+                    "A identifier list is needed, please run 'get_identifier_list_key'!"
+                )
+                # try:
+                #     raise KeyError(
+                #         "A identifier list is needed, please run 'get_identifier_list_key'!"
+                #     )
+                # except KeyError as e:
+                #     logger.error(str(e), exc_info=True)
+                #     raise
             single_set = set(all_dicts[single_dict][self.identifier_keyname])
             sets.append(single_set)
         fig = plt.figure(figsize=(10, 10))
@@ -494,22 +614,28 @@ class ChemicalDatasetComparator:
             venn = venn2(sets, set_labels=(all_dicts.keys()), alpha=0.5)
         else:
             raise ValueError("Visualization only possible for two or three data sets!")
+            # try:
+            #     raise ValueError("Visualization only possible for two or three data sets!")
+            # except ValueError as e:
+            #     logger.error(str(e), exc_info=True)
+            #     raise
         plt.title("Intersection as Venn diagram", fontsize=20)
         for text in venn.set_labels:
             text.set_fontsize(15)
         for x in range(len(venn.subset_labels)):
             if venn.subset_labels[x] is not None:
                 venn.subset_labels[x].set_fontsize(15)
-        if not os.path.exists("output"):
-            os.makedirs("output")
-        plt.savefig(
-            "output/intersection.%s" % (data_type),
-            bbox_inches="tight",
-            transparent=True,
-        )
-        all_dicts[self.figure_dict_keyname]["intersection"] = fig
+        self._save_to_figure_dict(all_dicts, 'intersection', fig, data_type=data_type)
+        # if not os.path.exists("output"):
+        #     os.makedirs("output")
+        # plt.savefig(
+        #     "output/intersection.%s" % (data_type),
+        #     bbox_inches="tight",
+        #     transparent=True,
+        # )
+        # all_dicts[self.figure_dict_keyname]["intersection"] = fig
         plt.close(fig)
-        logging.info("Updated dictionary with 'intersection'")
+        # logger.info("Updated dictionary with 'intersection'")
         return fig
 
     # Section: Get descriptors and create plots
@@ -555,8 +681,7 @@ class ChemicalDatasetComparator:
                 all_dicts[single_dict][self.import_keyname], descriptor
             )
             all_dicts[single_dict][descriptor_list_keyname] = descriptor_list
-        # print("Updated dictionary with '" + descriptor_list_keyname + "'")
-        logging.info("Updated dictionary with '%s'", descriptor_list_keyname)
+        logger.info("Updated dictionary with '%s'", descriptor_list_keyname)
         return
 
     def _get_discrete_descriptor_counts(
@@ -598,7 +723,7 @@ class ChemicalDatasetComparator:
                 sort=False,
             )
             all_dicts[single_dict][binned_descriptor_list_keyname] = counts
-        logging.info("Updated the dictionary with '%s'", binned_descriptor_list_keyname)
+        logger.info("Updated the dictionary with '%s'", binned_descriptor_list_keyname)
         return
 
     def _get_continuous_descriptor_counts(
@@ -663,7 +788,7 @@ class ChemicalDatasetComparator:
                 sort=False,
             )
             all_dicts[single_dict][binned_descriptor_list_keyname] = counts
-        logging.info("Updated the dictionary with '%s'", binned_descriptor_list_keyname)
+        logger.info("Updated the dictionary with '%s'", binned_descriptor_list_keyname)
         return
 
     def _discrete_descriptor_plot(
@@ -678,7 +803,7 @@ class ChemicalDatasetComparator:
         fontsize_ylabel: int = 20,
         fontsize_xlabel: int = 20,
         fontsize_title: int = 24,
-    ):
+    ) -> matplotlib.figure.Figure:
         """
         This function returns a bar-plot for a discrete descriptor with was previously binned.
         The plot is saved in an output folder as an image (data type can be chosen) and the data frame can also be saved as CSV file.
@@ -737,18 +862,19 @@ class ChemicalDatasetComparator:
             fontsize=fontsize_title,
         )
         fig = descriptor_plot.figure
-        fig.savefig(
-            "output/distribution_of_%s.%s" % (descriptor_list_keyname, data_type),
-            bbox_inches="tight",
-            transparent=True,
-        )
-        all_dicts[self.figure_dict_keyname][
-            "distribution_of_%s" % (descriptor_list_keyname)
-        ] = fig
+        self._save_to_figure_dict(all_dicts, keyname=('distribution_of_' + str(descriptor_list_keyname)), fig=fig, data_type=data_type)
+        # fig.savefig(
+        #     "output/distribution_of_%s.%s" % (descriptor_list_keyname, data_type),
+        #     bbox_inches="tight",
+        #     transparent=True,
+        # )
+        # all_dicts[self.figure_dict_keyname][
+        #     "distribution_of_%s" % (descriptor_list_keyname)
+        # ] = fig
         plt.close(fig)
-        logging.info(
-            "Updated dictionary with 'distribution_of_%s'", descriptor_list_keyname
-        )
+        # logger.info(
+        #     "Updated dictionary with 'distribution_of_%s'", descriptor_list_keyname
+        # )
         return fig
 
     def _continuous_descriptor_plot(
@@ -763,7 +889,7 @@ class ChemicalDatasetComparator:
         fontsize_ylabel: int = 20,
         fontsize_xlabel: int = 20,
         fontsize_title: int = 24,
-    ):
+    ) -> matplotlib.figure.Figure:
         """
         This function returns bar-plot for a continuous descriptor which was previously binned.
         The plot is saved in an output folder as an image (data type can be chosen) and the data frame can also be saved as CSV file.
@@ -822,18 +948,19 @@ class ChemicalDatasetComparator:
             fontsize=fontsize_title,
         )
         fig = descriptor_plot.figure
-        fig.savefig(
-            "output/distribution_of_%s.%s" % (descriptor_list_keyname, data_type),
-            bbox_inches="tight",
-            transparent=True,
-        )
-        all_dicts[self.figure_dict_keyname][
-            "distribution_of_%s" % (descriptor_list_keyname)
-        ] = fig
+        self._save_to_figure_dict(all_dicts, keyname=('distribution_of_' + str(descriptor_list_keyname)), fig=fig, data_type=data_type)
+        # fig.savefig(
+        #     "output/distribution_of_%s.%s" % (descriptor_list_keyname, data_type),
+        #     bbox_inches="tight",
+        #     transparent=True,
+        # )
+        # all_dicts[self.figure_dict_keyname][
+        #     "distribution_of_%s" % (descriptor_list_keyname)
+        # ] = fig
         plt.close(fig)
-        logging.info(
-            "Updated dictionary with 'distribution_of_%s'", descriptor_list_keyname
-        )
+        # logger.info(
+        #     "Updated dictionary with 'distribution_of_%s'", descriptor_list_keyname
+        # )
         return fig
 
     def descriptor_counts_and_plot(
@@ -849,7 +976,7 @@ class ChemicalDatasetComparator:
         fontsize_ylabel: int = 20,
         fontsize_xlabel: int = 20,
         fontsize_title: int = 24,
-    ):
+    ) -> matplotlib.figure.Figure:
         """
         This function updates the subdictionaries in the given dictionary with the binned descriptor values for a given descriptor value list. The values can either be continuous (binning with _get_continuous_descriptor_counts and plotted with _continuous_descriptor_plot) or discrete (binning with _get_discrete_descriptor_counts and plotted with _discrete_descriptor_plot).
         The created plots are saved in an output folder and the data frame can also be exported as CSV.
@@ -860,12 +987,16 @@ class ChemicalDatasetComparator:
             width_of_bins (int, optional): interval size for the bins for continuous values (default: 10).
             data_type (str): Data type for the exported image (default: png).
             save_dataframe (bool): Export dataframe as csv file or not (default: True).
-            fig_size (float, float): Width, height of the image in inches (default: 15, 7).
+            figsize (float, float): Width, height of the image in inches (default: 15, 7).
             fontsize_tick_labels (int): Fontsize of the labels on the ticks of the axis (default: 15).
             fontsize_legend (int): Fontsize of the legend (default: 15).
             fontsize_ylabel (int): Fontsize of the label of the y-axis (default: 20).
             fontsize_xlabel (int): Fontsize of the label of the x-axis (default: 20).
             fontsize_title (int): Fontsize of the title (default: 24).
+
+        Raises:
+            KeyError: if there is not the needed descriptor list.
+            ValueError: if the descriptor values are not int or float and can therefore not be plotted.
 
         Returns:
             fig (matplotlib.figure): Plot
@@ -878,10 +1009,19 @@ class ChemicalDatasetComparator:
             )
         ):
             raise KeyError(
-                "Descriptor ("
+                "A descriptor list ("
                 + str(descriptor_list_keyname)
-                + ") needs to be calculated before plotting!"
+                + ") is needed for plotting. Please run 'get_descriptor_list_key'!"
             )
+            # try:
+            #     raise KeyError(
+            #         "A descriptor list ("
+            #         + str(descriptor_list_keyname)
+            #         + ") is needed for plotting. Please run 'get_descriptor_list_key'!"
+            #     )
+            # except KeyError as e:
+            #     logger.error(str(e), exc_info=True)
+            #     raise
         elif type(all_dicts[first_dict][descriptor_list_keyname][0]) == int:
             self._get_discrete_descriptor_counts(all_dicts, descriptor_list_keyname)
             fig = self._discrete_descriptor_plot(
@@ -919,6 +1059,13 @@ class ChemicalDatasetComparator:
             raise ValueError(
                 'Descriptor values should be "int" or "float" (numpy.float64) to be binned!'
             )
+            # try:
+            #     raise ValueError(
+            #         'Descriptor values should be "int" or "float" (numpy.float64) to be binned!'
+            #     )
+            # except ValueError as e:
+            #     logger.error(str(e), exc_info=True)
+            #     raise
         return fig
 
     # Section: Check Lipinski Rule of 5 and visualization
@@ -972,14 +1119,7 @@ class ChemicalDatasetComparator:
                 "4_rules_broken": lipinski_break_list.count(4),
             }
             all_dicts[single_dict][self.lipinski_summary_keyname] = lipinski_summary
-        # print(
-        #     "Updated dictionary with '"
-        #     + self.lipinski_summary_keyname
-        #     + "' and '"
-        #     + self.lipinski_list_keyname
-        #     + "'"
-        # )
-        logging.info(
+        logger.info(
             "Updated dictionary with '%s' and '%s'",
             self.lipinski_list_keyname,
             self.lipinski_summary_keyname,
@@ -997,7 +1137,7 @@ class ChemicalDatasetComparator:
         fontsize_ylabel: int = 20,
         fontsize_xlabel: int = 20,
         fontsize_title: int = 24,
-    ):
+    ) -> matplotlib.figure.Figure :
         """
         This function returns a bar plot for the number of molecules in every subdictionary breaking 0 to 4 Lipinski rules using the 'lipinski_summary' key in the given dictionary. The plot is saved in an output folder (data type can be chosen) and the created data frame can also be exported as CSV.
 
@@ -1012,8 +1152,11 @@ class ChemicalDatasetComparator:
             fontsize_xlabel (int): Fontsize of the label of the x-axis (default: 20).
             fontsize_title (int): Fontsize of the title (default: 24).
 
-        returns:
-            fig (matplotlib.figure): Plot
+        Raises:
+            KeyError: if the Lipinski key is missing and therefore no plot can be generated.
+
+        Returns:
+            fig (matplotlib.figure.Figure): Plot
         """
         lipinski_df_dict = {"Number of broken rules": [0, 1, 2, 3, 4]}
         for single_dict in all_dicts:
@@ -1028,8 +1171,17 @@ class ChemicalDatasetComparator:
                 raise KeyError(
                     "Lipinski summary ("
                     + str(self.lipinski_summary_keyname)
-                    + ") needs to be calculated before plotting! Use 'get_lipinski_key'!"
+                    + ") is needed for plotting! Please run 'get_lipinski_key'!"
                 )
+                # try:
+                #     raise KeyError(
+                #         "Lipinski summary ("
+                #         + str(self.lipinski_summary_keyname)
+                #         + ") is needed for plotting! Please run 'get_lipinski_key'!"
+                #     )
+                # except KeyError as e:
+                #     logger.error(str(e), exc_info=True)
+                #     raise
             header = single_dict
             lipinski_df_dict.update(
                 {
@@ -1062,31 +1214,32 @@ class ChemicalDatasetComparator:
             fontsize=fontsize_title,
         )
         fig = lipinski_plot.figure
-        fig.savefig(
-            "output/lipinski_plot.%s" % (data_type),
-            bbox_inches="tight",
-            transparent=True,
-        )
-        all_dicts[self.figure_dict_keyname]["lipinski_plot"] = fig
+        self._save_to_figure_dict(all_dicts, 'lipinski_plot', fig, data_type=data_type)
+        # fig.savefig(
+        #     "output/lipinski_plot.%s" % (data_type),
+        #     bbox_inches="tight",
+        #     transparent=True,
+        # )
+        # all_dicts[self.figure_dict_keyname]["lipinski_plot"] = fig
         plt.close(fig)
-        logging.info("Updated dictionary with 'lipinski_plot'")
-        return lipinski_plot.figure
+        # logger.info("Updated dictionary with 'lipinski_plot'")
+        return fig
 
     # Section: Scaffold analysis and plotting
 
-    def _get_Murcko_scaffold(
+    def _get_scaffold(
         self,
         moleculeset: Chem.SDMolSupplier,
         number_of_structures: int = 5,
         structures_per_row: int = 5,
         image_size: int = 200,
         framework: bool = False,
-        skeleton: bool = False,
+        graph_framework: bool = False,
         normalize: bool = True,
-    ) -> Tuple[list, count]:  # what to use here?
+    ) -> Tuple[PIL.PngImagePlugin.PngImageFile, list, pd.core.series.Series]:
         """
-        This function creates a grid images of a chosen number of scaffolds/frameworks/cyclic skeletons for the molecules in a given SDMolSupplier Object. The scaffolds/frameworks/cyclic skeletons are sorted by their frequency.
-        The relative or absolute number of occurrence of a scaffold/framework/cyclic skeleton in the dataset is shown below each image.
+        This function creates a grid images of a chosen number of scaffolds/frameworks/graph framework for the molecules in a given SDMolSupplier Object. The scaffolds/frameworks/graph framework are sorted by their frequency.
+        The relative or absolute number of occurrence of a scaffold/framework/graph framework in the dataset is shown below each image.
 
         args:
             moleculeset (Chem.SDMolSupplier): SDMolSupplier Objects
@@ -1094,23 +1247,32 @@ class ChemicalDatasetComparator:
             structures_per_row (int): Number of structures in every row of the grid image (default: 5).
             image_size (int): Size of the image for a single molecule (default: 200).
             framework (bool): Remove terminal atoms with double bond (default: False).
-            skeleton (bool): Creating cyclic skeleton / graph framework (default: False).
+            graph_framework (bool): Creating graph framework (default: False).
             normalize (bool): Using relative numbers for scaffold analysis (default: True).
 
         returns:
-            structure_grid (PIL.PngImageFile): Grid image with most frequent scaffolds/frameworks/cyclic skeletons.
-            structure_list (list): List of scaffolds/frameworks/cyclic skeletons for every molecule.
-            structure_counts (pandas.Series): Absolute or relative frequency of each scaffold/frameworks/cyclic skeletons.
+            structure_grid (PIL.PngImageFile): Grid image with most frequent scaffolds/frameworks/graph framework.
+            structure_list (list): List of scaffolds/frameworks/graph framework for every molecule.
+            structure_counts (pandas.Series): Absolute or relative frequency of each scaffold/frameworks/graph framework.
+
+        raises:
+            KekulizeException: If molecule in SDMolSupplier Object cannot be kekulized.
         """
         structure_list = []
         scaffold_list = []
         for mol in moleculeset:
-            scaffold = MurckoScaffold.GetScaffoldForMol(mol)
+            try:
+                Chem.Kekulize(mol)
+                scaffold = MurckoScaffold.GetScaffoldForMol(mol)
+            except KekulizeException:
+                logger.info('Molecule can not be kekulized and will be excluded from scaffold analysis!')
+                continue
+            # scaffold = MurckoScaffold.GetScaffoldForMol(mol)
             scaffold_list.append(scaffold)
-        if framework == False and skeleton == False:
+        if not framework and not graph_framework:
             for mol in scaffold_list:
                 structure_list.append(Chem.MolToSmiles(mol))
-        if framework == True or skeleton == True:
+        if framework or graph_framework:
             framework_list = []
             for mol in scaffold_list:
                 to_remove = []
@@ -1126,13 +1288,14 @@ class ChemicalDatasetComparator:
                 framework_list.append(framework)
             for mol in framework_list:
                 structure_list.append(Chem.MolToSmiles(mol))
-        if skeleton == True:
+        if graph_framework:
             structure_list.clear()
-            skeleton_list = []
+            graph_framework_list = []
             for mol in framework_list:
-                skeleton_list.append(MurckoScaffold.MakeScaffoldGeneric(mol))
-            for mol in skeleton_list:
+                graph_framework_list.append(MurckoScaffold.MakeScaffoldGeneric(mol))
+            for mol in graph_framework_list:
                 structure_list.append(Chem.MolToSmiles(mol))
+        structure_list = ['*' if mol == '' else mol for mol in structure_list]
         structure_counts = pd.Index(structure_list).value_counts(normalize=normalize)
         if len(structure_counts) < number_of_structures:
             number_of_structures = len(structure_counts)
@@ -1141,8 +1304,10 @@ class ChemicalDatasetComparator:
         ]
         smiles_list = list(structure_counts.keys())
         to_draw = []
-        for mol in range(number_of_structures):
-            to_draw.append(Chem.MolFromSmiles(smiles_list[mol]))
+        for index in range(number_of_structures):
+            to_draw.append(Chem.MolFromSmiles(smiles_list[index]))
+            if smiles_list[index] == '*':
+                legend[index] = legend[index] + ' (No rings/scaffolds)'
         structure_grid = Draw.MolsToGridImage(
             to_draw,
             maxMols=number_of_structures,
@@ -1160,15 +1325,15 @@ class ChemicalDatasetComparator:
         structures_per_row: int = 5,
         image_size: int = 200,
         framework: bool = False,
-        skeleton: bool = False,
+        graph_framework: bool = False,
         normalize: bool = True,
         data_type: str = "png",
         figsize: Tuple[float, float] = [20.0, 20.0],
         fontsize_title: int = 24,
         fontsize_subtitle: int = 20,
-    ):
+    ) -> matplotlib.figure.Figure:
         """
-        This function creates a grid images of a chosen number of scaffolds/frameworks/cyclic skeletons for every subdictionary in the given dictionary and shows them together. The scaffolds/frameworks/cyclic skeletons in each gird image are sorted by their frequency. The relative or absolute number of occurrence of a scaffold/framework/cyclic skeleton in the dataset of the respective subdictionary is shown below each image.
+        This function creates a grid images of a chosen number of scaffolds/frameworks/graph framework for every subdictionary in the given dictionary and shows them together. The scaffolds/frameworks/graph framework in each gird image are sorted by their frequency. The relative or absolute number of occurrence of a scaffold/framework/graph framework in the dataset of the respective subdictionary is shown below each image.
 
         args:
             all_dicts (dict): Dictionary with subdictionaries including the key 'self.import_keyname'.
@@ -1176,7 +1341,7 @@ class ChemicalDatasetComparator:
             scaffolds_per_row (int): Number of scaffolds in every row of the grid image (default: 5).
             image_size (int): Size of the image for a single molecule (default: 200).
             framework (bool): Remove terminal atoms with double bond (default: False).
-            skeleton (bool): Creating cyclic skeleton / graph framework (default: False).
+            graph_framework (bool): Creating graph framework (default: False).
             normalize (bool): Using relative numbers for scaffold analysis (default: True).
             data_type (str): Data type for the exported image (default: png).
             figsize (float, float): Width, height of the image in inches (default: 20, 20)
@@ -1184,7 +1349,7 @@ class ChemicalDatasetComparator:
             fontsize_subtitle (int): Fontsize of the subtitles (default: 20).
 
         returns:
-            fig (PIL.PngImageFile): Grid images with most frequent scaffolds/frameworks/cyclic skeletons for each subdictionary.
+            fig (PIL.PngImageFile): Grid images with most frequent scaffolds/frameworks/graph framework for each subdictionary.
         """
         image_list = []
         title_list = []
@@ -1192,13 +1357,13 @@ class ChemicalDatasetComparator:
             if single_dict == self.figure_dict_keyname:
                 continue
             title_list.append(single_dict)
-            scaffolds = self._get_Murcko_scaffold(
+            scaffolds = self._get_scaffold(
                 all_dicts[single_dict][self.import_keyname],
                 number_of_structures,
                 structures_per_row,
                 image_size,
                 framework,
-                skeleton,
+                graph_framework,
                 normalize,
             )
             image_list.append(scaffolds[0])
@@ -1206,18 +1371,11 @@ class ChemicalDatasetComparator:
             all_dicts[single_dict][self.scaffold_summary_keyname] = (
                 scaffolds[2].to_frame("frequency")
             ).rename_axis("scaffold SMILES")
-        logging.info(
+        logger.info(
             "Updated dictionary with '%s' and '%s'",
             self.scaffold_list_keyname,
             self.scaffold_summary_keyname,
         )
-        # print(
-        #     "Updated dictionary with '"
-        #     + self.scaffold_list_keyname
-        #     + "' and '"
-        #     + self.scaffold_summary_keyname
-        #     + "'"
-        # )
         rows = len(image_list)
         fig = plt.figure(figsize=figsize)
         for j in range(0, rows):
@@ -1226,14 +1384,15 @@ class ChemicalDatasetComparator:
             plt.imshow(image_list[j])
             plt.title(title_list[j], fontsize=fontsize_subtitle)
         fig.suptitle(
-            "Most frequent Murcko scaffolds from the datasets", fontsize=fontsize_title
+            "Most frequent scaffolds from the datasets", fontsize=fontsize_title
         )
-        if not os.path.exists("output"):
-            os.makedirs("output")
-        fig.savefig("output/scaffold_grid.%s" % (data_type))
-        all_dicts[self.figure_dict_keyname]["scaffold_grid"] = fig
+        self._save_to_figure_dict(all_dicts, 'scaffold_grid', fig, data_type=data_type)
+        # if not os.path.exists("output"):
+        #     os.makedirs("output")
+        # fig.savefig("output/scaffold_grid.%s" % (data_type))
+        # all_dicts[self.figure_dict_keyname]["scaffold_grid"] = fig
         plt.close(fig)
-        logging.info("Updated dictionary with 'scaffold_grid'")
+        # logger.info("Updated dictionary with 'scaffold_grid'")
         return fig
 
     # Section: Chemical space visualization
@@ -1257,6 +1416,9 @@ class ChemicalDatasetComparator:
             fp_bits (int): Size of the Extended Connectivity Fingerprints (default: 2048).
             dimension_reduction (str): Method of dimension reduction (default: pca).
             interactive (bool): Creating an interactive plot or not (default: True).
+        Raises:
+            KeyError: if the identifier list is missing.
+            ValueError: if the dimension reduction is not pca, tsne or umap.
 
         Returns:
             Chemical space visualization
@@ -1266,6 +1428,17 @@ class ChemicalDatasetComparator:
         for single_dict in all_dicts:
             if single_dict == self.figure_dict_keyname:
                 continue
+            if not any(key == self.identifier_keyname for key in list(all_dicts[single_dict].keys())):
+                raise KeyError(
+                    "A identifier list is needed, please run 'get_identifier_list_key'!"
+                )
+                # try:
+                #     raise KeyError(
+                #         "A identifier list is needed, please run 'get_identifier_list_key'!"
+                #     )
+                # except KeyError as e:
+                #     logger.error(str(e), exc_info=True)
+                #     raise
             for mol in all_dicts[single_dict][self.identifier_keyname]:
                 all_mols_list.append(mol)
                 target_list.append(single_dict)
@@ -1314,18 +1487,35 @@ class ChemicalDatasetComparator:
         if dimension_reduction == "pca":
             chem_space.pca()  # n_components, copy, whiten, svd_solver ...
         elif dimension_reduction == "tsne":
-            chem_space.tsne()  # n_components, perplexity, learning_rate, n_iter, init, random_state ...
+            chem_space.tsne(learning_rate=200.0, init='random')  # n_components, perplexity, learning_rate, n_iter, init, random_state ...
         elif dimension_reduction == "umap":
             chem_space.umap()  # n_neighbors, min_dist, pca, random_state ...
         else:
             raise ValueError('dimension_reduction should be "pca", "tsne" or "umap"!')
+            # try:
+            #     raise ValueError('dimension_reduction should be "pca", "tsne" or "umap"!')
+            # except ValueError as e:
+            #     logger.error(str(e), exc_info=True)
+            #     raise
         if not os.path.exists("output"):
             os.makedirs("output")
         if not interactive:
-            chem_space.visualize_plot(filename="output/chemical_space")
+            fig = chem_space.visualize_plot().figure
+            self._save_to_figure_dict(all_dicts, 'chemical_space', fig)
+            plt.close(fig)
         else:
-            chem_space.interactive_plot(show_plot=True)
-        return chem_space
+            fig = chem_space.interactive_plot(show_plot=True)
+            if not os.path.exists("output/interactive_chemical_space.html"):
+                output_file("output/interactive_chemical_space.html")
+            else:
+                counter = 1
+                file_name = str('interactive_chemical_space_')
+                while os.path.exists("output/%s%d.html" % (file_name, counter)):
+                    counter += 1
+                output_file("output/%s%d.html" % (file_name, counter))
+            save(fig)
+            # fig = chem_space.interactive_plot(show_plot=True, filename="output/interactive_chemical_space.html")
+        return fig
 
     # Section: Data export
 
@@ -1342,7 +1532,9 @@ class ChemicalDatasetComparator:
             new_dict = all_dicts[single_dict].copy()
             counter = 0
             for key in new_dict.copy():
-                if type(new_dict[key]) == list:  # and len(new_dict[key]) == 100:
+                if key == self.import_keyname:
+                    new_dict.pop(key)
+                elif type(new_dict[key]) == list:
                     counter += 1
                 else:
                     new_dict.pop(key)
@@ -1351,8 +1543,7 @@ class ChemicalDatasetComparator:
             to_export.to_csv(
                 "output/descriptor_values_%s.csv" % (filename), index=False
             )
-            # print(single_dict + " : " + str(counter) + " exported descriptor values")
-            logging.info("%s: %d exported descriptor values", single_dict, counter)
+            logger.info("%s: %d exported descriptor values", single_dict, counter)
         return
 
     def export_all_figures_pdf(self, all_dicts: dict) -> None:
@@ -1360,13 +1551,13 @@ class ChemicalDatasetComparator:
         This function exports a pdf including all created figures form the figures subdictionary.
 
         Args:
-            all_dicts (dict): Dictionary with subdictionary (self.figure_dict_keyname) containing all created plots
+            all_dicts (dict): Dictionary with subdictionary (self.figure_dict_keyname: containing all created plots
         """
         pdf = PdfPages("output/all_figures.pdf")
         for value in all_dicts[self.figure_dict_keyname].values():
             pdf.savefig(value, bbox_inches="tight")
         pdf.close()
-        logging.info("All plots exported to 'all_figures.pdf'")
+        logger.info("All plots exported to 'all_figures.pdf'")
         # for image in os.listdir("output"):
         #     if image[-3:] == "png" or image[-3:] == "jpg":
         #         pdf.add_page()

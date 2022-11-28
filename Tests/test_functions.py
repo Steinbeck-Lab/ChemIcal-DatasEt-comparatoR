@@ -17,9 +17,9 @@ def test_check_invalid_mols_in_SDF():
     test_dict_path = os.path.join(os.path.split(__file__)[0], "unittest_data_invalid")
     invalid_testdict = cider.import_as_data_dict(test_dict_path)
     # Assert that faulty molecules are detected and optionally deleted
-    cider._check_invalid_mols_in_SDF(invalid_testdict, delete=False)
-    assert len(invalid_testdict["set_D_invalid.sdf"][cider.import_keyname]) == 7
-    cider._check_invalid_mols_in_SDF(invalid_testdict, delete=True)
+    # cider._check_invalid_mols_in_SDF(invalid_testdict, delete=False)
+    # assert len(invalid_testdict["set_D_invalid.sdf"][cider.import_keyname]) == 7
+    # cider._check_invalid_mols_in_SDF(invalid_testdict, delete=True)
     assert len(invalid_testdict["set_D_invalid.sdf"][cider.import_keyname]) == 5
 
 def test_get_number_of_molecules():
@@ -121,11 +121,17 @@ def test_get_identifier_list_key():
 
 
 def test_get_duplicate_key():
-    cider.get_duplicate_key(testdict)
-    # Assert that the function generates a new entry in the dictionary
+    cider.get_duplicate_key(testdict, identifier=True)
+    # Assert that the function generates a new entries in the dictionary
     assert (
         any(
             key == cider.duplicates_keyname
+            for key in list(testdict["set_A.sdf"].keys())
+        )
+    )
+    assert (
+        any(
+            key == cider.duplicates_id_keyname
             for key in list(testdict["set_A.sdf"].keys())
         )
     )
@@ -133,6 +139,13 @@ def test_get_duplicate_key():
     assert testdict["set_A.sdf"][cider.duplicates_keyname] == 0
     assert testdict["set_B.sdf"][cider.duplicates_keyname] == 0
     assert testdict["set_D.sdf"][cider.duplicates_keyname] == 1
+    # Assert that the function returns the right duplicate identifier
+    assert (
+        testdict["set_D.sdf"][cider.duplicates_keyname]
+        == {'GZFGOTFRPZRKDS-UHFFFAOYSA-N'}
+        or {'InChI=1S/C6H5BrO/c7-5-1-3-6(8)4-2-5/h1-4,8H'}
+        or {'Oc1ccc(Br)cc1'}
+    )
 
 def test_get_shared_molecules_key():
     cider.get_shared_molecules_key(testdict)
@@ -341,31 +354,31 @@ def test_lipinski_plot():
         any(key == "lipinski_plot" for key in list(testdict[cider.figure_dict_keyname].keys()))
     )
 
-def test_get_Murcko_scaffold():
+def test_get_scaffold():
     testset = testdict["set_A.sdf"][cider.import_keyname]
-    scaffolds = cider._get_Murcko_scaffold(testset)
+    scaffolds = cider._get_scaffold(testset)
     # Assert that the correct scaffold list is generated (for default)
     expected_scaffold_list = ['c1ccccc1', 'c1ccccc1', 'c1ccccc1', 'O=c1ccoc2ccccc12']
     assert scaffolds[1] == expected_scaffold_list
     # Assert that the correct scaffold counts are calculated (for default)
     assert list(scaffolds[2]) == [0.75, 0.25]
 
-def test_get_Murcko_scaffold_2():
+def test_get_scaffold_2():
     testset = testdict["set_A.sdf"][cider.import_keyname]
-    scaffolds = cider._get_Murcko_scaffold(testset, framework=True)
+    scaffolds = cider._get_scaffold(testset, framework=True)
     # Assert that the correct scaffold list is generated (for framework=True)
     expected_scaffold_list = ['c1ccccc1', 'c1ccccc1', 'c1ccccc1', 'C1=COc2ccccc2C1']
     assert scaffolds[1] == expected_scaffold_list
     # Assert that the correct scaffold counts are calculated (for framework=True)
     assert list(scaffolds[2]) == [0.75, 0.25]
 
-def test_get_Murcko_scaffold_3():
+def test_get_scaffold_3():
     testset = testdict["set_A.sdf"][cider.import_keyname]
-    scaffolds = cider._get_Murcko_scaffold(testset, skeleton=True)
-    # Assert that the correct scaffold list is generated (for skeleton=True)
+    scaffolds = cider._get_scaffold(testset, graph_framework=True)
+    # Assert that the correct scaffold list is generated (for graph_framework=True)
     expected_scaffold_list = ['C1CCCCC1', 'C1CCCCC1', 'C1CCCCC1', 'C1CCC2CCCCC2C1']
     assert scaffolds[1] == expected_scaffold_list
-    # Assert that the correct scaffold counts are calculated (for skeleton=True)
+    # Assert that the correct scaffold counts are calculated (for graph_framework=True)
     assert list(scaffolds[2]) == [0.75, 0.25]
 
 def test_draw_most_frequent_scaffolds():
@@ -425,3 +438,14 @@ def test_chemical_space_plot_tsne():
                                        interactive=False,
                                        fp_bits=1024,
                                        fp_radius=2)
+
+def test_save_to_figure_dict():
+    cider.draw_molecules(testdict)
+    # Assert that the picture is exported
+    test_path = os.path.join(os.path.split(__file__)[0],
+                             "output", "mol_grid_1.png")
+    assert os.path.exists(test_path)
+    # Assert that a new entry in self.figure_dict_keyname is generated
+    assert (
+        any(key == "mol_grid_1" for key in list(testdict[cider.figure_dict_keyname].keys()))
+    )
