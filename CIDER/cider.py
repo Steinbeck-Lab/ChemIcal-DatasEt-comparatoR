@@ -36,6 +36,7 @@ from rdkit.Chem import Draw
 from rdkit.Chem.Draw import IPythonConsole
 from rdkit.Chem.Scaffolds import MurckoScaffold
 from rdkit.Chem import rdchem
+from rdkit.Chem import KekulizeException
 
 import matplotlib.pyplot as plt
 from matplotlib_venn import venn2
@@ -149,13 +150,12 @@ class ChemicalDatasetComparator:
 
     # Section: Import data and check for faulty SDFiles
 
-    def _check_invalid_mols_in_SDF(self, all_dicts: dict, delete: bool = True) -> None:
+    def _check_invalid_mols_in_SDF(self, all_dicts: dict) -> None:
         """
-        This function checks if there are invalid entries in the SDFiles that can cause errors in the subsequent functions. At choice the invalid entries can be removed form the SDMolSupplier Object. The entry will remain in the original SDFile as it is. (private method)
+        This function checks if there are invalid entries in the SDFiles that can cause errors in the subsequent functions. Those invalid entries will be removed form the SDMolSupplier Object. The entry will remain in the original SDFile as it is. (private method)
 
         Args:
             all_dicts (dict): Dictionary with sub-dictionaries including SDMolSupplier Objects.
-            delete (bool): Deleting invalid entries or not (default: False).
         """
         for single_dict in all_dicts:
             if single_dict == self.figure_dict_keyname:
@@ -171,7 +171,7 @@ class ChemicalDatasetComparator:
                     invalid_index.append(mol_index)
             if not invalid_index:
                 logger.info("No faulty molecules found in %s" % (single_dict))
-            elif delete and invalid_index:
+            else:
                 new_SDMol = list(all_dicts[single_dict][self.import_keyname])
                 for index in sorted(invalid_index, reverse=True):
                     del new_SDMol[index]
@@ -180,20 +180,19 @@ class ChemicalDatasetComparator:
                     "%d invalid molecule(s) deleted from %s"
                     % (len(invalid_index), single_dict)
                 )
-            elif not delete and invalid_index:
-                logger.warning(
-                    "%d invalid molecule(s) will remain in %s. This might cause subsequent errors!"
-                    % (len(invalid_index), single_dict)
-                )
+            # elif not delete and invalid_index:
+            #     logger.warning(
+            #         "%d invalid molecule(s) will remain in %s. This might cause subsequent errors!"
+            #         % (len(invalid_index), single_dict)
+            #     )
         return
 
-    def import_as_data_dict(self, path_to_data: str, delete: bool = True) -> Dict:
+    def import_as_data_dict(self, path_to_data: str) -> Dict:
         """
         This function creates a dictionary with the names of the imported file as keys. The values of each of these keys is a subdictionary. The first entry of every subdictionary is self.import_keyname (class variable, can be changed) as key and a SDMolSupplier Object of the SDFile as value. To find faulty molecules every entry of the SDMolSupplier Object will be parsed once. (Parsed molecules will not be stored in the dictionary to save memory.)
 
         Args:
             path_to_data (str): Path to the directory where the SDFiles are stored.
-            delete (bool): Delete faulty molecules from imported dataset.
 
         Returns:
             all_dicts (dict): Dictionary with subdictionaries for every dataset, updated with the SDMolSupplier Objects.
@@ -219,7 +218,7 @@ class ChemicalDatasetComparator:
             #     raise
         figure_dict = {}
         all_dicts[self.figure_dict_keyname] = figure_dict
-        self._check_invalid_mols_in_SDF(all_dicts, delete)
+        self._check_invalid_mols_in_SDF(all_dicts)
         logger.info("Created dictionary with keys: %s", list(all_dicts.keys()))
         os.chdir(os.path.dirname(data_dir))
         if not os.path.exists("output"):
@@ -1255,6 +1254,9 @@ class ChemicalDatasetComparator:
             structure_grid (PIL.PngImageFile): Grid image with most frequent scaffolds/frameworks/graph framework.
             structure_list (list): List of scaffolds/frameworks/graph framework for every molecule.
             structure_counts (pandas.Series): Absolute or relative frequency of each scaffold/frameworks/graph framework.
+
+        raises:
+            KekulizeException: If molecule in SDMolSupplier Object cannot be kekulized.
         """
         structure_list = []
         scaffold_list = []
@@ -1262,7 +1264,7 @@ class ChemicalDatasetComparator:
             try:
                 Chem.Kekulize(mol)
                 scaffold = MurckoScaffold.GetScaffoldForMol(mol)
-            except BaseException:
+            except KekulizeException:
                 logger.info('Molecule can not be kekulized and will be excluded from scaffold analysis!')
                 continue
             # scaffold = MurckoScaffold.GetScaffoldForMol(mol)

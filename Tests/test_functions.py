@@ -15,11 +15,11 @@ def test_import_as_data_dict():
 
 def test_check_invalid_mols_in_SDF():
     test_dict_path = os.path.join(os.path.split(__file__)[0], "unittest_data_invalid")
-    invalid_testdict = cider.import_as_data_dict(test_dict_path, delete=False)
+    invalid_testdict = cider.import_as_data_dict(test_dict_path)
     # Assert that faulty molecules are detected and optionally deleted
-    cider._check_invalid_mols_in_SDF(invalid_testdict, delete=False)
-    assert len(invalid_testdict["set_D_invalid.sdf"][cider.import_keyname]) == 7
-    cider._check_invalid_mols_in_SDF(invalid_testdict, delete=True)
+    # cider._check_invalid_mols_in_SDF(invalid_testdict, delete=False)
+    # assert len(invalid_testdict["set_D_invalid.sdf"][cider.import_keyname]) == 7
+    # cider._check_invalid_mols_in_SDF(invalid_testdict, delete=True)
     assert len(invalid_testdict["set_D_invalid.sdf"][cider.import_keyname]) == 5
 
 def test_get_number_of_molecules():
