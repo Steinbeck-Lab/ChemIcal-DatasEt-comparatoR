@@ -204,7 +204,7 @@ class ChemicalDatasetComparator:
         all_dicts = {}
         data_dir = os.path.abspath(str(path_to_data))
         for dict_name in os.listdir(data_dir):
-            if dict_name[-3:] == "sdf":
+            if dict_name[-3:] == "sdf" or dict_name[-3:] == "SDF":
                 single_dict = {}
                 dict_path = os.path.join(data_dir, dict_name)
                 single_dict[self.import_keyname] = Chem.SDMolSupplier(dict_path)
