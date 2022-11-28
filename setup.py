@@ -28,6 +28,7 @@ setuptools.setup(
         "rdkit-pypi",
         "pytest",
         "scikit-learn==1.1.1",
+        "bokeh==2.4.3",
     ],
     package_data={"CIDER": ["assets/*.*", "assets/*/*.*", "assets/*/*/*.*"]},
     classifiers=[
