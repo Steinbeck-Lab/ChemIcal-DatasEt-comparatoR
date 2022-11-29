@@ -4,7 +4,7 @@
 [![GitHub issues](https://img.shields.io/github/issues/hannbus/ChemIcal_DatasEt_compaRator.svg)](https://GitHub.com/hannbus/ChemIcal_DatasEt_compaRator/issues/)
 [![GitHub contributors](https://img.shields.io/github/contributors/hannbus/ChemIcal_DatasEt_compaRator.svg)](https://GitHub.com/hannbus/ChemIcal_DatasEt_compaRator/graphs/contributors/)
 [![DOI](https://zenodo.org/badge/501949039.svg)](https://zenodo.org/badge/latestdoi/501949039)
-[![Documentation Status](https://readthedocs.org/projects/ChemIcal_DatasEt_compaRator/badge/?version=latest)](https://ChemIcal_DatasEt_compaRator.readthedocs.io/en/latest/?badge=latest)
+[![Documentation Status](https://readthedocs.org/projects/chemical-dataset-comparator/badge/?version=latest)](https://chemical-dataset-comparator.readthedocs.io/en/latest/?badge=latest)
 [![GitHub release](https://img.shields.io/github/release/hannbus/ChemIcal_DatasEt_compaRator.svg)](https://github.com/hannbus/ChemIcal_DatasEt_compaRator/releases/)
 [![PyPI version fury.io](https://badge.fury.io/py/cider-chem.svg)](https://pypi.python.org/pypi/cider-chem/)
 
@@ -57,6 +57,8 @@ testdict = cider.import_as_data_dict(data_dir)
 cider.get_number_of_molecules(testdict)
 
 ```
+### Documentation
+- The documentation for the CIDER package can be found [here](https://chemical-dataset-comparator.readthedocs.io/en/latest/?badge=latest).
 
 ### Cite us
 - Busch, H., Schaub, J., Brinkhaus, H. O., Rajan, K., & Steinbeck, C. (2022). ChemIcal DatasEt comparatoR CIDER (Version 0.0.1-dev) [Computer software]. https://doi.org/10.5281/zenodo.6630494
