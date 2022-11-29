@@ -1,3 +1,6 @@
+nbsphinx
+sphinx-autodoc-typehints
+sphinx_rtd_theme
 rdkit-pypi
 matplotlib==3.5.1
 seaborn==0.11.2
