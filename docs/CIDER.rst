@@ -1,10 +1,10 @@
-RanDepict package
+CIDER package
 =================
 
 Submodules
 ----------
 
-RanDepict.randepict module
+CIDER.cider module
 --------------------------
 
 .. automodule:: CIDER.cider
