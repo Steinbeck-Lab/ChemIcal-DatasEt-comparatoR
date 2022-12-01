@@ -13,6 +13,12 @@ def test_import_as_data_dict():
     # Assert that the function generates the dictionary
     assert set(testdict.keys()) == {"set_A.sdf", "set_B.sdf", "set_D.sdf", cider.figure_dict_keyname}
 
+def test_smi_import_as_data_dict():
+    test_dict_path = os.path.join(os.path.split(__file__)[0], "unittest_smi_data")
+    smi_testdict = cider.import_smi_as_data_dict(test_dict_path)
+    # Assert that the function generates the dictionary
+    assert set(smi_testdict.keys()) == {"blankspace.smi", "header.smi", "id_first.smi", "komma.smi", cider.figure_dict_keyname}
+
 def test_check_invalid_mols_in_SDF():
     test_dict_path = os.path.join(os.path.split(__file__)[0], "unittest_data_invalid")
     invalid_testdict = cider.import_as_data_dict(test_dict_path)
