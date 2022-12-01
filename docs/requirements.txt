@@ -8,3 +8,4 @@ chemplot==1.2.0
 matplotlib_venn==0.11.6
 FPDF==1.7.2
 bokeh==2.4.3
+IPython
