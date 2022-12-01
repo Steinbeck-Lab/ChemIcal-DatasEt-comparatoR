@@ -1,4 +1,4 @@
-RanDepict package
+CIDER package
 =================
 
 Submodules
