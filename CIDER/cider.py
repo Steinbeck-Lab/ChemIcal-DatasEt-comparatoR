@@ -28,6 +28,7 @@ SOFTWARE.
 
 import os
 import pandas as pd
+from pandas.errors import ParserError
 import numpy as np
 
 from rdkit import Chem
@@ -176,6 +177,11 @@ class ChemicalDatasetComparator:
                 for index in sorted(invalid_index, reverse=True):
                     del new_SDMol[index]
                 all_dicts[single_dict].update({self.import_keyname: new_SDMol})
+                if self.database_id_keyname in all_dicts[single_dict]:
+                    new_id_list = list(all_dicts[single_dict][self.database_id_keyname])
+                    for index in sorted(invalid_index, reverse=True):
+                        del new_id_list[index]
+                    all_dicts[single_dict].update({self.database_id_keyname: new_id_list})
                 logger.info(
                     "%d invalid molecule(s) deleted from %s"
                     % (len(invalid_index), single_dict)
@@ -247,10 +253,15 @@ class ChemicalDatasetComparator:
         all_dicts = {}
         data_dir = os.path.abspath(str(path_to_data))
         for dict_name in os.listdir(data_dir):
-            if dict_name[-3:] == "smi" or dict_name[-3:] == "SMI":
+            if dict_name[-3:] == "smi" or dict_name[-3:] == "SMI" or dict_name[-3:] == "txt":
                 single_dict = {}
                 dict_path = os.path.join(data_dir, dict_name)
-                smi_table = pd.read_csv(dict_path, sep=None, engine='python', header=None)
+                try:
+                    smi_table = pd.read_csv(dict_path, sep=None, engine='python', header=None)
+                except ParserError:
+                    smi_table = pd.read_csv(dict_path, header=None)
+                # except:
+                #     raise ImportError("Cannot import files! Please check your data.")
                 for column in range(len(smi_table.columns)):
                     is_mol = []
                     for row in range(3):
@@ -263,6 +274,17 @@ class ChemicalDatasetComparator:
                     rdkit_mol_list.append(Chem.MolFromSmiles(mol))
                 single_dict[self.import_keyname] = rdkit_mol_list
                 all_dicts[dict_name] = single_dict
+                if id:
+                    try:
+                        if smi_column == 1:
+                            id_column = 0
+                        elif smi_column == 0:
+                            id_column = 1
+                        id_list = list(smi_table[id_column])
+                        single_dict[self.database_id_keyname] = id_list
+                    except KeyError:
+                        logger.info("Cannot find IDs for file %s! SMILES strings and database ID should be the first a d second entry of the files to import the ID." % (dict_name))
+                        continue
         if not all_dicts:
             raise KeyError("No SMI files found in the given directory %s!" % (data_dir))
         figure_dict = {}
