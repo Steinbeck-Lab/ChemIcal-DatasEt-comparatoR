@@ -431,11 +431,11 @@ def test_export_single_dict_values():
     assert os.path.exists(test_path_setB)
     assert os.path.exists(test_path_setD)
 
-def test_export_all_figures_pdf():
-    cider.export_all_figures_pdf(testdict)
+def test_export_figure_report():
+    cider.export_figure_report(testdict)
     # Assert that the picture is exported
     test_path = os.path.join(os.path.split(__file__)[0],
-                             "output", "all_figures.pdf")
+                             "output", "cider_report.pdf")
     assert os.path.exists(test_path)
 
 def test_chemical_space_plot_tsne():

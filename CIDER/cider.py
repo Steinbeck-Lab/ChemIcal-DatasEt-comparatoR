@@ -51,7 +51,15 @@ from bokeh.plotting import output_file, save
 from typing import List, Tuple, Dict
 from itertools import count
 import PIL
+from PIL import Image
 import matplotlib
+
+import io
+from fpdf import FPDF
+from fpdf import YPos
+from fpdf import XPos
+from fpdf.enums import Align
+from datetime import date
 
 import logging
 import sys
@@ -1617,25 +1625,40 @@ class ChemicalDatasetComparator:
             logger.info("%s: %d exported descriptor values", single_dict, counter)
         return
 
-    def export_all_figures_pdf(self, all_dicts: dict) -> None:
+    def export_figure_report(self, all_dicts: dict) -> None:
         """
-        This function exports a pdf including all created figures form the figures subdictionary.
+        This function exports a pdf including some general information and all created figures form the figures subdictionary.
 
         Args:
-            all_dicts (dict): Dictionary with subdictionary (self.figure_dict_keyname: containing all created plots
+            all_dicts (dict): Dictionary with subdictionary 'self.figure_dict_keyname' containing all created plots
         """
-        pdf = PdfPages("output/all_figures.pdf")
-        for value in all_dicts[self.figure_dict_keyname].values():
-            pdf.savefig(value, bbox_inches="tight")
-        pdf.close()
-        logger.info("All plots exported to 'all_figures.pdf'")
-        # for image in os.listdir("output"):
-        #     if image[-3:] == "png" or image[-3:] == "jpg":
-        #         pdf.add_page()
-        #         pdf.image("output/%s" % (image), 5, 5, 200)
-        #     elif image[-3:] == "csv":
-        #         pass
-        #     else:
-        #         print(image + " not included, due to unsupported image type.")
-        # pdf.output("output/all_figures.pdf")
+        first_dict = list(all_dicts.keys())[0]
+        today = date.today()
+        data = (('Date:', str(today)),
+                ('Data:', str(list(all_dicts.keys())[:-1])[1:-1]),
+                ('Generated CIDER keys:', str(list(all_dicts[first_dict].keys()))[1:-1]),
+                ('Generated CIDER figures:', str(list(all_dicts[self.figure_dict_keyname].keys()))[1:-1]),
+                )
+        pdf = FPDF()
+        pdf.set_font('Helvetica')
+        pdf.add_page()
+        pdf.set_font_size(30)
+        pdf.cell(txt='Report CIDER', align='C', w=pdf.epw, border='B')
+        pdf.set_font_size(12)
+        pdf.set_y(50)
+        for row in data:
+            pdf.multi_cell(40, 7, row[0], new_y=YPos.LAST, new_x=XPos.RIGHT)
+            pdf.multi_cell(150, 7, row[1], new_y=YPos.NEXT, new_x=XPos.LMARGIN)
+        pdf.add_page()
+        for fig in all_dicts['figures']:
+            reader = io.BytesIO()
+            all_dicts['figures'][fig].savefig(reader, bbox_inches="tight", format="png")
+            fig = Image.open(reader)
+            if fig.height <= fig.width:
+                pdf.image(reader, w=pdf.epw)
+            if fig.height > fig.width:
+                pdf.image(reader, h=pdf.eph)
+            fig.close()
+        pdf.output("output/cider_report.pdf")
+        logger.info("'cider_report.pdf' exported")
         return
