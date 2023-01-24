@@ -38,6 +38,7 @@ from rdkit.Chem.Draw import IPythonConsole
 from rdkit.Chem.Scaffolds import MurckoScaffold
 from rdkit.Chem import rdchem
 from rdkit.Chem import KekulizeException
+from rdkit.Chem import AllChem
 
 import matplotlib.pyplot as plt
 from matplotlib_venn import venn2
@@ -391,7 +392,7 @@ class ChemicalDatasetComparator:
             mols_per_row (int): number of molecules per row in the grid (default: 3).
             image_size (int): the size of the image for a single molecule (default: 200).
             data_type (str): data type for the exported files (e.g. png, jpg, pdf, default: png).
-            figsize (float, float): Width, height of the image in inches (default: 20, 20)
+            figsize (float, float): Width, height of the figure in inches (default: 20, 20)
             fontsize_title (int): Fontsize of the title (default: 24).
             fontsize_subtitle (int): Fontsize of the subtitles (default: 20).
 
@@ -411,6 +412,11 @@ class ChemicalDatasetComparator:
                 number_of_mols_final = number_of_mols
             for i in range(number_of_mols_final):
                 to_draw.append(all_dicts[single_dict][self.import_keyname][i])
+            for mol in to_draw:
+                atom0_pos = [mol.GetConformer().GetAtomPosition(0).x, mol.GetConformer().GetAtomPosition(0).y, mol.GetConformer().GetAtomPosition(0).z]
+                atom1_pos = [mol.GetConformer().GetAtomPosition(1).x, mol.GetConformer().GetAtomPosition(1).y, mol.GetConformer().GetAtomPosition(1).z]
+                if atom0_pos == atom1_pos:
+                    AllChem.Compute2DCoords(mol)
             mol_grid = Draw.MolsToGridImage(
                 to_draw,
                 maxMols=number_of_mols_final,
