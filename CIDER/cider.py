@@ -1642,8 +1642,8 @@ class ChemicalDatasetComparator:
         today = date.today()
         data = (('Date:', str(today)),
                 ('Data:', str(list(all_dicts.keys())[:-1])[1:-1]),
-                ('Generated CIDER keys:', str(list(all_dicts[first_dict].keys()))[1:-1]),
-                ('Generated CIDER figures:', str(list(all_dicts[self.figure_dict_keyname].keys()))[1:-1]),
+                ('Generated keys:', str(list(all_dicts[first_dict].keys()))[1:-1]),
+                ('Generated figures:', str(list(all_dicts[self.figure_dict_keyname].keys()))[1:-1]),
                 )
         pdf = FPDF()
         pdf.set_font('Helvetica')
@@ -1655,15 +1655,18 @@ class ChemicalDatasetComparator:
         for row in data:
             pdf.multi_cell(40, 7, row[0], new_y=YPos.LAST, new_x=XPos.RIGHT)
             pdf.multi_cell(150, 7, row[1], new_y=YPos.NEXT, new_x=XPos.LMARGIN)
-        pdf.add_page()
         for fig in all_dicts['figures']:
+            pdf.add_page()
             reader = io.BytesIO()
             all_dicts['figures'][fig].savefig(reader, bbox_inches="tight", format="png")
             fig = Image.open(reader)
             if fig.height <= fig.width:
                 pdf.image(reader, w=pdf.epw)
             if fig.height > fig.width:
-                pdf.image(reader, h=pdf.eph)
+                if fig.height/fig.width < 1.4:
+                    pdf.image(reader, w=pdf.epw)
+                if fig.height/fig.width > 1.4:
+                    pdf.image(reader, h=pdf.eph)
             fig.close()
         pdf.output("output/cider_report.pdf")
         logger.info("'cider_report.pdf' exported")
