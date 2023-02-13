@@ -61,6 +61,7 @@ from fpdf import YPos
 from fpdf import XPos
 from fpdf.enums import Align
 from datetime import date
+import datetime
 
 import logging
 import sys
@@ -106,12 +107,16 @@ class ChemicalDatasetComparator:
 
     if not os.path.exists("output"):
         os.mkdir("output")
+    if not os.path.exists("output/logs"):
+        os.mkdir("output/logs")
+
+    now = (str(datetime.datetime.now())[:-7]).replace(':', '-')
 
     logging.basicConfig(
         format='%(asctime)s [%(levelname)s] %(name)s: %(message)s',
         level=logging.INFO,
         handlers=[
-            logging.FileHandler("output/cider_logging.log"),
+            logging.FileHandler("output/logs/%s_cider_logging.log" % (now)),
             logging.StreamHandler(sys.stdout)
         ]
     )
@@ -226,11 +231,6 @@ class ChemicalDatasetComparator:
                 all_dicts[dict_name] = single_dict
         if not all_dicts:
             raise KeyError("No SDFiles found in the given directory %s!" % (data_dir))
-            # try:
-            #     raise KeyError("No SDFiles found in the given directory %s!" % (data_dir))
-            # except KeyError as e:
-            #     logger.error(str(e), exc_info=True)  # logger.error(str(e))
-            #     raise
         figure_dict = {}
         all_dicts[self.figure_dict_keyname] = figure_dict
         self._check_invalid_mols_in_SDF(all_dicts)
@@ -269,8 +269,6 @@ class ChemicalDatasetComparator:
                     smi_table = pd.read_csv(dict_path, sep=None, engine='python', header=None)
                 except ParserError:
                     smi_table = pd.read_csv(dict_path, header=None)
-                # except:
-                #     raise ImportError("Cannot import files! Please check your data.")
                 for column in range(len(smi_table.columns)):
                     is_mol = []
                     for row in range(3):
