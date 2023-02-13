@@ -38,6 +38,7 @@ from rdkit.Chem.Draw import IPythonConsole
 from rdkit.Chem.Scaffolds import MurckoScaffold
 from rdkit.Chem import rdchem
 from rdkit.Chem import KekulizeException
+from rdkit.Chem import AllChem
 
 import matplotlib.pyplot as plt
 from matplotlib_venn import venn2
@@ -59,7 +60,7 @@ from fpdf import FPDF
 from fpdf import YPos
 from fpdf import XPos
 from fpdf.enums import Align
-from datetime import date
+from datetime import date, datetime
 
 import logging
 import sys
@@ -105,12 +106,16 @@ class ChemicalDatasetComparator:
 
     if not os.path.exists("output"):
         os.mkdir("output")
+    if not os.path.exists("output/logs"):
+        os.mkdir("output/logs")
+
+    now = (str(datetime.now())[:-7]).replace(':', '-')
 
     logging.basicConfig(
         format='%(asctime)s [%(levelname)s] %(name)s: %(message)s',
         level=logging.INFO,
         handlers=[
-            logging.FileHandler("output/cider_logging.log"),
+            logging.FileHandler("output/logs/%s_cider_logging.log" % (now)),
             logging.StreamHandler(sys.stdout)
         ]
     )
@@ -225,11 +230,6 @@ class ChemicalDatasetComparator:
                 all_dicts[dict_name] = single_dict
         if not all_dicts:
             raise KeyError("No SDFiles found in the given directory %s!" % (data_dir))
-            # try:
-            #     raise KeyError("No SDFiles found in the given directory %s!" % (data_dir))
-            # except KeyError as e:
-            #     logger.error(str(e), exc_info=True)  # logger.error(str(e))
-            #     raise
         figure_dict = {}
         all_dicts[self.figure_dict_keyname] = figure_dict
         self._check_invalid_mols_in_SDF(all_dicts)
@@ -268,8 +268,6 @@ class ChemicalDatasetComparator:
                     smi_table = pd.read_csv(dict_path, sep=None, engine='python', header=None)
                 except ParserError:
                     smi_table = pd.read_csv(dict_path, header=None)
-                # except:
-                #     raise ImportError("Cannot import files! Please check your data.")
                 for column in range(len(smi_table.columns)):
                     is_mol = []
                     for row in range(3):
@@ -391,7 +389,7 @@ class ChemicalDatasetComparator:
             mols_per_row (int): number of molecules per row in the grid (default: 3).
             image_size (int): the size of the image for a single molecule (default: 200).
             data_type (str): data type for the exported files (e.g. png, jpg, pdf, default: png).
-            figsize (float, float): Width, height of the image in inches (default: 20, 20)
+            figsize (float, float): Width, height of the figure in inches (default: 20, 20)
             fontsize_title (int): Fontsize of the title (default: 24).
             fontsize_subtitle (int): Fontsize of the subtitles (default: 20).
 
@@ -411,6 +409,11 @@ class ChemicalDatasetComparator:
                 number_of_mols_final = number_of_mols
             for i in range(number_of_mols_final):
                 to_draw.append(all_dicts[single_dict][self.import_keyname][i])
+            for mol in to_draw:
+                atom0_pos = [mol.GetConformer().GetAtomPosition(0).x, mol.GetConformer().GetAtomPosition(0).y, mol.GetConformer().GetAtomPosition(0).z]
+                atom1_pos = [mol.GetConformer().GetAtomPosition(1).x, mol.GetConformer().GetAtomPosition(1).y, mol.GetConformer().GetAtomPosition(1).z]
+                if atom0_pos == atom1_pos:
+                    AllChem.Compute2DCoords(mol)
             mol_grid = Draw.MolsToGridImage(
                 to_draw,
                 maxMols=number_of_mols_final,
@@ -1636,8 +1639,8 @@ class ChemicalDatasetComparator:
         today = date.today()
         data = (('Date:', str(today)),
                 ('Data:', str(list(all_dicts.keys())[:-1])[1:-1]),
-                ('Generated CIDER keys:', str(list(all_dicts[first_dict].keys()))[1:-1]),
-                ('Generated CIDER figures:', str(list(all_dicts[self.figure_dict_keyname].keys()))[1:-1]),
+                ('Generated keys:', str(list(all_dicts[first_dict].keys()))[1:-1]),
+                ('Generated figures:', str(list(all_dicts[self.figure_dict_keyname].keys()))[1:-1]),
                 )
         pdf = FPDF()
         pdf.set_font('Helvetica')
@@ -1649,15 +1652,18 @@ class ChemicalDatasetComparator:
         for row in data:
             pdf.multi_cell(40, 7, row[0], new_y=YPos.LAST, new_x=XPos.RIGHT)
             pdf.multi_cell(150, 7, row[1], new_y=YPos.NEXT, new_x=XPos.LMARGIN)
-        pdf.add_page()
         for fig in all_dicts['figures']:
+            pdf.add_page()
             reader = io.BytesIO()
             all_dicts['figures'][fig].savefig(reader, bbox_inches="tight", format="png")
             fig = Image.open(reader)
             if fig.height <= fig.width:
                 pdf.image(reader, w=pdf.epw)
             if fig.height > fig.width:
-                pdf.image(reader, h=pdf.eph)
+                if fig.height/fig.width < 1.4:
+                    pdf.image(reader, w=pdf.epw)
+                if fig.height/fig.width > 1.4:
+                    pdf.image(reader, h=pdf.eph)
             fig.close()
         pdf.output("output/cider_report.pdf")
         logger.info("'cider_report.pdf' exported")
