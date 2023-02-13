@@ -61,7 +61,7 @@ from fpdf import YPos
 from fpdf import XPos
 from fpdf.enums import Align
 from datetime import date
-import datetime
+from datetime import datetime
 
 import logging
 import sys
@@ -110,7 +110,7 @@ class ChemicalDatasetComparator:
     if not os.path.exists("output/logs"):
         os.mkdir("output/logs")
 
-    now = (str(datetime.datetime.now())[:-7]).replace(':', '-')
+    now = (str(datetime.now())[:-7]).replace(':', '-')
 
     logging.basicConfig(
         format='%(asctime)s [%(levelname)s] %(name)s: %(message)s',
