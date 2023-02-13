@@ -60,8 +60,7 @@ from fpdf import FPDF
 from fpdf import YPos
 from fpdf import XPos
 from fpdf.enums import Align
-from datetime import date
-from datetime import datetime
+from datetime import date, datetime
 
 import logging
 import sys
