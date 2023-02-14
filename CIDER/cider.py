@@ -28,6 +28,7 @@ SOFTWARE.
 
 import os
 import pandas as pd
+from pandas.errors import ParserError
 import numpy as np
 
 from rdkit import Chem
@@ -37,6 +38,7 @@ from rdkit.Chem.Draw import IPythonConsole
 from rdkit.Chem.Scaffolds import MurckoScaffold
 from rdkit.Chem import rdchem
 from rdkit.Chem import KekulizeException
+from rdkit.Chem import AllChem
 
 import matplotlib.pyplot as plt
 from matplotlib_venn import venn2
@@ -50,7 +52,15 @@ from bokeh.plotting import output_file, save
 from typing import List, Tuple, Dict
 from itertools import count
 import PIL
+from PIL import Image
 import matplotlib
+
+import io
+from fpdf import FPDF
+from fpdf import YPos
+from fpdf import XPos
+from fpdf.enums import Align
+from datetime import date, datetime
 
 import logging
 import sys
@@ -71,7 +81,7 @@ class ChemicalDatasetComparator:
         The class variables of CIDER function as keys for the dictionary in which all calculated and plotted data will be stored. The keys will be generated when the CIDER method is executed.
         """
         # from cider.import_as_data_dict
-        self.import_keyname = "SDMolSupplier_Object"
+        self.import_keyname = "rdkit_mol_Object"
         self.figure_dict_keyname = "figures"
         # from cider.get_number_of_molecules
         self.dataset_length_keyname = "number_of_molecules"
@@ -96,12 +106,16 @@ class ChemicalDatasetComparator:
 
     if not os.path.exists("output"):
         os.mkdir("output")
+    if not os.path.exists("output/logs"):
+        os.mkdir("output/logs")
+
+    now = (str(datetime.now())[:-7]).replace(':', '-')
 
     logging.basicConfig(
         format='%(asctime)s [%(levelname)s] %(name)s: %(message)s',
         level=logging.INFO,
         handlers=[
-            logging.FileHandler("output/cider_logging.log"),
+            logging.FileHandler("output/logs/%s_cider_logging.log" % (now)),
             logging.StreamHandler(sys.stdout)
         ]
     )
@@ -152,10 +166,10 @@ class ChemicalDatasetComparator:
 
     def _check_invalid_mols_in_SDF(self, all_dicts: dict) -> None:
         """
-        This function checks if there are invalid entries in the SDFiles that can cause errors in the subsequent functions. Those invalid entries will be removed form the SDMolSupplier Object. The entry will remain in the original SDFile as it is. (private method)
+        This function checks if there are invalid entries in the SDFiles/SMI files that can cause errors in the subsequent functions. Those invalid entries will be removed form the rdkit_mol_objects. The entry will remain in the original SDFile/SMI File as it is. Header lines from the SMI File will also be removed. (private method)
 
         Args:
-            all_dicts (dict): Dictionary with sub-dictionaries including SDMolSupplier Objects.
+            all_dicts (dict): Dictionary with sub-dictionaries including rdkit_mol_objects.
         """
         for single_dict in all_dicts:
             if single_dict == self.figure_dict_keyname:
@@ -176,6 +190,11 @@ class ChemicalDatasetComparator:
                 for index in sorted(invalid_index, reverse=True):
                     del new_SDMol[index]
                 all_dicts[single_dict].update({self.import_keyname: new_SDMol})
+                if self.database_id_keyname in all_dicts[single_dict]:
+                    new_id_list = list(all_dicts[single_dict][self.database_id_keyname])
+                    for index in sorted(invalid_index, reverse=True):
+                        del new_id_list[index]
+                    all_dicts[single_dict].update({self.database_id_keyname: new_id_list})
                 logger.info(
                     "%d invalid molecule(s) deleted from %s"
                     % (len(invalid_index), single_dict)
@@ -189,17 +208,17 @@ class ChemicalDatasetComparator:
 
     def import_as_data_dict(self, path_to_data: str) -> Dict:
         """
-        This function creates a dictionary with the names of the imported file as keys. The values of each of these keys is a subdictionary. The first entry of every subdictionary is self.import_keyname (class variable, can be changed) as key and a SDMolSupplier Object of the SDFile as value. To find faulty molecules every entry of the SDMolSupplier Object will be parsed once. (Parsed molecules will not be stored in the dictionary to save memory.)
+        This function creates a dictionary with the names of the imported file as keys. The values of each of these keys is a subdictionary. The first entry of every subdictionary is self.import_keyname (class variable, can be changed) as key and rdkit_mol_objects (either a rdkit.Chem.rdmolfiles.SDMolSupplier Object or a list of rdkit.Chem.rdchem.mol Objects) of the SDFile as value. To find faulty molecules every entry of the rdkit_mol_objects will be parsed once. (Parsed molecules will not be stored in the dictionary to save memory.)
 
         Args:
             path_to_data (str): Path to the directory where the SDFiles are stored.
 
         Returns:
-            all_dicts (dict): Dictionary with subdictionaries for every dataset, updated with the SDMolSupplier Objects.
+            all_dicts (dict): Dictionary with subdictionaries for every dataset, including the key 'self.import_keyname'.
 
         Raises:
-            FileNotFoundError: if the data path is invalid
-            KeyError: if no SDFiles are in the given directory
+            FileNotFoundError: if the data path is invalid.
+            KeyError: if no SDFiles are in the given directory.
         """
         all_dicts = {}
         data_dir = os.path.abspath(str(path_to_data))
@@ -211,11 +230,69 @@ class ChemicalDatasetComparator:
                 all_dicts[dict_name] = single_dict
         if not all_dicts:
             raise KeyError("No SDFiles found in the given directory %s!" % (data_dir))
-            # try:
-            #     raise KeyError("No SDFiles found in the given directory %s!" % (data_dir))
-            # except KeyError as e:
-            #     logger.error(str(e), exc_info=True)  # logger.error(str(e))
-            #     raise
+        figure_dict = {}
+        all_dicts[self.figure_dict_keyname] = figure_dict
+        self._check_invalid_mols_in_SDF(all_dicts)
+        logger.info("Created dictionary with keys: %s", list(all_dicts.keys()))
+        os.chdir(os.path.dirname(data_dir))
+        if not os.path.exists("output"):
+            os.mkdir("output")
+        else:
+            if os.listdir("output"):
+                logger.warning(
+                    "Already existing output folder with files! Old data will be overwritten!"
+                )
+        return all_dicts
+
+    def import_smi_as_data_dict(self, path_to_data: str):
+        """
+        This function creates a dictionary with the names of the imported file as keys. The values of each of these keys is a subdictionary. The first entry of every subdictionary is self.import_keyname (class variable, can be changed) as key and rdkit_mol Objects (list of rdkit.Chem.rdchem.Mol objects) of the SMI File as value. To find faulty molecules, every entry of the rdkit_mol Objects will be parsed once. (Parsed molecules will not be stored in the dictionary to save memory.)
+
+        Args:
+            path_to_data (str): Path to the directory where the SMI Files are stored.
+
+        Returns:
+            all_dicts (dict): Dictionary with subdictionaries for every dataset, including the key 'self.import_keyname'.
+
+        Raises:
+            FileNotFoundError: if the data path is invalid.
+            KeyError: if no SMI Files are in the given directory.
+        """
+        all_dicts = {}
+        data_dir = os.path.abspath(str(path_to_data))
+        for dict_name in os.listdir(data_dir):
+            if dict_name[-3:] == "smi" or dict_name[-3:] == "SMI" or dict_name[-3:] == "txt":
+                single_dict = {}
+                dict_path = os.path.join(data_dir, dict_name)
+                try:
+                    smi_table = pd.read_csv(dict_path, sep=None, engine='python', header=None)
+                except ParserError:
+                    smi_table = pd.read_csv(dict_path, header=None)
+                for column in range(len(smi_table.columns)):
+                    is_mol = []
+                    for row in range(3):
+                        is_mol.append((Chem.MolFromSmiles(smi_table[column][row])))
+                    if any(is_mol):
+                        smi_column = column
+                        break
+                rdkit_mol_list = []
+                for mol in smi_table[smi_column]:
+                    rdkit_mol_list.append(Chem.MolFromSmiles(mol))
+                single_dict[self.import_keyname] = rdkit_mol_list
+                all_dicts[dict_name] = single_dict
+                if id:
+                    try:
+                        if smi_column == 1:
+                            id_column = 0
+                        elif smi_column == 0:
+                            id_column = 1
+                        id_list = list(smi_table[id_column])
+                        single_dict[self.database_id_keyname] = id_list
+                    except KeyError:
+                        logger.info("Cannot find IDs for file %s! SMILES strings and database ID should be the first a d second entry of the files to import the ID." % (dict_name))
+                        continue
+        if not all_dicts:
+            raise KeyError("No SMI files found in the given directory %s!" % (data_dir))
         figure_dict = {}
         all_dicts[self.figure_dict_keyname] = figure_dict
         self._check_invalid_mols_in_SDF(all_dicts)
@@ -278,7 +355,7 @@ class ChemicalDatasetComparator:
         This function updates the subdictionaries in the given dictionary (created from import_as_data_dict function) with the number of molecules in every dataset as new key-value pair. The key is the class variable 'cider.dataset_length_keyname'.
 
         Args:
-            all_dicts (dict): Dictionary with subdictionaries with SDMolSupplier Objects.
+            all_dicts (dict): Dictionary with subdictionaries for every dataset, including the key 'self.import_keyname'.
         """
         for single_dict in all_dicts:
             if single_dict == self.figure_dict_keyname:
@@ -307,12 +384,12 @@ class ChemicalDatasetComparator:
         This function creates an grid image of the first molecules of each dataset and exports the image to an output folder.
 
         Args:
-            all_dicts (dict): dictionary with subdictionaries with SDMolSupplier Objects.
+            all_dicts (dict): Dictionary with subdictionaries for every dataset, including the key 'self.import_keyname'.
             number_of_mols (int): number of molecules form each dataset that will be displayed (default: 12).
             mols_per_row (int): number of molecules per row in the grid (default: 3).
             image_size (int): the size of the image for a single molecule (default: 200).
             data_type (str): data type for the exported files (e.g. png, jpg, pdf, default: png).
-            figsize (float, float): Width, height of the image in inches (default: 20, 20)
+            figsize (float, float): Width, height of the figure in inches (default: 20, 20)
             fontsize_title (int): Fontsize of the title (default: 24).
             fontsize_subtitle (int): Fontsize of the subtitles (default: 20).
 
@@ -332,6 +409,11 @@ class ChemicalDatasetComparator:
                 number_of_mols_final = number_of_mols
             for i in range(number_of_mols_final):
                 to_draw.append(all_dicts[single_dict][self.import_keyname][i])
+            for mol in to_draw:
+                atom0_pos = [mol.GetConformer().GetAtomPosition(0).x, mol.GetConformer().GetAtomPosition(0).y, mol.GetConformer().GetAtomPosition(0).z]
+                atom1_pos = [mol.GetConformer().GetAtomPosition(1).x, mol.GetConformer().GetAtomPosition(1).y, mol.GetConformer().GetAtomPosition(1).z]
+                if atom0_pos == atom1_pos:
+                    AllChem.Compute2DCoords(mol)
             mol_grid = Draw.MolsToGridImage(
                 to_draw,
                 maxMols=number_of_mols_final,
@@ -362,10 +444,10 @@ class ChemicalDatasetComparator:
     def get_database_id(self, all_dicts: dict, id_name: str) -> None:
         """
         This function updates subdictionaries of a given dictionary with a list of database IDs for the single molecules as new key-value pairs. Depending on which database the molecules are coming from, the key as a class variable can be changed accordingly.
-        (To get the database ID the SDMolSupplier Objects needs to be parsed, this may take same time because no parsed molecules are saved in the dictionary to save memory.)
+        (To get the database ID the rdkit_mol Objects (rdkit.Chem.rdmol.Mol or rdkit.Chem.rdmolfiles.SDMolSupplier) needs to be parsed, this may take same time because no parsed molecules are saved in the dictionary to save memory.)
 
         Args:
-            all_dicts (dict): dictionary with subdictionaries including SDMolSupplier Objects (self.import_keyname).
+            all_dicts (dict): Dictionary with subdictionaries for every dataset, including the key 'self.import_keyname'.
             id_name (str): ID name in the original SDFile.
         """
         id_count = 0
@@ -391,13 +473,13 @@ class ChemicalDatasetComparator:
     # Section: Get string identifier
 
     def _get_identifier_list(
-        self, moleculeset: Chem.SDMolSupplier, id_type: str = "inchi"
+        self, moleculeset, id_type: str = "inchi"
     ) -> Tuple[list, count]:
         """
-        This function returns a list of InChI, InChIKey or canonical SMILES strings for all molecules in a given SDMolSupplier object. (private method)
+        This function returns a list of InChI, InChIKey or canonical SMILES strings for all molecules in the given rdkit_mol Objects (rdkit.Chem.rdmol.Mol or rdkit.Chem.rdmolfile.SDMolSupplier). (private method)
 
         Args:
-            moleculeset (rdkit.Chem.SDMolSupplier):
+            moleculeset (rdkit.Chem.rdmolfile.SDMolSupplier or list[rdkit.Chem.rdmol.Mol]):
             id_type (str, optional): "inchi", "inchikey" or "smiles". Defaults to "inchi".
 
         Raises:
@@ -435,10 +517,10 @@ class ChemicalDatasetComparator:
 
     def get_identifier_list_key(self, all_dicts: dict, id_type: str = "inchi") -> None:
         """
-        This function updates the subdictionaries in the given dictionary (created with the import_as_data_dict function) with a list of identifiers (InChI, InChIKey, canonical SMILES strings) as a new key-value pair using  _get_identifier_list on the SDMolSupplier Objects. The key self.identifier_keyname (class variable) can be changed.
+        This function updates the subdictionaries in the given dictionary (created with the import_as_data_dict function) with a list of identifiers (InChI, InChIKey, canonical SMILES strings) as a new key-value pair using  _get_identifier_list on the rdkit_mol Objects (rdkit.Chem.rdmol.Mol or rdkit.Chem.rdmolfiles.SDMolSupplier). The key self.identifier_keyname (class variable) can be changed.
 
         Args:
-            all_dicts (dict): Dictionary with subdictionaries including SDMolSupplier Objects (self.import_keyname).
+            all_dicts (dict): Dictionary with subdictionaries for every dataset, including the key 'self.import_keyname'.
             id_type (str): Type of Identifier ("inchi", "inchikey" or "smiles")
         """
         for single_dict in all_dicts:
@@ -528,7 +610,7 @@ class ChemicalDatasetComparator:
     def get_shared_molecules_key(self, all_dicts: dict) -> None:
         """
         This function updates the subdictionaries in the given dictionary (created with the import_as_data_dict function) with the number of molecules that can be found in all of the given datasets (key: self.shared_mols_keyname) and an identifier list of these molecules (key: self.shared_mols_id_keyname) as two new key-value pairs (number of compared datasets can be any number).
-        The comparison of the molecules is based on the identifiers (string representation), not the SDMolSupplier Object.
+        The comparison of the molecules is based on the identifiers (string representation), not the rdkit_mol Object (rdkit.Chem.rdmol.Mol or rdkit.Chem.rdmolfiles.SDMolSupplier).
 
         Args:
             all_dicts (dict): Dictionary with subdictionaries including a lists of identifiers (self.identifier_keyname).
@@ -646,10 +728,10 @@ class ChemicalDatasetComparator:
         descriptor: callable,
     ) -> List:
         """
-        This function returns a list of descriptor values for all molecules in a given SDMolSupplier object and a callable descriptor (e.g Descriptors.MolWt or rdMolDescriptors.CalcExactMolWt). (private method)
+        This function returns a list of descriptor values for all molecules in the given rdkit_mol objects (rdkit.Chem.rdmol.Mol or rdkit.Chem.rdmolfiles.SDMolSupplier) and a callable descriptor (e.g Descriptors.MolWt or rdMolDescriptors.CalcExactMolWt). (private method)
 
         Args:
-            moleculeset (rdkit.Chem.SDMolSupplier)
+            moleculeset (rdkit.Chem.rdmolfiles.SDMolSupplier or list[rdkit.Chem.rdmol.Mol])
             descriptor (callable): RDKit method that returns a molecular descriptor for a given molecule.
 
         Returns:
@@ -667,10 +749,10 @@ class ChemicalDatasetComparator:
         self, all_dicts: dict, descriptor: callable, descriptor_list_keyname: str
     ) -> None:
         """
-        This function updates the subdictionaries in the given dictionary with a list of descriptor values as a new key-value pair using _get_descriptor_list on the SDMolSupplier Objects in the subdictionaries.
+        This function updates the subdictionaries in the given dictionary with a list of descriptor values as a new key-value pair using _get_descriptor_list on the rdkit_mol Objects (rdkit.Chem.rdmol.Mol or rdkit.Chem.rdmolfiles.SDMolSupplier) in the subdictionaries.
 
         Args:
-            all_dicts (dict): Dictionary of dictionaries with SDMolSupplier Object.
+            all_dicts (dict): Dictionary with subdictionaries for every dataset, including the key 'self.import_keyname'.
             descriptor (callable): RDKit method that returns a molecular descriptor for a given molecule
             descriptor_list_keyname (str): Key name for the dictionary entry (should match the descriptor)
         """
@@ -1070,12 +1152,12 @@ class ChemicalDatasetComparator:
 
     # Section: Check Lipinski Rule of 5 and visualization
 
-    def _test_for_lipinski(self, moleculeset: Chem.SDMolSupplier) -> List[int]:
+    def _test_for_lipinski(self, moleculeset) -> List[int]:
         """
         This function returns a list with the number of Lipinski Rules broken for every molecule in the given molecule set.
 
         Args:
-            moleculeset (Chem.SDMolSupplier): SDMolSupplier Objects
+            moleculeset (rdkit.Chem.rdmolfiles.SDMolSupplier or list[rdkit.Chem.rdmol.Mol]): rdkit_mol Objects
 
         Returns:
             list[int]: List of a number of broken Lipinski Rules.
@@ -1229,7 +1311,7 @@ class ChemicalDatasetComparator:
 
     def _get_scaffold(
         self,
-        moleculeset: Chem.SDMolSupplier,
+        moleculeset,
         number_of_structures: int = 5,
         structures_per_row: int = 5,
         image_size: int = 200,
@@ -1238,11 +1320,11 @@ class ChemicalDatasetComparator:
         normalize: bool = True,
     ) -> Tuple[PIL.PngImagePlugin.PngImageFile, list, pd.core.series.Series]:
         """
-        This function creates a grid images of a chosen number of scaffolds/frameworks/graph framework for the molecules in a given SDMolSupplier Object. The scaffolds/frameworks/graph framework are sorted by their frequency.
+        This function creates a grid images of a chosen number of scaffolds/frameworks/graph framework for the molecules in a given rdkit_mol Object (rdkit.Chem.rdmol.Mol or rdkit.Chem.rdmolfiles.SDMolSupplier). The scaffolds/frameworks/graph framework are sorted by their frequency.
         The relative or absolute number of occurrence of a scaffold/framework/graph framework in the dataset is shown below each image.
 
         args:
-            moleculeset (Chem.SDMolSupplier): SDMolSupplier Objects
+            moleculeset (rdkit.Chem.rdmolfiles.SDMolSupplier or list[rdkit.Chem.rdmol.Mol]): rdkit_mol Objects.
             number_of_structures (int): Number of structures displayed in the grid images (default: 5).
             structures_per_row (int): Number of structures in every row of the grid image (default: 5).
             image_size (int): Size of the image for a single molecule (default: 200).
@@ -1256,7 +1338,7 @@ class ChemicalDatasetComparator:
             structure_counts (pandas.Series): Absolute or relative frequency of each scaffold/frameworks/graph framework.
 
         raises:
-            KekulizeException: If molecule in SDMolSupplier Object cannot be kekulized.
+            KekulizeException: If molecule of the rdkit_mol Object cannot be kekulized.
         """
         structure_list = []
         scaffold_list = []
@@ -1546,25 +1628,43 @@ class ChemicalDatasetComparator:
             logger.info("%s: %d exported descriptor values", single_dict, counter)
         return
 
-    def export_all_figures_pdf(self, all_dicts: dict) -> None:
+    def export_figure_report(self, all_dicts: dict) -> None:
         """
-        This function exports a pdf including all created figures form the figures subdictionary.
+        This function exports a pdf including some general information and all created figures form the figures subdictionary.
 
         Args:
-            all_dicts (dict): Dictionary with subdictionary (self.figure_dict_keyname: containing all created plots
+            all_dicts (dict): Dictionary with subdictionary 'self.figure_dict_keyname' containing all created plots
         """
-        pdf = PdfPages("output/all_figures.pdf")
-        for value in all_dicts[self.figure_dict_keyname].values():
-            pdf.savefig(value, bbox_inches="tight")
-        pdf.close()
-        logger.info("All plots exported to 'all_figures.pdf'")
-        # for image in os.listdir("output"):
-        #     if image[-3:] == "png" or image[-3:] == "jpg":
-        #         pdf.add_page()
-        #         pdf.image("output/%s" % (image), 5, 5, 200)
-        #     elif image[-3:] == "csv":
-        #         pass
-        #     else:
-        #         print(image + " not included, due to unsupported image type.")
-        # pdf.output("output/all_figures.pdf")
+        first_dict = list(all_dicts.keys())[0]
+        today = date.today()
+        data = (('Date:', str(today)),
+                ('Data:', str(list(all_dicts.keys())[:-1])[1:-1]),
+                ('Generated keys:', str(list(all_dicts[first_dict].keys()))[1:-1]),
+                ('Generated figures:', str(list(all_dicts[self.figure_dict_keyname].keys()))[1:-1]),
+                )
+        pdf = FPDF()
+        pdf.set_font('Helvetica')
+        pdf.add_page()
+        pdf.set_font_size(30)
+        pdf.cell(txt='Report CIDER', align='C', w=pdf.epw, border='B')
+        pdf.set_font_size(12)
+        pdf.set_y(50)
+        for row in data:
+            pdf.multi_cell(40, 7, row[0], new_y=YPos.LAST, new_x=XPos.RIGHT)
+            pdf.multi_cell(150, 7, row[1], new_y=YPos.NEXT, new_x=XPos.LMARGIN)
+        for fig in all_dicts['figures']:
+            pdf.add_page()
+            reader = io.BytesIO()
+            all_dicts['figures'][fig].savefig(reader, bbox_inches="tight", format="png")
+            fig = Image.open(reader)
+            if fig.height <= fig.width:
+                pdf.image(reader, w=pdf.epw)
+            if fig.height > fig.width:
+                if fig.height/fig.width < 1.4:
+                    pdf.image(reader, w=pdf.epw)
+                if fig.height/fig.width > 1.4:
+                    pdf.image(reader, h=pdf.eph)
+            fig.close()
+        pdf.output("output/cider_report.pdf")
+        logger.info("'cider_report.pdf' exported")
         return

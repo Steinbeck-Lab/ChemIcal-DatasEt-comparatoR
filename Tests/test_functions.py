@@ -13,6 +13,12 @@ def test_import_as_data_dict():
     # Assert that the function generates the dictionary
     assert set(testdict.keys()) == {"set_A.sdf", "set_B.sdf", "set_D.sdf", cider.figure_dict_keyname}
 
+def test_smi_import_as_data_dict():
+    test_dict_path = os.path.join(os.path.split(__file__)[0], "unittest_smi_data")
+    smi_testdict = cider.import_smi_as_data_dict(test_dict_path)
+    # Assert that the function generates the dictionary
+    assert set(smi_testdict.keys()) == {"blankspace.smi", "header.smi", "id_first.smi", "komma.smi", cider.figure_dict_keyname}
+
 def test_check_invalid_mols_in_SDF():
     test_dict_path = os.path.join(os.path.split(__file__)[0], "unittest_data_invalid")
     invalid_testdict = cider.import_as_data_dict(test_dict_path)
@@ -425,11 +431,11 @@ def test_export_single_dict_values():
     assert os.path.exists(test_path_setB)
     assert os.path.exists(test_path_setD)
 
-def test_export_all_figures_pdf():
-    cider.export_all_figures_pdf(testdict)
+def test_export_figure_report():
+    cider.export_figure_report(testdict)
     # Assert that the picture is exported
     test_path = os.path.join(os.path.split(__file__)[0],
-                             "output", "all_figures.pdf")
+                             "output", "cider_report.pdf")
     assert os.path.exists(test_path)
 
 def test_chemical_space_plot_tsne():

@@ -24,7 +24,7 @@ setuptools.setup(
         "matplotlib==3.5.1",
         "chemplot==1.2.0",
         "matplotlib_venn==0.11.6",
-        "FPDF==1.7.2",
+        "fpdf2==2.6.0",
         "rdkit-pypi",
         "pytest",
         "scikit-learn==1.1.1",
