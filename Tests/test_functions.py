@@ -4,20 +4,32 @@ from rdkit.Chem import rdMolDescriptors
 import os
 
 cider = ChemicalDatasetComparator()
-test_dict_path = os.path.join(os.path.split(__file__)[0],
-                              "unittest_data")
+test_dict_path = os.path.join(os.path.split(__file__)[0], "unittest_data")
 testdict = cider.import_as_data_dict(test_dict_path)
 
 
 def test_import_as_data_dict():
     # Assert that the function generates the dictionary
-    assert set(testdict.keys()) == {"set_A.sdf", "set_B.sdf", "set_D.sdf", cider.figure_dict_keyname}
+    assert set(testdict.keys()) == {
+        "set_A.sdf",
+        "set_B.sdf",
+        "set_D.sdf",
+        cider.figure_dict_keyname,
+    }
+
 
 def test_smi_import_as_data_dict():
     test_dict_path = os.path.join(os.path.split(__file__)[0], "unittest_smi_data")
     smi_testdict = cider.import_smi_as_data_dict(test_dict_path)
     # Assert that the function generates the dictionary
-    assert set(smi_testdict.keys()) == {"blankspace.smi", "header.smi", "id_first.smi", "komma.smi", cider.figure_dict_keyname}
+    assert set(smi_testdict.keys()) == {
+        "blankspace.smi",
+        "header.smi",
+        "id_first.smi",
+        "komma.smi",
+        cider.figure_dict_keyname,
+    }
+
 
 def test_check_invalid_mols_in_SDF():
     test_dict_path = os.path.join(os.path.split(__file__)[0], "unittest_data_invalid")
@@ -28,6 +40,7 @@ def test_check_invalid_mols_in_SDF():
     # cider._check_invalid_mols_in_SDF(invalid_testdict, delete=True)
     assert len(invalid_testdict["set_D_invalid.sdf"][cider.import_keyname]) == 5
 
+
 def test_get_number_of_molecules():
     cider.get_number_of_molecules(testdict)
     # Assert that the function generates new entries in the dictionary
@@ -36,23 +49,22 @@ def test_get_number_of_molecules():
     assert testdict["set_B.sdf"][cider.dataset_length_keyname] == 4
     assert testdict["set_D.sdf"][cider.dataset_length_keyname] == 7
 
+
 def test_draw_molecules():
     cider.draw_molecules(testdict)
     # Assert that the picture is exported
-    test_path = os.path.join(os.path.split(__file__)[0],
-                             "output", "mol_grid.png")
+    test_path = os.path.join(os.path.split(__file__)[0], "output", "mol_grid.png")
     assert os.path.exists(test_path)
     # Assert that a new entry in self.figure_dict_keyname is generated
-    assert (
-        any(key == "mol_grid" for key in list(testdict[cider.figure_dict_keyname].keys()))
+    assert any(
+        key == "mol_grid" for key in list(testdict[cider.figure_dict_keyname].keys())
     )
+
 
 def test_get_database_id():
     cider.get_database_id(testdict, "coconut_id")
     # Assert that the function generates a new entry in the dictionary
-    assert (
-        any(key == "coconut_id" for key in list(testdict["set_A.sdf"].keys()))
-    )
+    assert any(key == "coconut_id" for key in list(testdict["set_A.sdf"].keys()))
     # Assert that the function gets the correct IDs
     assert list(testdict["set_A.sdf"][cider.database_id_keyname]) == [
         "CNP0206286",
@@ -101,14 +113,12 @@ def test_get_identifier_list():
     smiles = cider._get_identifier_list(testset, "smiles")
     assert expected_smiles == smiles
 
+
 def test_get_identifier_list_key():
     cider.get_identifier_list_key(testdict)
     # Assert that the function generates a new entry in the dictionary
-    assert (
-        any(
-            key == cider.identifier_keyname
-            for key in list(testdict["set_A.sdf"].keys())
-        )
+    assert any(
+        key == cider.identifier_keyname for key in list(testdict["set_A.sdf"].keys())
     )
     # Assert that at default configuration the correct InChI string is generated.
     assert (
@@ -129,17 +139,11 @@ def test_get_identifier_list_key():
 def test_get_duplicate_key():
     cider.get_duplicate_key(testdict, identifier=True)
     # Assert that the function generates a new entries in the dictionary
-    assert (
-        any(
-            key == cider.duplicates_keyname
-            for key in list(testdict["set_A.sdf"].keys())
-        )
+    assert any(
+        key == cider.duplicates_keyname for key in list(testdict["set_A.sdf"].keys())
     )
-    assert (
-        any(
-            key == cider.duplicates_id_keyname
-            for key in list(testdict["set_A.sdf"].keys())
-        )
+    assert any(
+        key == cider.duplicates_id_keyname for key in list(testdict["set_A.sdf"].keys())
     )
     # Assert that the function returns the right number of duplicates
     assert testdict["set_A.sdf"][cider.duplicates_keyname] == 0
@@ -148,25 +152,21 @@ def test_get_duplicate_key():
     # Assert that the function returns the right duplicate identifier
     assert (
         testdict["set_D.sdf"][cider.duplicates_keyname]
-        == {'GZFGOTFRPZRKDS-UHFFFAOYSA-N'}
-        or {'InChI=1S/C6H5BrO/c7-5-1-3-6(8)4-2-5/h1-4,8H'}
-        or {'Oc1ccc(Br)cc1'}
+        == {"GZFGOTFRPZRKDS-UHFFFAOYSA-N"}
+        or {"InChI=1S/C6H5BrO/c7-5-1-3-6(8)4-2-5/h1-4,8H"}
+        or {"Oc1ccc(Br)cc1"}
     )
+
 
 def test_get_shared_molecules_key():
     cider.get_shared_molecules_key(testdict)
     # Assert that the function generates a new entry in the dictionary
-    assert (
-        any(
-            key == cider.shared_mols_keyname
-            for key in list(testdict["set_A.sdf"].keys())
-        )
+    assert any(
+        key == cider.shared_mols_keyname for key in list(testdict["set_A.sdf"].keys())
     )
-    assert (
-        any(
-            key == cider.shared_mols_id_keyname
-            for key in list(testdict["set_A.sdf"].keys())
-        )
+    assert any(
+        key == cider.shared_mols_id_keyname
+        for key in list(testdict["set_A.sdf"].keys())
     )
     # Assert that the correct number and identity of the shared molecules are returned
     assert testdict["set_A.sdf"][cider.shared_mols_keyname] == 1
@@ -177,32 +177,37 @@ def test_get_shared_molecules_key():
         or "Clc1cccc(Cl)c1"
     )
 
+
 def test_visualize_intersection():
     cider.visualize_intersection(testdict)
     # Assert that the figure is exported
-    test_path = os.path.join(os.path.split(__file__)[0],
-                             "output", "intersection.png")
+    test_path = os.path.join(os.path.split(__file__)[0], "output", "intersection.png")
     assert os.path.exists(test_path)
     # Assert that a new entry in self.figure_dict_keyname is generated
-    assert (
-        any(key == "intersection" for key in list(testdict[cider.figure_dict_keyname].keys()))
+    assert any(
+        key == "intersection"
+        for key in list(testdict[cider.figure_dict_keyname].keys())
     )
 
 
 def test_get_descriptor_list():
     testset = testdict["set_A.sdf"][cider.import_keyname]
     # Assert that the correct LogP values are returned
-    expected_LogP = [3.6468000000000007, 2.9934000000000003, 2.993400000000001, 3.2089000000000008]
+    expected_LogP = [
+        3.6468000000000007,
+        2.9934000000000003,
+        2.993400000000001,
+        3.2089000000000008,
+    ]
     LogP = cider._get_descriptor_list(testset, Descriptors.MolLogP)
     assert expected_LogP == LogP
+
 
 def test_get_descriptor_list_key_1():
     # Assertion for continuous values
     cider.get_descriptor_list_key(testdict, Descriptors.MolWt, "Molecular Weight")
     # Assert that the function generates a new entry in the dictionary
-    assert (
-        any(key == "Molecular Weight" for key in list(testdict["set_A.sdf"].keys()))
-    )
+    assert any(key == "Molecular Weight" for key in list(testdict["set_A.sdf"].keys()))
     # Assert that the correct values for the molecular weight are returned from rdkit.Chem Descriptors
     assert list(testdict["set_A.sdf"]["Molecular Weight"]) == [
         181.449,
@@ -211,15 +216,14 @@ def test_get_descriptor_list_key_1():
         259.48600000000005,
     ]
 
+
 def test_get_descriptor_list_key_2():
     # Assertion for discrete values
     cider.get_descriptor_list_key(
         testdict, rdMolDescriptors.CalcMolFormula, "Molecular Formula"
     )
     # Assert that the function generates a new entry in the dictionary
-    assert (
-        any(key == "Molecular Formula" for key in list(testdict["set_A.sdf"].keys()))
-    )
+    assert any(key == "Molecular Formula" for key in list(testdict["set_A.sdf"].keys()))
     # Assert that the correct strings for the molecular formula are returned from rdkit.Chem rdMolDescriptors
     assert list(testdict["set_A.sdf"]["Molecular Formula"]) == [
         "C6H3Cl3",
@@ -227,6 +231,7 @@ def test_get_descriptor_list_key_2():
         "C6H4Cl2",
         "C9H4BrClO2",
     ]
+
 
 def test_get_discrete_descriptor_counts():
     cider.get_descriptor_list_key(
@@ -240,6 +245,7 @@ def test_get_discrete_descriptor_counts():
     # Assert the correct values for the bins
     assert list(testdict["set_A.sdf"]["binned_Number of H-Donors"]) == [4, 0]
 
+
 def test_get_continuous_descriptor_counts():
     cider.get_descriptor_list_key(testdict, Descriptors.MolLogP, "LogP")
     cider._get_continuous_descriptor_counts(testdict, "LogP", 2)
@@ -248,33 +254,42 @@ def test_get_continuous_descriptor_counts():
     # Assert the correct values for the bins
     assert list(testdict["set_A.sdf"]["binned_LogP"]) == [0, 4, 0, 0, 0]
 
+
 def test_discrete_descriptor_plot():
     cider._discrete_descriptor_plot(testdict, "Number of H-Donors")
     # Assert that the image and the table are exported
-    test_path_NumHDpng = os.path.join(os.path.split(__file__)[0],
-                                      "output", "distribution_of_Number of H-Donors.png")
-    test_path_NumHDcsv = os.path.join(os.path.split(__file__)[0],
-                                      "output", "table_Number of H-Donors.csv")
+    test_path_NumHDpng = os.path.join(
+        os.path.split(__file__)[0], "output", "distribution_of_Number of H-Donors.png"
+    )
+    test_path_NumHDcsv = os.path.join(
+        os.path.split(__file__)[0], "output", "table_Number of H-Donors.csv"
+    )
     assert os.path.exists(test_path_NumHDpng)
     assert os.path.exists(test_path_NumHDcsv)
     # Assert that a new entry in self.figure_dict_keyname is generated
-    assert (
-        any(key == "distribution_of_Number of H-Donors" for key in list(testdict[cider.figure_dict_keyname].keys()))
+    assert any(
+        key == "distribution_of_Number of H-Donors"
+        for key in list(testdict[cider.figure_dict_keyname].keys())
     )
+
 
 def test_continuous_descriptor_plot():
     cider._continuous_descriptor_plot(testdict, "LogP")
     # Assert that the image and the table are exported
-    test_path_logppng = os.path.join(os.path.split(__file__)[0],
-                                     "output", "distribution_of_LogP.png")
-    test_path_logpcsv = os.path.join(os.path.split(__file__)[0],
-                                     "output", "table_LogP.csv")
+    test_path_logppng = os.path.join(
+        os.path.split(__file__)[0], "output", "distribution_of_LogP.png"
+    )
+    test_path_logpcsv = os.path.join(
+        os.path.split(__file__)[0], "output", "table_LogP.csv"
+    )
     assert os.path.exists(test_path_logppng)
     assert os.path.exists(test_path_logpcsv)
     # Assert that a new entry in self.figure_dict_keyname is generated
-    assert (
-        any(key == "distribution_of_LogP" for key in list(testdict[cider.figure_dict_keyname].keys()))
+    assert any(
+        key == "distribution_of_LogP"
+        for key in list(testdict[cider.figure_dict_keyname].keys())
     )
+
 
 def test_descriptor_counts_and_plot():
     # Assertion for continuous descriptor
@@ -299,8 +314,9 @@ def test_descriptor_counts_and_plot():
         1,
     ]
     # Assert that a new entry in self.figure_dict_keyname is generated
-    assert (
-        any(key == "distribution_of_Molecular Weight" for key in list(testdict[cider.figure_dict_keyname].keys()))
+    assert any(
+        key == "distribution_of_Molecular Weight"
+        for key in list(testdict[cider.figure_dict_keyname].keys())
     )
 
     # Assertion for discrete descriptor
@@ -313,9 +329,11 @@ def test_descriptor_counts_and_plot():
     # Assert the correct values for the bins
     assert list(testdict["set_A.sdf"]["binned_Number of Rings"]) == [0, 3, 1]
     # Assert that a new entry in self.figure_dict_keyname is generated
-    assert (
-        any(key == "distribution_of_Number of Rings" for key in list(testdict[cider.figure_dict_keyname].keys()))
+    assert any(
+        key == "distribution_of_Number of Rings"
+        for key in list(testdict[cider.figure_dict_keyname].keys())
     )
+
 
 def test_test_for_lipinski():
     testset = testdict["set_A.sdf"][cider.import_keyname]
@@ -324,20 +342,16 @@ def test_test_for_lipinski():
     num_of_break = cider._test_for_lipinski(testset)
     assert expected_num_of_break == num_of_break
 
+
 def test_get_lipinski_key():
     cider.get_lipinski_key(testdict)
     # Assert that the function generates new entries in the dictionary
-    assert (
-        any(
-            key == cider.lipinski_list_keyname
-            for key in list(testdict["set_A.sdf"].keys())
-        )
+    assert any(
+        key == cider.lipinski_list_keyname for key in list(testdict["set_A.sdf"].keys())
     )
-    assert (
-        any(
-            key == cider.lipinski_summary_keyname
-            for key in list(testdict["set_A.sdf"].keys())
-        )
+    assert any(
+        key == cider.lipinski_summary_keyname
+        for key in list(testdict["set_A.sdf"].keys())
     )
     # Assert that the correct numbers are returned
     assert testdict["set_A.sdf"][cider.lipinski_list_keyname] == [0, 0, 0, 0]
@@ -349,109 +363,116 @@ def test_get_lipinski_key():
         "4_rules_broken": 0,
     }
 
+
 def test_lipinski_plot():
     cider.lipinski_plot(testdict)
     # Assert that the picture is exported
-    test_path = os.path.join(os.path.split(__file__)[0],
-                             "output", "lipinski_plot.png")
+    test_path = os.path.join(os.path.split(__file__)[0], "output", "lipinski_plot.png")
     assert os.path.exists(test_path)
     # Assert that a new entry in self.figure_dict_keyname is generated
-    assert (
-        any(key == "lipinski_plot" for key in list(testdict[cider.figure_dict_keyname].keys()))
+    assert any(
+        key == "lipinski_plot"
+        for key in list(testdict[cider.figure_dict_keyname].keys())
     )
+
 
 def test_get_scaffold():
     testset = testdict["set_A.sdf"][cider.import_keyname]
     scaffolds = cider._get_scaffold(testset)
     # Assert that the correct scaffold list is generated (for default)
-    expected_scaffold_list = ['c1ccccc1', 'c1ccccc1', 'c1ccccc1', 'O=c1ccoc2ccccc12']
+    expected_scaffold_list = ["c1ccccc1", "c1ccccc1", "c1ccccc1", "O=c1ccoc2ccccc12"]
     assert scaffolds[1] == expected_scaffold_list
     # Assert that the correct scaffold counts are calculated (for default)
     assert list(scaffolds[2]) == [0.75, 0.25]
+
 
 def test_get_scaffold_2():
     testset = testdict["set_A.sdf"][cider.import_keyname]
     scaffolds = cider._get_scaffold(testset, framework=True)
     # Assert that the correct scaffold list is generated (for framework=True)
-    expected_scaffold_list = ['c1ccccc1', 'c1ccccc1', 'c1ccccc1', 'C1=COc2ccccc2C1']
+    expected_scaffold_list = ["c1ccccc1", "c1ccccc1", "c1ccccc1", "C1=COc2ccccc2C1"]
     assert scaffolds[1] == expected_scaffold_list
     # Assert that the correct scaffold counts are calculated (for framework=True)
     assert list(scaffolds[2]) == [0.75, 0.25]
+
 
 def test_get_scaffold_3():
     testset = testdict["set_A.sdf"][cider.import_keyname]
     scaffolds = cider._get_scaffold(testset, graph_framework=True)
     # Assert that the correct scaffold list is generated (for graph_framework=True)
-    expected_scaffold_list = ['C1CCCCC1', 'C1CCCCC1', 'C1CCCCC1', 'C1CCC2CCCCC2C1']
+    expected_scaffold_list = ["C1CCCCC1", "C1CCCCC1", "C1CCCCC1", "C1CCC2CCCCC2C1"]
     assert scaffolds[1] == expected_scaffold_list
     # Assert that the correct scaffold counts are calculated (for graph_framework=True)
     assert list(scaffolds[2]) == [0.75, 0.25]
 
+
 def test_draw_most_frequent_scaffolds():
     cider.draw_most_frequent_scaffolds(testdict)
     # Assert that the function generates new keys in the dictionary
-    assert (
-        any(
-            key == cider.scaffold_list_keyname
-            for key in list(testdict["set_A.sdf"].keys())
-        )
+    assert any(
+        key == cider.scaffold_list_keyname for key in list(testdict["set_A.sdf"].keys())
     )
-    assert (
-        any(
-            key == cider.scaffold_summary_keyname
-            for key in list(testdict["set_A.sdf"].keys())
-        )
+    assert any(
+        key == cider.scaffold_summary_keyname
+        for key in list(testdict["set_A.sdf"].keys())
     )
     # Assert that the picture is exported
-    test_path = os.path.join(os.path.split(__file__)[0],
-                             "output", "scaffold_grid.png")
+    test_path = os.path.join(os.path.split(__file__)[0], "output", "scaffold_grid.png")
     assert os.path.exists(test_path)
     # Assert that a new entry in self.figure_dict_keyname is generated
-    assert (
-        any(key == "scaffold_grid" for key in list(testdict[cider.figure_dict_keyname].keys()))
+    assert any(
+        key == "scaffold_grid"
+        for key in list(testdict[cider.figure_dict_keyname].keys())
     )
+
 
 def test_chemical_space_visualization():
     cider.chemical_space_visualization(testdict, interactive=False)
     # Assert that the picture is exported
-    test_path = os.path.join(os.path.split(__file__)[0],
-                             "output", "chemical_space.png")
+    test_path = os.path.join(os.path.split(__file__)[0], "output", "chemical_space.png")
     assert os.path.exists(test_path)
+
 
 def test_export_single_dict_values():
     cider.export_single_dict_values(testdict)
     # Assert that the picture is exported
-    test_path_setA = os.path.join(os.path.split(__file__)[0],
-                                  "output", "descriptor_values_set_A.csv")
-    test_path_setB = os.path.join(os.path.split(__file__)[0],
-                                  "output", "descriptor_values_set_B.csv")
-    test_path_setD = os.path.join(os.path.split(__file__)[0],
-                                  "output", "descriptor_values_set_D.csv")
+    test_path_setA = os.path.join(
+        os.path.split(__file__)[0], "output", "descriptor_values_set_A.csv"
+    )
+    test_path_setB = os.path.join(
+        os.path.split(__file__)[0], "output", "descriptor_values_set_B.csv"
+    )
+    test_path_setD = os.path.join(
+        os.path.split(__file__)[0], "output", "descriptor_values_set_D.csv"
+    )
     assert os.path.exists(test_path_setA)
     assert os.path.exists(test_path_setB)
     assert os.path.exists(test_path_setD)
 
+
 def test_export_figure_report():
     cider.export_figure_report(testdict)
     # Assert that the picture is exported
-    test_path = os.path.join(os.path.split(__file__)[0],
-                             "output", "cider_report.pdf")
+    test_path = os.path.join(os.path.split(__file__)[0], "output", "cider_report.pdf")
     assert os.path.exists(test_path)
 
+
 def test_chemical_space_plot_tsne():
-    cider.chemical_space_visualization(testdict,
-                                       dimension_reduction='tsne',
-                                       interactive=False,
-                                       fp_bits=1024,
-                                       fp_radius=2)
+    cider.chemical_space_visualization(
+        testdict,
+        dimension_reduction="tsne",
+        interactive=False,
+        fp_bits=1024,
+        fp_radius=2,
+    )
+
 
 def test_save_to_figure_dict():
     cider.draw_molecules(testdict)
     # Assert that the picture is exported
-    test_path = os.path.join(os.path.split(__file__)[0],
-                             "output", "mol_grid_1.png")
+    test_path = os.path.join(os.path.split(__file__)[0], "output", "mol_grid_1.png")
     assert os.path.exists(test_path)
     # Assert that a new entry in self.figure_dict_keyname is generated
-    assert (
-        any(key == "mol_grid_1" for key in list(testdict[cider.figure_dict_keyname].keys()))
+    assert any(
+        key == "mol_grid_1" for key in list(testdict[cider.figure_dict_keyname].keys())
     )

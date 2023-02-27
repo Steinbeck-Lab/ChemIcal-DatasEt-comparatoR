@@ -13,6 +13,4 @@ __all__ = [
 ]
 
 
-from .cider import (
-    ChemicalDatasetComparator
-)
+from .cider import ChemicalDatasetComparator
