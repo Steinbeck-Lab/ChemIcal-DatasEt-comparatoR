@@ -65,9 +65,10 @@ from datetime import date, datetime
 import logging
 import sys
 
-logger = logging.getLogger('CIDER')  # needs to be here
+logger = logging.getLogger("CIDER")  # needs to be here
 
 # Section: Constructor
+
 
 class ChemicalDatasetComparator:
     """
@@ -109,17 +110,17 @@ class ChemicalDatasetComparator:
     if not os.path.exists("output/logs"):
         os.mkdir("output/logs")
 
-    now = (str(datetime.now())[:-7]).replace(':', '-')
+    now = (str(datetime.now())[:-7]).replace(":", "-")
 
     logging.basicConfig(
-        format='%(asctime)s [%(levelname)s] %(name)s: %(message)s',
+        format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
         level=logging.INFO,
         handlers=[
             logging.FileHandler("output/logs/%s_cider_logging.log" % (now)),
-            logging.StreamHandler(sys.stdout)
-        ]
+            logging.StreamHandler(sys.stdout),
+        ],
     )
-    logger = logging.getLogger('CIDER')
+    logger = logging.getLogger("CIDER")
 
     def exception_handler_IP(self, exc_type, exc_value, exc_tb, tb_offset=None):
         """
@@ -147,7 +148,7 @@ class ChemicalDatasetComparator:
         """
         logger.exception(
             "An Error occured while executing CIDER!",
-            exc_info=(exc_type, exc_value, exc_tb)
+            exc_info=(exc_type, exc_value, exc_tb),
         )
         return
 
@@ -157,6 +158,7 @@ class ChemicalDatasetComparator:
     try:
         __IPYTHON__
         from IPython import get_ipython
+
         ip = get_ipython()
         ip.set_custom_exc((BaseException,), exception_handler_IP)
     except NameError:
@@ -194,7 +196,9 @@ class ChemicalDatasetComparator:
                     new_id_list = list(all_dicts[single_dict][self.database_id_keyname])
                     for index in sorted(invalid_index, reverse=True):
                         del new_id_list[index]
-                    all_dicts[single_dict].update({self.database_id_keyname: new_id_list})
+                    all_dicts[single_dict].update(
+                        {self.database_id_keyname: new_id_list}
+                    )
                 logger.info(
                     "%d invalid molecule(s) deleted from %s"
                     % (len(invalid_index), single_dict)
@@ -261,11 +265,17 @@ class ChemicalDatasetComparator:
         all_dicts = {}
         data_dir = os.path.abspath(str(path_to_data))
         for dict_name in os.listdir(data_dir):
-            if dict_name[-3:] == "smi" or dict_name[-3:] == "SMI" or dict_name[-3:] == "txt":
+            if (
+                dict_name[-3:] == "smi"
+                or dict_name[-3:] == "SMI"
+                or dict_name[-3:] == "txt"
+            ):
                 single_dict = {}
                 dict_path = os.path.join(data_dir, dict_name)
                 try:
-                    smi_table = pd.read_csv(dict_path, sep=None, engine='python', header=None)
+                    smi_table = pd.read_csv(
+                        dict_path, sep=None, engine="python", header=None
+                    )
                 except ParserError:
                     smi_table = pd.read_csv(dict_path, header=None)
                 for column in range(len(smi_table.columns)):
@@ -289,7 +299,10 @@ class ChemicalDatasetComparator:
                         id_list = list(smi_table[id_column])
                         single_dict[self.database_id_keyname] = id_list
                     except KeyError:
-                        logger.info("Cannot find IDs for file %s! SMILES strings and database ID should be the first a d second entry of the files to import the ID." % (dict_name))
+                        logger.info(
+                            "Cannot find IDs for file %s! SMILES strings and database ID should be the first a d second entry of the files to import the ID."
+                            % (dict_name)
+                        )
                         continue
         if not all_dicts:
             raise KeyError("No SMI files found in the given directory %s!" % (data_dir))
@@ -310,11 +323,7 @@ class ChemicalDatasetComparator:
     # Section: Saving figures and images
 
     def _save_to_figure_dict(
-        self,
-        all_dicts: dict,
-        keyname: str,
-        fig,
-        data_type: str = 'png'
+        self, all_dicts: dict, keyname: str, fig, data_type: str = "png"
     ) -> None:
         """
         This function stores the images and figures created by CIDER in the 'figure' (self.figure_dict_keyname) subdictionary and exports them to the output folder with a given data type. When the name for a figure is already used there will be a increasing number added. This only works within one analysis, after restarting CIDER the files in the output folder might be overwritten.
@@ -325,7 +334,9 @@ class ChemicalDatasetComparator:
             fig: Images or figure to be stored.
             data_type (str): Data type for the exported file. (Default: png)
         """
-        if not any(key == keyname for key in list(all_dicts[self.figure_dict_keyname].keys())):
+        if not any(
+            key == keyname for key in list(all_dicts[self.figure_dict_keyname].keys())
+        ):
             all_dicts[self.figure_dict_keyname][keyname] = fig
             plt.savefig(
                 "output/%s.%s" % (keyname, data_type),
@@ -335,10 +346,13 @@ class ChemicalDatasetComparator:
             logger.info("Updated dictionary with '%s'", keyname)
         else:
             counter = 1
-            new_keyname = (keyname + '_' + str(counter))
-            while any(key == new_keyname for key in list(all_dicts[self.figure_dict_keyname].keys())):
+            new_keyname = keyname + "_" + str(counter)
+            while any(
+                key == new_keyname
+                for key in list(all_dicts[self.figure_dict_keyname].keys())
+            ):
                 counter += 1
-                new_keyname = (keyname + '_' + str(counter))
+                new_keyname = keyname + "_" + str(counter)
             all_dicts[self.figure_dict_keyname][new_keyname] = fig
             plt.savefig(
                 "output/%s.%s" % (new_keyname, data_type),
@@ -410,8 +424,16 @@ class ChemicalDatasetComparator:
             for i in range(number_of_mols_final):
                 to_draw.append(all_dicts[single_dict][self.import_keyname][i])
             for mol in to_draw:
-                atom0_pos = [mol.GetConformer().GetAtomPosition(0).x, mol.GetConformer().GetAtomPosition(0).y, mol.GetConformer().GetAtomPosition(0).z]
-                atom1_pos = [mol.GetConformer().GetAtomPosition(1).x, mol.GetConformer().GetAtomPosition(1).y, mol.GetConformer().GetAtomPosition(1).z]
+                atom0_pos = [
+                    mol.GetConformer().GetAtomPosition(0).x,
+                    mol.GetConformer().GetAtomPosition(0).y,
+                    mol.GetConformer().GetAtomPosition(0).z,
+                ]
+                atom1_pos = [
+                    mol.GetConformer().GetAtomPosition(1).x,
+                    mol.GetConformer().GetAtomPosition(1).y,
+                    mol.GetConformer().GetAtomPosition(1).z,
+                ]
                 if atom0_pos == atom1_pos:
                     AllChem.Compute2DCoords(mol)
             mol_grid = Draw.MolsToGridImage(
@@ -430,7 +452,7 @@ class ChemicalDatasetComparator:
             plt.imshow(image_list[j])
             plt.title(title_list[j], fontsize=fontsize_subtitle)
         fig.suptitle("Exemplary molecules from the datasets", fontsize=fontsize_title)
-        self._save_to_figure_dict(all_dicts, 'mol_grid', fig, data_type=data_type)
+        self._save_to_figure_dict(all_dicts, "mol_grid", fig, data_type=data_type)
         # if not os.path.exists("output"):
         #     os.makedirs("output")
         # fig.savefig("output/mol_grid.%s" % (data_type))
@@ -555,7 +577,10 @@ class ChemicalDatasetComparator:
         for single_dict in all_dicts:
             if single_dict == self.figure_dict_keyname:
                 continue
-            if not any(key == self.identifier_keyname for key in list(all_dicts[single_dict].keys())):
+            if not any(
+                key == self.identifier_keyname
+                for key in list(all_dicts[single_dict].keys())
+            ):
                 raise KeyError(
                     "A identifier list is needed, please run 'get_identifier_list_key'!"
                 )
@@ -574,7 +599,10 @@ class ChemicalDatasetComparator:
                 if number_of_duplicates != 0:
                     all_duplicates = []
                     for mol in all_dicts[single_dict][self.identifier_keyname]:
-                        if all_dicts[single_dict][self.identifier_keyname].count(mol) > 1:
+                        if (
+                            all_dicts[single_dict][self.identifier_keyname].count(mol)
+                            > 1
+                        ):
                             all_duplicates.append(mol)
                     duplicates = set(all_duplicates)
                 else:
@@ -599,10 +627,7 @@ class ChemicalDatasetComparator:
                 self.duplicates_id_keyname,
             )
         else:
-            logger.info(
-                "Updated dictionary with '%s'",
-                self.duplicates_keyname
-            )
+            logger.info("Updated dictionary with '%s'", self.duplicates_keyname)
         return
 
     # Section: Dataset comparison and visualization
@@ -621,11 +646,16 @@ class ChemicalDatasetComparator:
         """
         sets = []
         if len(all_dicts.keys()) <= 2:
-            raise ValueError("Only one dataset is given. Shared molecules can only calculated when comparing at least 2 datasets!")
+            raise ValueError(
+                "Only one dataset is given. Shared molecules can only calculated when comparing at least 2 datasets!"
+            )
         for single_dict in all_dicts:
             if single_dict == self.figure_dict_keyname:
                 continue
-            if not any(key == self.identifier_keyname for key in list(all_dicts[single_dict].keys())):
+            if not any(
+                key == self.identifier_keyname
+                for key in list(all_dicts[single_dict].keys())
+            ):
                 raise KeyError(
                     "A identifier list is needed, please run 'get_identifier_list_key'!"
                 )
@@ -656,7 +686,9 @@ class ChemicalDatasetComparator:
         )
         return
 
-    def visualize_intersection(self, all_dicts: dict, data_type: str = "png") -> matplotlib.figure.Figure:
+    def visualize_intersection(
+        self, all_dicts: dict, data_type: str = "png"
+    ) -> matplotlib.figure.Figure:
         """
         This function returns a Venn diagram of the intersection between the molecules in the subdictionaries of the given dictionary. Every subdictionary is represented as a circle and the overlaps between the circles indicate the molecules present in more than one subdictionary. (The function only works with two or three subdictionaries.)
         The intersection is based on the identifiers (string representation).
@@ -676,7 +708,10 @@ class ChemicalDatasetComparator:
         for single_dict in all_dicts:
             if single_dict == self.figure_dict_keyname:
                 continue
-            if not any(key == self.identifier_keyname for key in list(all_dicts[single_dict].keys())):
+            if not any(
+                key == self.identifier_keyname
+                for key in list(all_dicts[single_dict].keys())
+            ):
                 raise KeyError(
                     "A identifier list is needed, please run 'get_identifier_list_key'!"
                 )
@@ -707,7 +742,7 @@ class ChemicalDatasetComparator:
         for x in range(len(venn.subset_labels)):
             if venn.subset_labels[x] is not None:
                 venn.subset_labels[x].set_fontsize(15)
-        self._save_to_figure_dict(all_dicts, 'intersection', fig, data_type=data_type)
+        self._save_to_figure_dict(all_dicts, "intersection", fig, data_type=data_type)
         # if not os.path.exists("output"):
         #     os.makedirs("output")
         # plt.savefig(
@@ -944,7 +979,12 @@ class ChemicalDatasetComparator:
             fontsize=fontsize_title,
         )
         fig = descriptor_plot.figure
-        self._save_to_figure_dict(all_dicts, keyname=('distribution_of_' + str(descriptor_list_keyname)), fig=fig, data_type=data_type)
+        self._save_to_figure_dict(
+            all_dicts,
+            keyname=("distribution_of_" + str(descriptor_list_keyname)),
+            fig=fig,
+            data_type=data_type,
+        )
         # fig.savefig(
         #     "output/distribution_of_%s.%s" % (descriptor_list_keyname, data_type),
         #     bbox_inches="tight",
@@ -1030,7 +1070,12 @@ class ChemicalDatasetComparator:
             fontsize=fontsize_title,
         )
         fig = descriptor_plot.figure
-        self._save_to_figure_dict(all_dicts, keyname=('distribution_of_' + str(descriptor_list_keyname)), fig=fig, data_type=data_type)
+        self._save_to_figure_dict(
+            all_dicts,
+            keyname=("distribution_of_" + str(descriptor_list_keyname)),
+            fig=fig,
+            data_type=data_type,
+        )
         # fig.savefig(
         #     "output/distribution_of_%s.%s" % (descriptor_list_keyname, data_type),
         #     bbox_inches="tight",
@@ -1219,7 +1264,7 @@ class ChemicalDatasetComparator:
         fontsize_ylabel: int = 20,
         fontsize_xlabel: int = 20,
         fontsize_title: int = 24,
-    ) -> matplotlib.figure.Figure :
+    ) -> matplotlib.figure.Figure:
         """
         This function returns a bar plot for the number of molecules in every subdictionary breaking 0 to 4 Lipinski rules using the 'lipinski_summary' key in the given dictionary. The plot is saved in an output folder (data type can be chosen) and the created data frame can also be exported as CSV.
 
@@ -1296,7 +1341,7 @@ class ChemicalDatasetComparator:
             fontsize=fontsize_title,
         )
         fig = lipinski_plot.figure
-        self._save_to_figure_dict(all_dicts, 'lipinski_plot', fig, data_type=data_type)
+        self._save_to_figure_dict(all_dicts, "lipinski_plot", fig, data_type=data_type)
         # fig.savefig(
         #     "output/lipinski_plot.%s" % (data_type),
         #     bbox_inches="tight",
@@ -1347,7 +1392,9 @@ class ChemicalDatasetComparator:
                 Chem.Kekulize(mol)
                 scaffold = MurckoScaffold.GetScaffoldForMol(mol)
             except KekulizeException:
-                logger.info('Molecule can not be kekulized and will be excluded from scaffold analysis!')
+                logger.info(
+                    "Molecule can not be kekulized and will be excluded from scaffold analysis!"
+                )
                 continue
             # scaffold = MurckoScaffold.GetScaffoldForMol(mol)
             scaffold_list.append(scaffold)
@@ -1377,7 +1424,7 @@ class ChemicalDatasetComparator:
                 graph_framework_list.append(MurckoScaffold.MakeScaffoldGeneric(mol))
             for mol in graph_framework_list:
                 structure_list.append(Chem.MolToSmiles(mol))
-        structure_list = ['*' if mol == '' else mol for mol in structure_list]
+        structure_list = ["*" if mol == "" else mol for mol in structure_list]
         structure_counts = pd.Index(structure_list).value_counts(normalize=normalize)
         if len(structure_counts) < number_of_structures:
             number_of_structures = len(structure_counts)
@@ -1388,8 +1435,8 @@ class ChemicalDatasetComparator:
         to_draw = []
         for index in range(number_of_structures):
             to_draw.append(Chem.MolFromSmiles(smiles_list[index]))
-            if smiles_list[index] == '*':
-                legend[index] = legend[index] + ' (No rings/scaffolds)'
+            if smiles_list[index] == "*":
+                legend[index] = legend[index] + " (No rings/scaffolds)"
         structure_grid = Draw.MolsToGridImage(
             to_draw,
             maxMols=number_of_structures,
@@ -1468,7 +1515,7 @@ class ChemicalDatasetComparator:
         fig.suptitle(
             "Most frequent scaffolds from the datasets", fontsize=fontsize_title
         )
-        self._save_to_figure_dict(all_dicts, 'scaffold_grid', fig, data_type=data_type)
+        self._save_to_figure_dict(all_dicts, "scaffold_grid", fig, data_type=data_type)
         # if not os.path.exists("output"):
         #     os.makedirs("output")
         # fig.savefig("output/scaffold_grid.%s" % (data_type))
@@ -1510,7 +1557,10 @@ class ChemicalDatasetComparator:
         for single_dict in all_dicts:
             if single_dict == self.figure_dict_keyname:
                 continue
-            if not any(key == self.identifier_keyname for key in list(all_dicts[single_dict].keys())):
+            if not any(
+                key == self.identifier_keyname
+                for key in list(all_dicts[single_dict].keys())
+            ):
                 raise KeyError(
                     "A identifier list is needed, please run 'get_identifier_list_key'!"
                 )
@@ -1569,7 +1619,9 @@ class ChemicalDatasetComparator:
         if dimension_reduction == "pca":
             chem_space.pca()  # n_components, copy, whiten, svd_solver ...
         elif dimension_reduction == "tsne":
-            chem_space.tsne(learning_rate=200.0, init='random')  # n_components, perplexity, learning_rate, n_iter, init, random_state ...
+            chem_space.tsne(
+                learning_rate=200.0, init="random"
+            )  # n_components, perplexity, learning_rate, n_iter, init, random_state ...
         elif dimension_reduction == "umap":
             chem_space.umap()  # n_neighbors, min_dist, pca, random_state ...
         else:
@@ -1583,7 +1635,7 @@ class ChemicalDatasetComparator:
             os.makedirs("output")
         if not interactive:
             fig = chem_space.visualize_plot().figure
-            self._save_to_figure_dict(all_dicts, 'chemical_space', fig)
+            self._save_to_figure_dict(all_dicts, "chemical_space", fig)
             plt.close(fig)
         else:
             fig = chem_space.interactive_plot(show_plot=True)
@@ -1591,7 +1643,7 @@ class ChemicalDatasetComparator:
                 output_file("output/interactive_chemical_space.html")
             else:
                 counter = 1
-                file_name = str('interactive_chemical_space_')
+                file_name = str("interactive_chemical_space_")
                 while os.path.exists("output/%s%d.html" % (file_name, counter)):
                     counter += 1
                 output_file("output/%s%d.html" % (file_name, counter))
@@ -1637,32 +1689,36 @@ class ChemicalDatasetComparator:
         """
         first_dict = list(all_dicts.keys())[0]
         today = date.today()
-        data = (('Date:', str(today)),
-                ('Data:', str(list(all_dicts.keys())[:-1])[1:-1]),
-                ('Generated keys:', str(list(all_dicts[first_dict].keys()))[1:-1]),
-                ('Generated figures:', str(list(all_dicts[self.figure_dict_keyname].keys()))[1:-1]),
-                )
+        data = (
+            ("Date:", str(today)),
+            ("Data:", str(list(all_dicts.keys())[:-1])[1:-1]),
+            ("Generated keys:", str(list(all_dicts[first_dict].keys()))[1:-1]),
+            (
+                "Generated figures:",
+                str(list(all_dicts[self.figure_dict_keyname].keys()))[1:-1],
+            ),
+        )
         pdf = FPDF()
-        pdf.set_font('Helvetica')
+        pdf.set_font("Helvetica")
         pdf.add_page()
         pdf.set_font_size(30)
-        pdf.cell(txt='Report CIDER', align='C', w=pdf.epw, border='B')
+        pdf.cell(txt="Report CIDER", align="C", w=pdf.epw, border="B")
         pdf.set_font_size(12)
         pdf.set_y(50)
         for row in data:
             pdf.multi_cell(40, 7, row[0], new_y=YPos.LAST, new_x=XPos.RIGHT)
             pdf.multi_cell(150, 7, row[1], new_y=YPos.NEXT, new_x=XPos.LMARGIN)
-        for fig in all_dicts['figures']:
+        for fig in all_dicts["figures"]:
             pdf.add_page()
             reader = io.BytesIO()
-            all_dicts['figures'][fig].savefig(reader, bbox_inches="tight", format="png")
+            all_dicts["figures"][fig].savefig(reader, bbox_inches="tight", format="png")
             fig = Image.open(reader)
             if fig.height <= fig.width:
                 pdf.image(reader, w=pdf.epw)
             if fig.height > fig.width:
-                if fig.height/fig.width < 1.4:
+                if fig.height / fig.width < 1.4:
                     pdf.image(reader, w=pdf.epw)
-                if fig.height/fig.width > 1.4:
+                if fig.height / fig.width > 1.4:
                     pdf.image(reader, h=pdf.eph)
             fig.close()
         pdf.output("output/cider_report.pdf")

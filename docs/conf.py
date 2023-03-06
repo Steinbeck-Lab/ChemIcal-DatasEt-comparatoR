@@ -12,17 +12,18 @@
 #
 import os
 import sys
+
 sys.path.insert(0, os.path.abspath(".."))
 
 
 # -- Project information -----------------------------------------------------
 
-project = 'ChemIcal DatasEt comparatoR (CIDER)'
-copyright = '2022, Hannah Busch, Jonas Schaub, Otto Brinkhaus and Kohulan Rajan'
-author = 'Hannah Busch, Jonas Schaub, Otto Brinkhaus and Kohulan Rajan'
+project = "ChemIcal DatasEt comparatoR (CIDER)"
+copyright = "2022, Hannah Busch, Jonas Schaub, Otto Brinkhaus and Kohulan Rajan"
+author = "Hannah Busch, Jonas Schaub, Otto Brinkhaus and Kohulan Rajan"
 
 # The full version, including alpha/beta/rc tags
-release = 'Version 1.0.0 - alpha'
+release = "Version 1.0.0 - alpha"
 
 
 # -- General configuration ---------------------------------------------------
@@ -37,8 +38,8 @@ extensions = [
     "sphinx_rtd_theme",
     "nbsphinx",
     "sphinx.ext.mathjax",
-    'sphinx.ext.githubpages',
-    "sphinx.ext.viewcode"
+    "sphinx.ext.githubpages",
+    "sphinx.ext.viewcode",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -48,10 +49,10 @@ templates_path = ["_templates"]
 # You can specify multiple suffix as a list of string:
 #
 # source_suffix = ['.rst', '.md']
-source_suffix = '.rst'
+source_suffix = ".rst"
 
 # The master toctree document.
-master_doc = 'index'
+master_doc = "index"
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -67,7 +68,7 @@ pygments_style = None
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'sphinx_rtd_theme'
+html_theme = "sphinx_rtd_theme"
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -78,9 +79,9 @@ html_theme = 'sphinx_rtd_theme'
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
-html_favicon = '_static/CIDER_Logo.png'
-html_logo = '_static/CIDER_Logo.png'
+html_static_path = ["_static"]
+html_favicon = "_static/CIDER_Logo.png"
+html_logo = "_static/CIDER_Logo.png"
 # Custom sidebar templates, must be a dictionary that maps document names
 # to template names.
 #
