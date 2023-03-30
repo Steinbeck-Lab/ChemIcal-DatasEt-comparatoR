@@ -1425,8 +1425,10 @@ class ChemicalDatasetComparator:
                 try:
                     graph_framework_list.append(MurckoScaffold.MakeScaffoldGeneric(mol))
                 except AtomValenceException:
+                    index = framework_list.index(mol)
+                    identifier = moleculeset[index]
                     logger.info(
-                        "Scaffold can not be generated, molecule will be excluded from scaffold analysis!"
+                        "Graph framework can not be generated, molecule (%s, index %d) will be excluded from scaffold analysis!" , identifier, index
                     )
                 continue
             for mol in graph_framework_list:
