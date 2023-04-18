@@ -22,7 +22,7 @@ setuptools.setup(
         "notebook",
         "seaborn==0.11.2",
         "matplotlib==3.5.1",
-        "chemplot==1.2.0",
+        "chemplot @ git+https://github.com/Kohulan/ChemPlot.git@main#egg=chemplot",
         "matplotlib_venn==0.11.6",
         "fpdf2==2.6.0",
         "rdkit-pypi",
