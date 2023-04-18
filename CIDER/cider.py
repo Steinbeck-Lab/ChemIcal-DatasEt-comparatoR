@@ -38,6 +38,7 @@ from rdkit.Chem.Draw import IPythonConsole
 from rdkit.Chem.Scaffolds import MurckoScaffold
 from rdkit.Chem import rdchem
 from rdkit.Chem import KekulizeException
+from rdkit.Chem import AtomValenceException
 from rdkit.Chem import AllChem
 
 import matplotlib.pyplot as plt
@@ -1421,7 +1422,15 @@ class ChemicalDatasetComparator:
             structure_list.clear()
             graph_framework_list = []
             for mol in framework_list:
-                graph_framework_list.append(MurckoScaffold.MakeScaffoldGeneric(mol))
+                try:
+                    graph_framework_list.append(MurckoScaffold.MakeScaffoldGeneric(mol))
+                except AtomValenceException:
+                    index = framework_list.index(mol)
+                    identifier = moleculeset[index]
+                    logger.info(
+                        "Graph framework can not be generated, molecule (%s, index %d) will be excluded from scaffold analysis!" , identifier, index
+                    )
+                continue
             for mol in graph_framework_list:
                 structure_list.append(Chem.MolToSmiles(mol))
         structure_list = ["*" if mol == "" else mol for mol in structure_list]
