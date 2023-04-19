@@ -1428,7 +1428,9 @@ class ChemicalDatasetComparator:
                     index = framework_list.index(mol)
                     identifier = moleculeset[index]
                     logger.info(
-                        "Graph framework can not be generated, molecule (%s, index %d) will be excluded from scaffold analysis!" , identifier, index
+                        "Graph framework can not be generated, molecule (%s, index %d) will be excluded from scaffold analysis!",
+                        identifier,
+                        index,
                     )
                 continue
             for mol in graph_framework_list:
