@@ -1541,7 +1541,7 @@ class ChemicalDatasetComparator:
         self,
         all_dicts: dict,
         fp_radius: int = 2,
-        fp_bits: int = 2048,
+        fp_bits: int = 512,
         dimension_reduction: str = "pca",
         interactive: bool = True,
     ):
