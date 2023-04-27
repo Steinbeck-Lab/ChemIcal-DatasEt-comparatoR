@@ -1428,7 +1428,9 @@ class ChemicalDatasetComparator:
                     index = framework_list.index(mol)
                     identifier = moleculeset[index]
                     logger.info(
-                        "Graph framework can not be generated, molecule (%s, index %d) will be excluded from scaffold analysis!" , identifier, index
+                        "Graph framework can not be generated, molecule (%s, index %d) will be excluded from scaffold analysis!",
+                        identifier,
+                        index,
                     )
                 continue
             for mol in graph_framework_list:
@@ -1539,7 +1541,7 @@ class ChemicalDatasetComparator:
         self,
         all_dicts: dict,
         fp_radius: int = 2,
-        fp_bits: int = 2048,
+        fp_bits: int = 512,
         dimension_reduction: str = "pca",
         interactive: bool = True,
     ):
@@ -1589,6 +1591,8 @@ class ChemicalDatasetComparator:
                 target=target_list,  # corresponding list for inchi_list, shows which dataset the molecules belong to
                 target_type="C",  # classification (classes are the datasets listed in the target_list)
                 sim_type="structural",  # similarity solely based on structure (no property is taken into account)
+                radius=fp_radius,
+                nBits=fp_bits,
             )
         elif (
             len(all_mols_list[0]) == 27  # check if identifier is InChIKey
@@ -1607,6 +1611,8 @@ class ChemicalDatasetComparator:
                 target=target_list,  # corresponding list for inchi_list, shows which dataset the molecules belong to
                 target_type="C",  # classification (classes are the datasets listed in the target_list)
                 sim_type="structural",  # similarity solely based on structure (no property is taken into account)
+                radius=fp_radius,
+                nBits=fp_bits,
             )
         else:
             chem_space = cp.Plotter.from_smiles(
@@ -1614,17 +1620,9 @@ class ChemicalDatasetComparator:
                 target=target_list,  # corresponding list for inchi_list, shows which dataset the molecules belong to
                 target_type="C",  # classification (classes are the datasets listed in the target_list)
                 sim_type="structural",  # similarity solely based on structure (no property is taken into account)
+                radius=fp_radius,
+                nBits=fp_bits,
             )
-        if fp_radius != 2 or fp_bits != 2048:
-            if all_mols_list[0].startswith("InChI="):
-                new_fingerprint = descriptors.get_ecfp_from_inchi(
-                    all_mols_list, target_list, radius=fp_radius, nBits=fp_bits
-                )
-            else:
-                new_fingerprint = descriptors.get_ecfp(
-                    all_mols_list, target_list, radius=fp_radius, nBits=fp_bits
-                )
-            chem_space._Plotter__mols = new_fingerprint[0]
         if dimension_reduction == "pca":
             chem_space.pca()  # n_components, copy, whiten, svd_solver ...
         elif dimension_reduction == "tsne":
