@@ -26,45 +26,43 @@ SOFTWARE.
 
 # Section: Import Libraries
 
+import io
+import logging
 import os
+import sys
 import pandas as pd
 from pandas.errors import ParserError
 import numpy as np
 
 from rdkit import Chem
-from rdkit.Chem import Descriptors
-from rdkit.Chem import Draw
+from rdkit.Chem import (
+    AllChem,
+    AtomValenceException,
+    Descriptors,
+    Draw,
+    Lipinski,
+    KekulizeException,
+    rdchem,
+)
 from rdkit.Chem.Draw import IPythonConsole
 from rdkit.Chem.Scaffolds import MurckoScaffold
-from rdkit.Chem import rdchem
-from rdkit.Chem import KekulizeException
-from rdkit.Chem import AtomValenceException
-from rdkit.Chem import AllChem
 
 import matplotlib.pyplot as plt
-from matplotlib_venn import venn2
-from matplotlib_venn import venn3
+from matplotlib_venn import venn2, venn3
 from matplotlib.backends.backend_pdf import PdfPages
+import matplotlib
 
 import chemplot as cp
-from chemplot import descriptors
 from bokeh.plotting import output_file, save
 
 from typing import List, Tuple, Dict
 from itertools import count
 import PIL
 from PIL import Image
-import matplotlib
 
-import io
-from fpdf import FPDF
-from fpdf import YPos
-from fpdf import XPos
+from fpdf import FPDF, YPos, XPos
 from fpdf.enums import Align
 from datetime import date, datetime
-
-import logging
-import sys
 
 logger = logging.getLogger("CIDER")  # needs to be here
 
@@ -1218,9 +1216,9 @@ class ChemicalDatasetComparator:
                 rule_break += 1
             if Descriptors.MolWt(mol) > 500:
                 rule_break += 1
-            if Descriptors.NumHAcceptors(mol) > 10:
+            if Lipinski.NumHAcceptors(mol) > 10:
                 rule_break += 1
-            if Descriptors.NumHDonors(mol) > 5:
+            if Lipinski.NumHDonors(mol) > 5:
                 rule_break += 1
             num_of_break.append(rule_break)
         return num_of_break
