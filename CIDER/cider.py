@@ -90,6 +90,7 @@ class ChemicalDatasetComparator:
         # cider.get_duplicate_key
         self.duplicates_keyname = "number_of_duplicates"
         self.duplicates_id_keyname = "duplicates"
+        self.duplicates_index_keyname = "duplicates_index"
         # from cider.get_shared_molecules_key
         self.shared_mols_keyname = "number_of_shared_molecules"
         self.shared_mols_id_keyname = "shared_molecules"
@@ -583,50 +584,37 @@ class ChemicalDatasetComparator:
                 raise KeyError(
                     "A identifier list is needed, please run 'get_identifier_list_key'!"
                 )
-                # try:
-                #     raise KeyError(
-                #         "A identifier list is needed, please run 'get_identifier_list_key'!"
-                #     )
-                # except KeyError as e:
-                #     logger.error(str(e), exc_info=True)
-                #     raise
-            number_of_duplicates = len(
-                all_dicts[single_dict][self.identifier_keyname]
-            ) - len(set(all_dicts[single_dict][self.identifier_keyname]))
-            all_dicts[single_dict][self.duplicates_keyname] = number_of_duplicates
-            if identifier:
-                if number_of_duplicates != 0:
-                    all_duplicates = []
-                    for mol in all_dicts[single_dict][self.identifier_keyname]:
-                        if (
-                            all_dicts[single_dict][self.identifier_keyname].count(mol)
-                            > 1
-                        ):
-                            all_duplicates.append(mol)
-                    duplicates = set(all_duplicates)
+            # number_of_duplicates = len(
+                # all_dicts[single_dict][self.identifier_keyname]
+            # ) - len(set(all_dicts[single_dict][self.identifier_keyname]))
+            # all_dicts[single_dict][self.duplicates_keyname] = number_of_duplicates
+            mol_index = -1
+            mol_list = []
+            duplicate_list = []
+            duplicate_index = []
+            for mol in all_dicts[single_dict][self.identifier_keyname]:
+                mol_index += 1
+                if mol not in mol_list:
+                    mol_list.append(mol)
                 else:
-                    duplicates = set()
-                all_dicts[single_dict][self.duplicates_id_keyname] = duplicates
-                logger.info(
-                    "Number of duplicates in %s: %d, duplicate identifier(s): %s",
-                    single_dict,
-                    all_dicts[single_dict][self.duplicates_keyname],
-                    all_dicts[single_dict][self.duplicates_id_keyname],
-                )
-            else:
-                logger.info(
-                    "Number of duplicates in %s: %d",
-                    single_dict,
-                    all_dicts[single_dict][self.duplicates_keyname],
-                )
-        if identifier:
+                    duplicate_list.append(mol)
+                    duplicate_index.append(mol_index)
+            all_dicts[single_dict][self.duplicates_keyname] = len(duplicate_list)
+            all_dicts[single_dict][self.duplicates_id_keyname] = duplicate_list
+            all_dicts[single_dict][self.duplicates_index_keyname] = duplicate_index
             logger.info(
-                "Updated dictionary with '%s' and '%s'",
-                self.duplicates_keyname,
-                self.duplicates_id_keyname,
+                "Number of duplicates in %s: %d, duplicate identifier(s): %s, duplicate index: %s",
+                single_dict,
+                all_dicts[single_dict][self.duplicates_keyname],
+                all_dicts[single_dict][self.duplicates_id_keyname],
+                all_dicts[single_dict][self.duplicates_index_keyname]
             )
-        else:
-            logger.info("Updated dictionary with '%s'", self.duplicates_keyname)
+        logger.info(
+            "Updated dictionary with '%s', '%s' and '%s'",
+            self.duplicates_keyname,
+            self.duplicates_id_keyname,
+            self.duplicates_index_keyname
+        )
         return
 
     # Section: Dataset comparison and visualization
