@@ -33,6 +33,7 @@ import sys
 import pandas as pd
 from pandas.errors import ParserError
 import numpy as np
+import collections
 
 from rdkit import Chem
 from rdkit.Chem import (
@@ -564,9 +565,13 @@ class ChemicalDatasetComparator:
 
     # Section: Check for duplicates
 
-    def get_duplicate_key(self, all_dicts: dict, identifier: bool = False) -> None:
+    def get_duplicate_key(self, all_dicts: dict) -> None:
         """
-        This function updates the subdictionaries in the given dictionary with the number of duplicates in the identifier list as a new key-value-Pair (key: self.duplicates_keyname) and a list of the duplicated identifier (key: self.duplicates_id_keyname).
+        This function updates the subdictionaries in the given dictionary with
+        the number of duplicates in the identifier list as a new key-value-Pair
+        (key: self.duplicates_keyname), a list of the duplicated identifier
+        (key: self.duplicates_id_keyname) and a list of the indices of the
+        duplicates in the rdkit_mol Object (key self.duplicates_index_keyname).
 
         Args:
             all_dicts (dict): Dictionary with subdictionaries including a list of identifiers (self.identifier_keyname).
@@ -588,20 +593,20 @@ class ChemicalDatasetComparator:
                 # all_dicts[single_dict][self.identifier_keyname]
             # ) - len(set(all_dicts[single_dict][self.identifier_keyname]))
             # all_dicts[single_dict][self.duplicates_keyname] = number_of_duplicates
-            mol_index = -1
-            mol_list = []
             duplicate_list = []
-            duplicate_index = []
-            for mol in all_dicts[single_dict][self.identifier_keyname]:
-                mol_index += 1
-                if mol not in mol_list:
-                    mol_list.append(mol)
-                else:
+            count = collections.Counter(all_dicts[single_dict][self.identifier_keyname])
+            for mol in count:
+                if count[mol] > 1:
                     duplicate_list.append(mol)
-                    duplicate_index.append(mol_index)
             all_dicts[single_dict][self.duplicates_keyname] = len(duplicate_list)
             all_dicts[single_dict][self.duplicates_id_keyname] = duplicate_list
-            all_dicts[single_dict][self.duplicates_index_keyname] = duplicate_index
+            all_dicts[single_dict][self.duplicates_index_keyname] = []
+            for duplicate in duplicate_list:
+                index_list = []
+                for index, mol in enumerate(all_dicts[single_dict][self.identifier_keyname]):
+                    if mol == duplicate:
+                        index_list.append(index)
+                all_dicts[single_dict][self.duplicates_index_keyname].append(index_list)
             logger.info(
                 "Number of duplicates in %s: %d, duplicate identifier(s): %s, duplicate index: %s",
                 single_dict,
@@ -621,8 +626,15 @@ class ChemicalDatasetComparator:
 
     def get_shared_molecules_key(self, all_dicts: dict) -> None:
         """
-        This function updates the subdictionaries in the given dictionary (created with the import_as_data_dict function) with the number of molecules that can be found in all of the given datasets (key: self.shared_mols_keyname) and an identifier list of these molecules (key: self.shared_mols_id_keyname) as two new key-value pairs (number of compared datasets can be any number).
-        The comparison of the molecules is based on the identifiers (string representation), not the rdkit_mol Object (rdkit.Chem.rdmol.Mol or rdkit.Chem.rdmolfiles.SDMolSupplier).
+        This function updates the subdictionaries in the given dictionary
+        (created with the import_as_data_dict function) with the number of
+        molecules that can be found in all of the given datasets (key:
+        self.shared_mols_keyname) and an identifier list of these molecules
+        (key: self.shared_mols_id_keyname) as two new key-value pairs (number
+        of compared datasets can be any number).
+        The comparison of the molecules is based on the identifiers (string
+        representation), not the rdkit_mol Object (rdkit.Chem.rdmol.Mol or
+        rdkit.Chem.rdmolfiles.SDMolSupplier).
 
         Args:
             all_dicts (dict): Dictionary with subdictionaries including a lists of identifiers (self.identifier_keyname).
@@ -677,7 +689,11 @@ class ChemicalDatasetComparator:
         self, all_dicts: dict, data_type: str = "png"
     ) -> matplotlib.figure.Figure:
         """
-        This function returns a Venn diagram of the intersection between the molecules in the subdictionaries of the given dictionary. Every subdictionary is represented as a circle and the overlaps between the circles indicate the molecules present in more than one subdictionary. (The function only works with two or three subdictionaries.)
+        This function returns a Venn diagram of the intersection between the
+        molecules in the subdictionaries of the given dictionary. Every
+        subdictionary is represented as a circle and the overlaps between the
+        circles indicate the molecules present in more than one subdictionary.
+        (The function only works with two or three subdictionaries.)
         The intersection is based on the identifiers (string representation).
         The diagram is saved in an output folder.
 
@@ -750,7 +766,10 @@ class ChemicalDatasetComparator:
         descriptor: callable,
     ) -> List:
         """
-        This function returns a list of descriptor values for all molecules in the given rdkit_mol objects (rdkit.Chem.rdmol.Mol or rdkit.Chem.rdmolfiles.SDMolSupplier) and a callable descriptor (e.g Descriptors.MolWt or rdMolDescriptors.CalcExactMolWt). (private method)
+        This function returns a list of descriptor values for all molecules in
+        the given rdkit_mol objects (rdkit.Chem.rdmol.Mol or
+        rdkit.Chem.rdmolfiles.SDMolSupplier) and a callable descriptor (e.g
+        Descriptors.MolWt or rdMolDescriptors.CalcExactMolWt). (private method)
 
         Args:
             moleculeset (rdkit.Chem.rdmolfiles.SDMolSupplier or list[rdkit.Chem.rdmol.Mol])
@@ -771,7 +790,10 @@ class ChemicalDatasetComparator:
         self, all_dicts: dict, descriptor: callable, descriptor_list_keyname: str
     ) -> None:
         """
-        This function updates the subdictionaries in the given dictionary with a list of descriptor values as a new key-value pair using _get_descriptor_list on the rdkit_mol Objects (rdkit.Chem.rdmol.Mol or rdkit.Chem.rdmolfiles.SDMolSupplier) in the subdictionaries.
+        This function updates the subdictionaries in the given dictionary with
+        a list of descriptor values as a new key-value pair using
+        _get_descriptor_list on the rdkit_mol Objects (rdkit.Chem.rdmol.Mol or
+        rdkit.Chem.rdmolfiles.SDMolSupplier) in the subdictionaries.
 
         Args:
             all_dicts (dict): Dictionary with subdictionaries for every dataset, including the key 'self.import_keyname'.
@@ -792,7 +814,10 @@ class ChemicalDatasetComparator:
         self, all_dicts: dict, descriptor_list_keyname: str
     ) -> None:
         """
-        This function updates the subdictionaries in the given dictionary with the binned descriptor values for a given descriptor value list with discrete values (e.g. number of H-Bond donors or acceptors). (private method)
+        This function updates the subdictionaries in the given dictionary with
+        the binned descriptor values for a given descriptor value list with
+        discrete values (e.g. number of H-Bond donors or acceptors). (private
+        method)
 
         Args:
             all_dicts (dict): Dictionary with subdictionaries including a discrete descriptor value list.
@@ -834,7 +859,10 @@ class ChemicalDatasetComparator:
         self, all_dicts: dict, descriptor_list_keyname: str, width_of_bins: float = 10.0
     ) -> None:
         """
-        This function updates the subdictionaries in the given dictionary with the binned descriptor values for a given descriptor value list with continuous values (e.g. molecular weight or logP values). The interval size of the bins can be chosen. (private method)
+        This function updates the subdictionaries in the given dictionary with
+        the binned descriptor values for a given descriptor value list with
+        continuous values (e.g. molecular weight or logP values). The interval
+        size of the bins can be chosen. (private method)
 
         Args:
             all_dicts (dict): Dictionary with subdictionaries including a continuous descriptor value list.
@@ -1659,7 +1687,7 @@ class ChemicalDatasetComparator:
             new_dict = all_dicts[single_dict].copy()
             counter = 0
             for key in new_dict.copy():
-                if key == self.import_keyname:
+                if key == self.import_keyname or self.duplicates_index_keyname:
                     new_dict.pop(key)
                 elif type(new_dict[key]) == list:
                     counter += 1
