@@ -33,7 +33,6 @@ import sys
 import pandas as pd
 from pandas.errors import ParserError
 import numpy as np
-import collections
 
 from rdkit import Chem
 from rdkit.Chem import (
@@ -50,7 +49,6 @@ from rdkit.Chem.Scaffolds import MurckoScaffold
 
 import matplotlib.pyplot as plt
 from matplotlib_venn import venn2, venn3
-from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib
 
 import chemplot as cp
