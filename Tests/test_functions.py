@@ -137,7 +137,7 @@ def test_get_identifier_list_key():
 
 
 def test_get_duplicate_key():
-    cider.get_duplicate_key(testdict, identifier=True)
+    cider.get_duplicate_key(testdict)
     # Assert that the function generates a new entries in the dictionary
     assert any(
         key == cider.duplicates_keyname for key in list(testdict["set_A.sdf"].keys())
@@ -145,17 +145,22 @@ def test_get_duplicate_key():
     assert any(
         key == cider.duplicates_id_keyname for key in list(testdict["set_A.sdf"].keys())
     )
+    assert any(
+        key == cider.duplicates_index_keyname for key in list(testdict["set_A.sdf"].keys())
+    )
     # Assert that the function returns the right number of duplicates
     assert testdict["set_A.sdf"][cider.duplicates_keyname] == 0
     assert testdict["set_B.sdf"][cider.duplicates_keyname] == 0
     assert testdict["set_D.sdf"][cider.duplicates_keyname] == 1
     # Assert that the function returns the right duplicate identifier
     assert (
-        testdict["set_D.sdf"][cider.duplicates_keyname]
+        testdict["set_D.sdf"][cider.duplicates_id_keyname]
         == {"GZFGOTFRPZRKDS-UHFFFAOYSA-N"}
         or {"InChI=1S/C6H5BrO/c7-5-1-3-6(8)4-2-5/h1-4,8H"}
         or {"Oc1ccc(Br)cc1"}
     )
+    # Assert that the function returns the right indices for duplicates
+    assert testdict["set_D.sdf"][cider.duplicates_index_keyname] == [[1, 3]]
 
 
 def test_get_shared_molecules_key():
