@@ -652,19 +652,21 @@ class ChemicalDatasetComparator:
             all_dicts[single_dict][self.duplicates_id_keyname] = duplicates
             all_dicts[single_dict][self.duplicates_index_keyname] = []
             for mol in duplicates:
-                all_dicts[single_dict][self.duplicates_index_keyname].append(mol_id_dict[mol])
+                all_dicts[single_dict][self.duplicates_index_keyname].append(
+                    mol_id_dict[mol]
+                )
             logger.info(
                 "Number of duplicates in %s: %d, duplicate identifier(s): %s, duplicate index: %s",
                 single_dict,
                 all_dicts[single_dict][self.duplicates_keyname],
                 all_dicts[single_dict][self.duplicates_id_keyname],
-                all_dicts[single_dict][self.duplicates_index_keyname]
+                all_dicts[single_dict][self.duplicates_index_keyname],
             )
         logger.info(
             "Updated dictionary with '%s', '%s' and '%s'",
             self.duplicates_keyname,
             self.duplicates_id_keyname,
-            self.duplicates_index_keyname
+            self.duplicates_index_keyname,
         )
         return
 
@@ -1767,8 +1769,10 @@ class ChemicalDatasetComparator:
         """
         first_dict = list(all_dicts.keys())[0]
         today = date.today()
+        current_time = datetime.now().strftime("%H:%M:%S")
         data = (
             ("Date:", str(today)),
+            ("Time:", current_time),
             ("Data:", str(list(all_dicts.keys())[:-1])[1:-1]),
             ("Generated keys:", str(list(all_dicts[first_dict].keys()))[1:-1]),
             (
