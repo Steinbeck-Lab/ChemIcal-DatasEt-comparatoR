@@ -146,7 +146,8 @@ def test_get_duplicate_key():
         key == cider.duplicates_id_keyname for key in list(testdict["set_A.sdf"].keys())
     )
     assert any(
-        key == cider.duplicates_index_keyname for key in list(testdict["set_A.sdf"].keys())
+        key == cider.duplicates_index_keyname
+        for key in list(testdict["set_A.sdf"].keys())
     )
     # Assert that the function returns the right number of duplicates
     assert testdict["set_A.sdf"][cider.duplicates_keyname] == 0
