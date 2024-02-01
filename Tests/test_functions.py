@@ -1,7 +1,9 @@
-from CIDER import ChemicalDatasetComparator
+import os
+
 from rdkit.Chem import Descriptors
 from rdkit.Chem import rdMolDescriptors
-import os
+
+from CIDER import ChemicalDatasetComparator
 
 cider = ChemicalDatasetComparator()
 test_dict_path = os.path.join(os.path.split(__file__)[0], "unittest_data")

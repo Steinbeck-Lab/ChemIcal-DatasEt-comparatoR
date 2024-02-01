@@ -28,10 +28,10 @@ M  V30 9 1 2 9
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0206286
 
-> <SMILES> 
+> <SMILES>
 ClC1=CC=C(Cl)C(Cl)=C1
 
 $$$$
@@ -63,10 +63,10 @@ M  V30 8 1 7 8
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0284887
 
-> <SMILES> 
+> <SMILES>
 ClC=1C=CC=CC1Cl
 
 $$$$
@@ -98,10 +98,10 @@ M  V30 8 1 2 8
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0080171
 
-> <SMILES> 
+> <SMILES>
 ClC1=CC=CC(Cl)=C1
 
 $$$$
@@ -144,10 +144,10 @@ M  V30 14 1 7 13
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0100364
 
-> <SMILES> 
+> <SMILES>
 O=C1C(Br)=COC2=CC=C(Cl)C=C12
 
 $$$$

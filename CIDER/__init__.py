@@ -1,5 +1,6 @@
 """
 CIDER Python Package.
+
 ============================
 ChemIcal DatasEt comparatoR (CIDER) is a Python package and ready-to-use Jupyter Notebook workflow
 which primarily utilizes RDKit to compare two or more chemical structure datasets (SD files) in different aspects,

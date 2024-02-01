@@ -47,7 +47,7 @@ $ pip install git+https://github.com/hannbus/ChemIcal_DatasEt_compaRator.git
 $ pip install cider-chem
 ```
 
-### Basic usage: 
+### Basic usage:
 ```python
 from CIDER import ChemicalDatasetComparator
 cider = ChemicalDatasetComparator()
