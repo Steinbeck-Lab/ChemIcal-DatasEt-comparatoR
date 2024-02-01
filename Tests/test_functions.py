@@ -1,7 +1,9 @@
-from CIDER import ChemicalDatasetComparator
+import os
+
 from rdkit.Chem import Descriptors
 from rdkit.Chem import rdMolDescriptors
-import os
+
+from CIDER import ChemicalDatasetComparator
 
 cider = ChemicalDatasetComparator()
 test_dict_path = os.path.join(os.path.split(__file__)[0], "unittest_data")
@@ -146,7 +148,8 @@ def test_get_duplicate_key():
         key == cider.duplicates_id_keyname for key in list(testdict["set_A.sdf"].keys())
     )
     assert any(
-        key == cider.duplicates_index_keyname for key in list(testdict["set_A.sdf"].keys())
+        key == cider.duplicates_index_keyname
+        for key in list(testdict["set_A.sdf"].keys())
     )
     # Assert that the function returns the right number of duplicates
     assert testdict["set_A.sdf"][cider.duplicates_keyname] == 0
