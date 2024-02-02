@@ -1222,7 +1222,7 @@ class ChemicalDatasetComparator:
                 + str(descriptor_list_keyname)
                 + ") is needed for plotting. Please run 'get_descriptor_list_key'!"
             )
-        elif type(all_dicts[first_dict][descriptor_list_keyname][0]) == int:
+        elif isinstance(all_dicts[first_dict][descriptor_list_keyname][0], int):
             self._get_discrete_descriptor_counts(all_dicts, descriptor_list_keyname)
             fig = self._discrete_descriptor_plot(
                 all_dicts,
@@ -1236,10 +1236,9 @@ class ChemicalDatasetComparator:
                 fontsize_xlabel,
                 fontsize_title,
             )
-        elif (
-            type(all_dicts[first_dict][descriptor_list_keyname][0]) == float
-            or type(all_dicts[first_dict][descriptor_list_keyname][0]) == np.float64
-        ):
+        elif isinstance(
+            all_dicts[first_dict][descriptor_list_keyname][0], float
+        ) or isinstance(all_dicts[first_dict][descriptor_list_keyname][0], np.float64):
             self._get_continuous_descriptor_counts(
                 all_dicts, descriptor_list_keyname, width_of_bins
             )
@@ -1772,7 +1771,7 @@ class ChemicalDatasetComparator:
             for key in new_dict.copy():
                 if key == self.import_keyname or self.duplicates_index_keyname:
                     new_dict.pop(key)
-                elif type(new_dict[key]) == list:
+                elif isinstance(new_dict[key], list):
                     counter += 1
                 else:
                     new_dict.pop(key)
