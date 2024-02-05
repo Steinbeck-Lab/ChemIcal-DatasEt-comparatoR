@@ -1,0 +1,20 @@
+
+# This workflow will perform the following actions when the code is pushed to the main branch.
+# - Trigger release-please action to create a release which needs a test to pass first.
+
+name: release-please-action
+
+on:
+  push:
+    branches:
+      - main
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: google-github-actions/release-please-action@v3
+        with:
+          release-type: python
+          package-name: release-please-action
+          token: ${{ secrets.GITHUB_TOKEN }}
+          start-version: '1.0.0'

@@ -28,10 +28,10 @@ M  V30 9 1 2 9
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0216116
 
-> <SMILES> 
+> <SMILES>
 BrC1=CC=C(O)C(Br)=C1
 
 $$$$
@@ -63,10 +63,10 @@ M  V30 8 1 2 8
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0085593
 
-> <SMILES> 
+> <SMILES>
 BrC1=CC=C(O)C=C1
 
 $$$$
@@ -100,10 +100,10 @@ M  V30 9 1 2 9
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0401033
 
-> <SMILES> 
+> <SMILES>
 ClC1=CC=C(O)C(Cl)=C1
 
 $$$$
@@ -135,10 +135,10 @@ M  V30 8 1 2 8
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0109649
 
-> <SMILES> 
+> <SMILES>
 ClC1=CC=CC(O)=C1
 
 $$$$
@@ -172,10 +172,10 @@ M  V30 9 1 2 9
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0088749
 
-> <SMILES> 
+> <SMILES>
 FC1=CC=C(Br)C(O)=C1
 
 $$$$
@@ -207,10 +207,10 @@ M  V30 8 1 7 8
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0071171
 
-> <SMILES> 
+> <SMILES>
 ClC=1C=CC=CC1O
 
 $$$$
@@ -240,10 +240,10 @@ M  V30 7 2 2 7
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0155356
 
-> <SMILES> 
+> <SMILES>
 OC=1C=CC=CC1
 
 $$$$
@@ -277,10 +277,10 @@ M  V30 9 1 2 9
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0061661
 
-> <SMILES> 
+> <SMILES>
 FC1=CC=C(O)C(Br)=C1
 
 $$$$
@@ -314,10 +314,10 @@ M  V30 9 1 8 9
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0395062
 
-> <SMILES> 
+> <SMILES>
 FC1=CC(O)=CC=C1Br
 
 $$$$
@@ -351,10 +351,10 @@ M  V30 9 1 2 9
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0236901
 
-> <SMILES> 
+> <SMILES>
 ClC1=CC=C(Cl)C(O)=C1
 
 $$$$
@@ -386,10 +386,10 @@ M  V30 8 1 2 8
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0032139
 
-> <SMILES> 
+> <SMILES>
 FC1=CC=C(O)C=C1
 
 $$$$
@@ -423,10 +423,10 @@ M  V30 9 1 8 9
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0059204
 
-> <SMILES> 
+> <SMILES>
 FC1=CC(Br)=CC=C1O
 
 $$$$
@@ -460,10 +460,10 @@ M  V30 9 1 8 9
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0060336
 
-> <SMILES> 
+> <SMILES>
 ClC1=CC=CC(O)=C1Cl
 
 $$$$
@@ -495,10 +495,10 @@ M  V30 8 1 7 8
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0083000
 
-> <SMILES> 
+> <SMILES>
 BrC=1C=CC=CC1O
 
 $$$$
@@ -532,10 +532,10 @@ M  V30 9 1 8 9
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0386646
 
-> <SMILES> 
+> <SMILES>
 ClC1=CC=C(O)C=C1Cl
 
 $$$$
@@ -567,10 +567,10 @@ M  V30 8 1 2 8
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0334769
 
-> <SMILES> 
+> <SMILES>
 ClC1=CC=C(O)C=C1
 
 $$$$
@@ -604,10 +604,10 @@ M  V30 9 1 8 9
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0331365
 
-> <SMILES> 
+> <SMILES>
 ClC1=CC(O)=CC=C1O
 
 $$$$
@@ -641,10 +641,10 @@ M  V30 9 1 3 9
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0148599
 
-> <SMILES> 
+> <SMILES>
 N#CC1=CC=C(O)C=C1
 
 $$$$
@@ -678,10 +678,10 @@ M  V30 9 1 8 9
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0409072
 
-> <SMILES> 
+> <SMILES>
 FC1=CC=CC(O)=C1O
 
 $$$$
@@ -713,10 +713,10 @@ M  V30 8 1 2 8
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0414137
 
-> <SMILES> 
+> <SMILES>
 OC1=CC=CC(O)=C1
 
 $$$$
@@ -748,10 +748,10 @@ M  V30 8 1 2 8
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0246516
 
-> <SMILES> 
+> <SMILES>
 OC1=CC=C(O)C=C1
 
 $$$$
@@ -785,10 +785,10 @@ M  V30 9 1 8 9
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0161760
 
-> <SMILES> 
+> <SMILES>
 BrC1=CC(O)=CC=C1O
 
 $$$$
@@ -822,10 +822,10 @@ M  V30 9 2 3 9
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0104146
 
-> <SMILES> 
+> <SMILES>
 N#CC=1C=CC=C(O)C1
 
 $$$$
@@ -859,10 +859,10 @@ M  V30 9 1 3 9
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0178351
 
-> <SMILES> 
+> <SMILES>
 N#[N+]C1=CC=C(O)C=C1
 
 $$$$
@@ -894,10 +894,10 @@ M  V30 8 1 7 8
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0143972
 
-> <SMILES> 
+> <SMILES>
 OC=1C=CC=CC1O
 
 $$$$
@@ -933,10 +933,10 @@ M  V30 10 1 9 10
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0284631
 
-> <SMILES> 
+> <SMILES>
 N#CC1=CC(O)=CC=C1O
 
 $$$$
@@ -974,10 +974,10 @@ M  V30 11 1 4 11
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0291002
 
-> <SMILES> 
+> <SMILES>
 O=[N+]([O-])C1=CC=C(O)C(Cl)=C1
 
 $$$$
@@ -1013,10 +1013,10 @@ M  V30 10 1 4 10
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0273783
 
-> <SMILES> 
+> <SMILES>
 O=[N+]([O-])C1=CC=C(O)C=C1
 
 $$$$
@@ -1048,10 +1048,10 @@ M  V30 8 1 7 8
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0115137
 
-> <SMILES> 
+> <SMILES>
 OC=1C=CC=CC1N
 
 $$$$
@@ -1083,10 +1083,10 @@ M  V30 8 1 2 8
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0172517
 
-> <SMILES> 
+> <SMILES>
 OC1=CC=CC(N)=C1
 
 $$$$
@@ -1122,10 +1122,10 @@ M  V30 10 1 4 10
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0157204
 
-> <SMILES> 
+> <SMILES>
 N#CSC1=CC=C(O)C=C1
 
 $$$$
@@ -1159,10 +1159,10 @@ M  V30 9 1 2 9
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0187325
 
-> <SMILES> 
+> <SMILES>
 OC1=CC=C(O)C(O)=C1
 
 $$$$
@@ -1196,10 +1196,10 @@ M  V30 9 2 3 9
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0106037
 
-> <SMILES> 
+> <SMILES>
 O=CC=1C=CC=C(O)C1
 
 $$$$
@@ -1233,10 +1233,10 @@ M  V30 9 1 2 9
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0420325
 
-> <SMILES> 
+> <SMILES>
 FC1=CC=C(N)C(O)=C1
 
 $$$$
@@ -1272,10 +1272,10 @@ M  V30 10 1 9 10
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0068656
 
-> <SMILES> 
+> <SMILES>
 O=[N+]([O-])C=1C=CC=CC1O
 
 $$$$
@@ -1311,10 +1311,10 @@ M  V30 10 1 9 10
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0293189
 
-> <SMILES> 
+> <SMILES>
 N#CC1=CC=C(O)C=C1O
 
 $$$$
@@ -1351,10 +1351,10 @@ M  V30 11 2 6 10
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0295607
 
-> <SMILES> 
+> <SMILES>
 OC1=CC=CC=2NN=NC12
 
 $$$$
@@ -1388,10 +1388,10 @@ M  V30 9 1 8 9
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0248019
 
-> <SMILES> 
+> <SMILES>
 FC1=CC(O)=CC=C1N
 
 $$$$
@@ -1425,10 +1425,10 @@ M  V30 9 1 8 9
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0070007
 
-> <SMILES> 
+> <SMILES>
 FC1=CC(N)=CC=C1O
 
 $$$$
@@ -1464,10 +1464,10 @@ M  V30 10 1 3 10
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0155663
 
-> <SMILES> 
+> <SMILES>
 N#CC1=CC=C(O)C(O)=C1
 
 $$$$
@@ -1505,10 +1505,10 @@ M  V30 11 1 10 11
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0047539
 
-> <SMILES> 
+> <SMILES>
 O=[N+]([O-])C1=CC(Cl)=CC=C1O
 
 $$$$
@@ -1540,10 +1540,10 @@ M  V30 8 1 2 8
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0149529
 
-> <SMILES> 
+> <SMILES>
 OC1=CC=C(N)C=C1
 
 $$$$
@@ -1580,10 +1580,10 @@ M  V30 11 2 5 10
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0079924
 
-> <SMILES> 
+> <SMILES>
 OC1=NOC=2C=CC=CC12
 
 $$$$
@@ -1617,10 +1617,10 @@ M  V30 9 1 3 9
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0076387
 
-> <SMILES> 
+> <SMILES>
 O=CC1=CC=C(O)C=C1
 
 $$$$
@@ -1654,10 +1654,10 @@ M  V30 9 1 3 9
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0230702
 
-> <SMILES> 
+> <SMILES>
 O=CC1=CC=C(O)C=C1
 
 $$$$
@@ -1696,10 +1696,10 @@ M  V30 12 1 2 11
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0374905
 
-> <SMILES> 
+> <SMILES>
 O=C1OC2=CC(O)=CC=C2S1
 
 $$$$
@@ -1733,10 +1733,10 @@ M  V30 9 1 8 9
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0410095
 
-> <SMILES> 
+> <SMILES>
 O=CC=1C=CC=CC1O
 
 $$$$
@@ -1770,10 +1770,10 @@ M  V30 9 1 8 9
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0132365
 
-> <SMILES> 
+> <SMILES>
 O=CC=1C=CC=CC1O
 
 $$$$
@@ -1807,10 +1807,10 @@ M  V30 9 1 2 9
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0062122
 
-> <SMILES> 
+> <SMILES>
 FC1=CC=C(O)C(N)=C1
 
 $$$$
@@ -1846,10 +1846,10 @@ M  V30 10 1 3 10
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0212461
 
-> <SMILES> 
+> <SMILES>
 O=CC1=CC=C(O)C(Br)=C1
 
 $$$$
@@ -1886,10 +1886,10 @@ M  V30 11 2 2 10
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0361868
 
-> <SMILES> 
+> <SMILES>
 OC=1C=CC=2NN=NC2C1
 
 $$$$
@@ -1923,10 +1923,10 @@ M  V30 9 1 8 9
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0308187
 
-> <SMILES> 
+> <SMILES>
 OC1=CC=CC(O)=C1O
 
 $$$$
@@ -1964,10 +1964,10 @@ M  V30 11 1 4 11
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0155417
 
-> <SMILES> 
+> <SMILES>
 O=[N+]([O-])C1=CC=C([O-])C(O)=C1
 
 $$$$
@@ -2005,10 +2005,10 @@ M  V30 11 1 10 11
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0077475
 
-> <SMILES> 
+> <SMILES>
 O=[N+]([O-])C1=CC(F)=CC=C1O
 
 $$$$
@@ -2046,10 +2046,10 @@ M  V30 11 1 10 11
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0210532
 
-> <SMILES> 
+> <SMILES>
 O=C(Cl)C1=CC=C(O)C=C1O
 
 $$$$
@@ -2087,10 +2087,10 @@ M  V30 11 1 10 11
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0038089
 
-> <SMILES> 
+> <SMILES>
 O=C([O-])C=1C(O)=CC=CC1O
 
 $$$$
@@ -2124,10 +2124,10 @@ M  V30 9 1 4 9
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0145784
 
-> <SMILES> 
+> <SMILES>
 ClC1=CC(=CC=C1O)C
 
 $$$$
@@ -2166,10 +2166,10 @@ M  V30 12 2 5 11
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0334574
 
-> <SMILES> 
+> <SMILES>
 OC1=NOC=2C=C(O)C=CC12
 
 $$$$
@@ -2206,10 +2206,10 @@ M  V30 11 2 6 10
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0278370
 
-> <SMILES> 
+> <SMILES>
 OC1=CC=CC=2OC=CC12
 
 $$$$
@@ -2243,10 +2243,10 @@ M  V30 9 1 8 9
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0329015
 
-> <SMILES> 
+> <SMILES>
 ClC1=CC=C(O)C=C1C
 
 $$$$
@@ -2282,10 +2282,10 @@ M  V30 10 1 9 10
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0326066
 
-> <SMILES> 
+> <SMILES>
 O=CC1=CC(O)=CC=C1O
 
 $$$$
@@ -2323,10 +2323,10 @@ M  V30 11 1 10 11
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0002331
 
-> <SMILES> 
+> <SMILES>
 O=[N+]([O-])C1=CC=C(O)C=C1O
 
 $$$$
@@ -2362,10 +2362,10 @@ M  V30 10 1 4 10
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0253685
 
-> <SMILES> 
+> <SMILES>
 O=C(O)C1=CC=C(O)C=C1
 
 $$$$
@@ -2403,10 +2403,10 @@ M  V30 11 1 10 11
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0030665
 
-> <SMILES> 
+> <SMILES>
 O=C([O-])C=1C=CC=C(O)C1O
 
 $$$$
@@ -2440,10 +2440,10 @@ M  V30 9 1 8 9
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0025703
 
-> <SMILES> 
+> <SMILES>
 BrC1=CC=C(O)C=C1C
 
 $$$$
@@ -2479,10 +2479,10 @@ M  V30 10 1 3 10
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0203672
 
-> <SMILES> 
+> <SMILES>
 O=CC1=CC=C(O)C(O)=C1
 
 $$$$
@@ -2518,10 +2518,10 @@ M  V30 10 2 4 10
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0217243
 
-> <SMILES> 
+> <SMILES>
 O=C(O)C=1C=CC=C(O)C1
 
 $$$$
@@ -2560,10 +2560,10 @@ M  V30 12 1 2 11
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0192870
 
-> <SMILES> 
+> <SMILES>
 O=C1SC2=CC(O)=CC=C2N1
 
 $$$$
@@ -2601,10 +2601,10 @@ M  V30 11 1 10 11
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0415681
 
-> <SMILES> 
+> <SMILES>
 O=S(=O)([O-])C=1C=CC=CC1O
 
 $$$$
@@ -2640,10 +2640,10 @@ M  V30 10 1 9 10
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0382408
 
-> <SMILES> 
+> <SMILES>
 O=CC1=CC=C(O)C=C1O
 
 $$$$
@@ -2675,10 +2675,10 @@ M  V30 8 1 5 8
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0267550
 
-> <SMILES> 
+> <SMILES>
 OC1=CC=C(C=C1)C
 
 $$$$
@@ -2714,10 +2714,10 @@ M  V30 10 1 9 10
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0104242
 
-> <SMILES> 
+> <SMILES>
 O=CC=1C=CC=C(O)C1O
 
 $$$$
@@ -2753,10 +2753,10 @@ M  V30 10 1 4 10
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0315067
 
-> <SMILES> 
+> <SMILES>
 O=[N](O)C1=CC=C(O)C=C1
 
 $$$$
@@ -2793,10 +2793,10 @@ M  V30 11 2 2 10
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0360936
 
-> <SMILES> 
+> <SMILES>
 OC=1C=CC=2OC=CC2C1
 
 $$$$
@@ -2833,10 +2833,10 @@ M  V30 11 2 2 10
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0083825
 
-> <SMILES> 
+> <SMILES>
 OC=1C=CC=2NC=NC2C1
 
 $$$$
@@ -2873,10 +2873,10 @@ M  V30 11 1 2 10
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0223104
 
-> <SMILES> 
+> <SMILES>
 OC1=CC=C2OCOC2=C1
 
 $$$$
@@ -2914,10 +2914,10 @@ M  V30 11 1 10 11
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0283266
 
-> <SMILES> 
+> <SMILES>
 O=NC1=CC(C=O)=CC=C1O
 
 $$$$
@@ -2955,10 +2955,10 @@ M  V30 11 1 4 11
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0131355
 
-> <SMILES> 
+> <SMILES>
 O=C(O)C1=CC=C(O)C(Cl)=C1
 
 $$$$
@@ -2990,10 +2990,10 @@ M  V30 8 1 7 8
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0242840
 
-> <SMILES> 
+> <SMILES>
 OC=1C=CC=CC1C
 
 $$$$
@@ -3025,10 +3025,10 @@ M  V30 8 1 6 8
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0355586
 
-> <SMILES> 
+> <SMILES>
 OC1=CC=CC(=C1)C
 
 $$$$
@@ -3062,10 +3062,10 @@ M  V30 9 1 2 9
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0176630
 
-> <SMILES> 
+> <SMILES>
 OC1=CC=C(O)C(N)=C1
 
 $$$$
@@ -3103,10 +3103,10 @@ M  V30 11 1 10 11
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0047841
 
-> <SMILES> 
+> <SMILES>
 O=C([O-])C1=CC=C(O)C=C1O
 
 $$$$
@@ -3143,10 +3143,10 @@ M  V30 11 2 2 10
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0263236
 
-> <SMILES> 
+> <SMILES>
 OC=1C=CC=2C=COC2C1
 
 $$$$
@@ -3184,10 +3184,10 @@ M  V30 11 1 10 11
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0027644
 
-> <SMILES> 
+> <SMILES>
 O=[N+]([O-])C1=CC(O)=CC=C1O
 
 $$$$
@@ -3225,10 +3225,10 @@ M  V30 11 1 10 11
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0064333
 
-> <SMILES> 
+> <SMILES>
 O=P([O-])([O-])C=1C=CC=CC1O
 
 $$$$
@@ -3266,10 +3266,10 @@ M  V30 11 1 10 11
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0085708
 
-> <SMILES> 
+> <SMILES>
 O=C(O)C1=CC(O)=CC=C1[O-]
 
 $$$$
@@ -3308,10 +3308,10 @@ M  V30 12 1 2 11
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0377919
 
-> <SMILES> 
+> <SMILES>
 O=C1OC2=CC(O)=CC=C2N1
 
 $$$$
@@ -3349,10 +3349,10 @@ M  V30 11 1 4 11
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0392208
 
-> <SMILES> 
+> <SMILES>
 O=[N+]([O-])C1=CC=C(O)C(O)=C1
 
 $$$$
@@ -3390,10 +3390,10 @@ M  V30 11 1 4 11
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0414254
 
-> <SMILES> 
+> <SMILES>
 O=C(O)C1=CC=C(O)C(Br)=C1
 
 $$$$
@@ -3429,10 +3429,10 @@ M  V30 10 1 9 10
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0230203
 
-> <SMILES> 
+> <SMILES>
 O=C(O)C=1C=CC=CC1O
 
 $$$$
@@ -3470,10 +3470,10 @@ M  V30 11 1 4 11
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0086341
 
-> <SMILES> 
+> <SMILES>
 O=C(O)C1=CC=C([O-])C(O)=C1
 
 $$$$
@@ -3511,10 +3511,10 @@ M  V30 11 1 10 11
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0200151
 
-> <SMILES> 
+> <SMILES>
 O=C(O)C=1C(O)=CC=CC1O
 
 $$$$
@@ -3548,10 +3548,10 @@ M  V30 9 1 2 9
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0268248
 
-> <SMILES> 
+> <SMILES>
 OC1=CC=CC(OC)=C1
 
 $$$$
@@ -3587,10 +3587,10 @@ M  V30 10 1 4 10
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0232327
 
-> <SMILES> 
+> <SMILES>
 N#CCC1=CC=C(O)C=C1
 
 $$$$
@@ -3624,10 +3624,10 @@ M  V30 9 1 8 9
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0103281
 
-> <SMILES> 
+> <SMILES>
 OC1=CC=C(C=C1)CO
 
 $$$$
@@ -3661,10 +3661,10 @@ M  V30 9 1 7 9
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0324010
 
-> <SMILES> 
+> <SMILES>
 OC1=CC=C(O)C(=C1)C
 
 $$$$
@@ -3698,10 +3698,10 @@ M  V30 9 1 8 9
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0104167
 
-> <SMILES> 
+> <SMILES>
 OC=1C=CC=CC1CO
 
 $$$$
@@ -3739,10 +3739,10 @@ M  V30 11 1 10 11
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0080275
 
-> <SMILES> 
+> <SMILES>
 O=CC1=CC=C(O)C(O)=C1O
 
 $$$$
@@ -3778,10 +3778,10 @@ M  V30 10 1 9 10
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0231136
 
-> <SMILES> 
+> <SMILES>
 OC=NC=1C=CC=CC1O
 
 $$$$
@@ -3819,10 +3819,10 @@ M  V30 11 2 10 11
 M  V30 END BOND
 M  V30 END CTAB
 M  END
-> <coconut_id> 
+> <coconut_id>
 CNP0288393
 
-> <SMILES> 
+> <SMILES>
 O=CC=1C=CC=C(O)C1C=O
 
 $$$$

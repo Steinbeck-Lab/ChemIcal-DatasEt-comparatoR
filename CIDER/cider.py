@@ -1,9 +1,8 @@
 """
-MIT License
+MIT License.
 
 Copyright (c) 2022 Hannah Busch, Jonas Schaub, Otto Brinkhaus, Kohulan Rajan,
 and Christoph Steinbeck
-
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -23,45 +22,44 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
-
 # Section: Import Libraries
-
 import io
 import logging
 import os
 import sys
-import pandas as pd
-from pandas.errors import ParserError
-import numpy as np
-
-from rdkit import Chem
-from rdkit.Chem import (
-    AllChem,
-    AtomValenceException,
-    Descriptors,
-    Draw,
-    Lipinski,
-    KekulizeException,
-    rdchem,
-)
-from rdkit.Chem.Draw import IPythonConsole
-from rdkit.Chem.Scaffolds import MurckoScaffold
-
-import matplotlib.pyplot as plt
-from matplotlib_venn import venn2, venn3
-import matplotlib
+from datetime import date
+from datetime import datetime
+from itertools import count
+from typing import Dict
+from typing import List
+from typing import Tuple
 
 import chemplot as cp
-from bokeh.plotting import output_file, save
-
-from typing import List, Tuple, Dict
-from itertools import count
+import matplotlib
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 import PIL
-from PIL import Image
-
-from fpdf import FPDF, YPos, XPos
+from bokeh.plotting import output_file
+from bokeh.plotting import save
+from fpdf import FPDF
+from fpdf import XPos
+from fpdf import YPos
 from fpdf.enums import Align
-from datetime import date, datetime
+from matplotlib_venn import venn2
+from matplotlib_venn import venn3
+from pandas.errors import ParserError
+from PIL import Image
+from rdkit import Chem
+from rdkit.Chem import AllChem
+from rdkit.Chem import AtomValenceException
+from rdkit.Chem import Descriptors
+from rdkit.Chem import Draw
+from rdkit.Chem import KekulizeException
+from rdkit.Chem import Lipinski
+from rdkit.Chem import rdchem
+from rdkit.Chem.Draw import IPythonConsole
+from rdkit.Chem.Scaffolds import MurckoScaffold
 
 logger = logging.getLogger("CIDER")  # needs to be here
 
@@ -70,7 +68,7 @@ logger = logging.getLogger("CIDER")  # needs to be here
 
 class ChemicalDatasetComparator:
     """
-    Wrapper class around all Cider functionalities
+    Wrapper class around all Cider functionalities.
 
     ChemIcal DatasEt comparatoR (CIDER) is a Python package and ready-to-use
     Jupyter Notebook workflow which primarily utilizes RDKit to compare two or
@@ -81,7 +79,8 @@ class ChemicalDatasetComparator:
 
     def __init__(self):
         """
-        The class variables of CIDER function as keys for the dictionary in
+        The class variables of CIDER function as keys for the dictionary in.
+
         which all calculated and plotted data will be stored. The keys will be
         generated when the CIDER method is executed.
         """
@@ -130,6 +129,7 @@ class ChemicalDatasetComparator:
     def exception_handler_IP(self, exc_type, exc_value, exc_tb, tb_offset=None):
         """
         This function is a callable exception handler when working in IPython.
+
         It logs the exception including the traceback into the log file.
 
         Args:
@@ -144,7 +144,8 @@ class ChemicalDatasetComparator:
 
     def exception_handler(exc_type, exc_value, exc_tb):
         """
-        This function is a callable exception handler when NOT working in
+        This function is a callable exception handler when NOT working in.
+
         IPython. It logs the exception including the traceback into the log
         file.
 
@@ -177,7 +178,8 @@ class ChemicalDatasetComparator:
 
     def _check_invalid_mols_in_SDF(self, all_dicts: dict) -> None:
         """
-        This function checks if there are invalid entries in the SDFiles/SMI
+        This function checks if there are invalid entries in the SDFiles/SMI.
+
         files that can cause errors in the subsequent functions. Those invalid
         entries will be removed form the rdkit_mol_objects. The entry will
         remain in the original SDFile/SMI File as it is. Header lines from the
@@ -221,7 +223,8 @@ class ChemicalDatasetComparator:
 
     def import_as_data_dict(self, path_to_data: str) -> Dict:
         """
-        This function creates a dictionary with the names of the imported file
+        This function creates a dictionary with the names of the imported file.
+
         as keys. The values of each of these keys is a subdictionary. The first
         entry of every subdictionary is self.import_keyname (class variable,
         can be changed) as key and rdkit_mol_objects (either a rdkit.Chem.
@@ -268,7 +271,8 @@ class ChemicalDatasetComparator:
 
     def import_smi_as_data_dict(self, path_to_data: str):
         """
-        This function creates a dictionary with the names of the imported file
+        This function creates a dictionary with the names of the imported file.
+
         as keys. The values of each of these keys is a subdictionary. The first
         entry of every subdictionary is self.import_keyname (class variable,
         can be changed) as key and rdkit_mol Objects (list of rdkit.Chem.rdchem.
@@ -351,8 +355,8 @@ class ChemicalDatasetComparator:
     def _save_to_figure_dict(
         self, all_dicts: dict, keyname: str, fig, data_type: str = "png"
     ) -> None:
-        """
-        This function stores the images and figures created by CIDER in the
+        """This function stores the images and figures created by CIDER in the.
+
         'figure' (self.figure_dict_keyname) subdictionary and exports them to
         the output folder with a given data type. When the name for a figure is
         already used there will be a increasing number added. This only works
@@ -398,7 +402,8 @@ class ChemicalDatasetComparator:
 
     def get_number_of_molecules(self, all_dicts: dict) -> None:
         """
-        This function updates the subdictionaries in the given dictionary
+        This function updates the subdictionaries in the given dictionary.
+
         (created from import_as_data_dict function) with the number of
         molecules in every dataset as new key-value pair. The key is the class
         variable 'cider.dataset_length_keyname'.
@@ -431,7 +436,8 @@ class ChemicalDatasetComparator:
         fontsize_subtitle: int = 20,
     ) -> matplotlib.figure.Figure:
         """
-        This function creates an grid image of the first molecules of each
+        This function creates an grid image of the first molecules of each.
+
         dataset and exports the image to an output folder.
 
         Args:
@@ -503,7 +509,8 @@ class ChemicalDatasetComparator:
 
     def get_database_id(self, all_dicts: dict, id_name: str) -> None:
         """
-        This function updates subdictionaries of a given dictionary with a list
+        This function updates subdictionaries of a given dictionary with a list.
+
         of database IDs for the single molecules as new key-value pairs.
         Depending on which database the molecules are coming from, the key as a
         class variable can be changed accordingly.
@@ -543,7 +550,8 @@ class ChemicalDatasetComparator:
         self, moleculeset, id_type: str = "inchi"
     ) -> Tuple[list, count]:
         """
-        This function returns a list of InChI, InChIKey or canonical SMILES
+        This function returns a list of InChI, InChIKey or canonical SMILES.
+
         strings for all molecules in the given rdkit_mol Objects (rdkit.Chem.
         rdmol.Mol or rdkit.Chem.rdmolfile.SDMolSupplier). (private method)
 
@@ -582,7 +590,8 @@ class ChemicalDatasetComparator:
 
     def get_identifier_list_key(self, all_dicts: dict, id_type: str = "inchi") -> None:
         """
-        This function updates the subdictionaries in the given dictionary
+        This function updates the subdictionaries in the given dictionary.
+
         (created with the import_as_data_dict function) with a list of
         identifiers (InChI, InChIKey, canonical SMILES strings) as a new
         key-value pair using  _get_identifier_list on the rdkit_mol Objects
@@ -615,7 +624,8 @@ class ChemicalDatasetComparator:
 
     def get_duplicate_key(self, all_dicts: dict) -> None:
         """
-        This function updates the subdictionaries in the given dictionary with
+        This function updates the subdictionaries in the given dictionary with.
+
         the number of duplicates in the identifier list as a new key-value-Pair
         (key: self.duplicates_keyname), a list of the duplicated identifier
         (key: self.duplicates_id_keyname) and a list of the indices of the
@@ -674,7 +684,8 @@ class ChemicalDatasetComparator:
 
     def get_shared_molecules_key(self, all_dicts: dict) -> None:
         """
-        This function updates the subdictionaries in the given dictionary
+        This function updates the subdictionaries in the given dictionary.
+
         (created with the import_as_data_dict function) with the number of
         molecules that can be found in all of the given datasets (key:
         self.shared_mols_keyname) and an identifier list of these molecules
@@ -738,7 +749,8 @@ class ChemicalDatasetComparator:
         self, all_dicts: dict, data_type: str = "png"
     ) -> matplotlib.figure.Figure:
         """
-        This function returns a Venn diagram of the intersection between the
+        This function returns a Venn diagram of the intersection between the.
+
         molecules in the subdictionaries of the given dictionary. Every
         subdictionary is represented as a circle and the overlaps between the
         circles indicate the molecules present in more than one subdictionary.
@@ -796,7 +808,8 @@ class ChemicalDatasetComparator:
         descriptor: callable,
     ) -> List:
         """
-        This function returns a list of descriptor values for all molecules in
+        This function returns a list of descriptor values for all molecules in.
+
         the given rdkit_mol objects (rdkit.Chem.rdmol.Mol or rdkit.Chem.
         rdmolfiles.SDMolSupplier) and a callable descriptor (e.g Descriptors.
         MolWt or rdMolDescriptors.CalcExactMolWt). (private method)
@@ -822,7 +835,8 @@ class ChemicalDatasetComparator:
         self, all_dicts: dict, descriptor: callable, descriptor_list_keyname: str
     ) -> None:
         """
-        This function updates the subdictionaries in the given dictionary with
+        This function updates the subdictionaries in the given dictionary with.
+
         a list of descriptor values as a new key-value pair using
         _get_descriptor_list on the rdkit_mol Objects (rdkit.Chem.rdmol.Mol or
         rdkit.Chem.rdmolfiles.SDMolSupplier) in the subdictionaries.
@@ -849,7 +863,8 @@ class ChemicalDatasetComparator:
         self, all_dicts: dict, descriptor_list_keyname: str
     ) -> None:
         """
-        This function updates the subdictionaries in the given dictionary with
+        This function updates the subdictionaries in the given dictionary with.
+
         the binned descriptor values for a given descriptor value list with
         discrete values (e.g. number of H-Bond donors or acceptors). (private
         method)
@@ -895,7 +910,8 @@ class ChemicalDatasetComparator:
         self, all_dicts: dict, descriptor_list_keyname: str, width_of_bins: float = 10.0
     ) -> None:
         """
-        This function updates the subdictionaries in the given dictionary with
+        This function updates the subdictionaries in the given dictionary with.
+
         the binned descriptor values for a given descriptor value list with
         continuous values (e.g. molecular weight or logP values). The interval
         size of the bins can be chosen. (private method)
@@ -975,7 +991,8 @@ class ChemicalDatasetComparator:
         fontsize_title: int = 24,
     ) -> matplotlib.figure.Figure:
         """
-        This function returns a bar-plot for a discrete descriptor with was
+        This function returns a bar-plot for a discrete descriptor with was.
+
         previously binned.
         The plot is saved in an output folder as an image (data type can be
         chosen) and the data frame can also be saved as CSV file.
@@ -1063,7 +1080,8 @@ class ChemicalDatasetComparator:
         fontsize_title: int = 24,
     ) -> matplotlib.figure.Figure:
         """
-        This function returns bar-plot for a continuous descriptor which was
+        This function returns bar-plot for a continuous descriptor which was.
+
         previously binned.
         The plot is saved in an output folder as an image (data type can be
         chosen) and the data frame can also be saved as CSV file.
@@ -1152,7 +1170,8 @@ class ChemicalDatasetComparator:
         fontsize_title: int = 24,
     ) -> matplotlib.figure.Figure:
         """
-        This function updates the subdictionaries in the given dictionary with
+        This function updates the subdictionaries in the given dictionary with.
+
         the binned descriptor values for a given descriptor value list. The
         values can either be continuous (binning with
         _get_continuous_descriptor_counts and plotted with
@@ -1203,7 +1222,7 @@ class ChemicalDatasetComparator:
                 + str(descriptor_list_keyname)
                 + ") is needed for plotting. Please run 'get_descriptor_list_key'!"
             )
-        elif type(all_dicts[first_dict][descriptor_list_keyname][0]) == int:
+        elif isinstance(all_dicts[first_dict][descriptor_list_keyname][0], int):
             self._get_discrete_descriptor_counts(all_dicts, descriptor_list_keyname)
             fig = self._discrete_descriptor_plot(
                 all_dicts,
@@ -1217,10 +1236,9 @@ class ChemicalDatasetComparator:
                 fontsize_xlabel,
                 fontsize_title,
             )
-        elif (
-            type(all_dicts[first_dict][descriptor_list_keyname][0]) == float
-            or type(all_dicts[first_dict][descriptor_list_keyname][0]) == np.float64
-        ):
+        elif isinstance(
+            all_dicts[first_dict][descriptor_list_keyname][0], float
+        ) or isinstance(all_dicts[first_dict][descriptor_list_keyname][0], np.float64):
             self._get_continuous_descriptor_counts(
                 all_dicts, descriptor_list_keyname, width_of_bins
             )
@@ -1246,7 +1264,8 @@ class ChemicalDatasetComparator:
 
     def _test_for_lipinski(self, moleculeset) -> List[int]:
         """
-        This function returns a list with the number of Lipinski Rules broken
+        This function returns a list with the number of Lipinski Rules broken.
+
         for every molecule in the given molecule set.
 
         Args:
@@ -1275,7 +1294,8 @@ class ChemicalDatasetComparator:
 
     def get_lipinski_key(self, all_dicts: dict) -> None:
         """
-        This function updates the subdictionaries in the given dictionary with
+        This function updates the subdictionaries in the given dictionary with.
+
         the list of the number of broken Lipinski Rules for every molecule
         (lipinski_list_keyname) and a summary of the broken rules
         (lipinski_summary_keyname) using _test_for_lipinski.
@@ -1319,7 +1339,8 @@ class ChemicalDatasetComparator:
         fontsize_title: int = 24,
     ) -> matplotlib.figure.Figure:
         """
-        This function returns a bar plot for the number of molecules in every
+        This function returns a bar plot for the number of molecules in every.
+
         subdictionary breaking 0 to 4 Lipinski rules using the
         'lipinski_summary' key in the given dictionary. The plot is saved in an
         output folder (data type can be chosen) and the created data frame can
@@ -1413,7 +1434,8 @@ class ChemicalDatasetComparator:
         normalize: bool = True,
     ) -> Tuple[PIL.PngImagePlugin.PngImageFile, list, pd.core.series.Series]:
         """
-        This function creates a grid images of a chosen number of scaffolds/
+        This function creates a grid images of a chosen number of scaffolds/.
+
         frameworks/graph framework for the molecules in a given rdkit_mol
         Object (rdkit.Chem.rdmol.Mol or rdkit.Chem.rdmolfiles.SDMolSupplier).
         The scaffolds/frameworks/graph framework are sorted by their frequency.
@@ -1534,7 +1556,8 @@ class ChemicalDatasetComparator:
         fontsize_subtitle: int = 20,
     ) -> matplotlib.figure.Figure:
         """
-        This function creates a grid images of a chosen number of scaffolds/
+        This function creates a grid images of a chosen number of scaffolds/.
+
         frameworks/graph framework for every subdictionary in the given
         dictionary and shows them together. The scaffolds/frameworks/graph
         framework in each gird image are sorted by their frequency. The
@@ -1616,7 +1639,8 @@ class ChemicalDatasetComparator:
         interactive: bool = True,
     ):
         """
-        This function returns a 2D visualization of the chemical space of the
+        This function returns a 2D visualization of the chemical space of the.
+
         molecules in all datasets using the chemplot module.
         On basis of the calculated identifier (self.identifier_keyname) for
         every molecule a Extended Connectivity Fingerprint (ECFP) will be
@@ -1730,7 +1754,8 @@ class ChemicalDatasetComparator:
 
     def export_single_dict_values(self, all_dicts: dict) -> None:
         """
-        This function exports only the (not-binned) descriptor values for each
+        This function exports only the (not-binned) descriptor values for each.
+
         dictionary according to the imported SDFile as a single csv file in the
         output folder.
 
@@ -1746,7 +1771,7 @@ class ChemicalDatasetComparator:
             for key in new_dict.copy():
                 if key == self.import_keyname or self.duplicates_index_keyname:
                     new_dict.pop(key)
-                elif type(new_dict[key]) == list:
+                elif isinstance(new_dict[key], list):
                     counter += 1
                 else:
                     new_dict.pop(key)
@@ -1760,7 +1785,8 @@ class ChemicalDatasetComparator:
 
     def export_figure_report(self, all_dicts: dict) -> None:
         """
-        This function exports a pdf including some general information and all
+        This function exports a pdf including some general information and all.
+
         created figures form the figures subdictionary.
 
         Args:
