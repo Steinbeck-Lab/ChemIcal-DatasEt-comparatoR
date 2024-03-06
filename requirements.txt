@@ -1,5 +1,4 @@
 bokeh==2.4.3
-chemplot==1.2.0
 chemplot @ git+https://github.com/Kohulan/ChemPlot.git@main#egg=chemplot
 fpdf2==2.6.0
 IPython

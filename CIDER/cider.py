@@ -306,18 +306,25 @@ class ChemicalDatasetComparator:
                     smi_table = pd.read_csv(
                         dict_path, sep=None, engine="python", header=None
                     )
+                    print(smi_table)
                 except ParserError:
                     smi_table = pd.read_csv(dict_path, header=None)
                 for column in range(len(smi_table.columns)):
                     is_mol = []
                     for row in range(3):
-                        is_mol.append((Chem.MolFromSmiles(smi_table[column][row])))
+                        molecule = Chem.MolFromSmiles(smi_table[column][row])
+                        if molecule:
+                            AllChem.Compute2DCoords(molecule)
+                            is_mol.append(molecule)
                     if any(is_mol):
                         smi_column = column
                         break
                 rdkit_mol_list = []
                 for mol in smi_table[smi_column]:
-                    rdkit_mol_list.append(Chem.MolFromSmiles(mol))
+                    molecule = Chem.MolFromSmiles(mol)
+                    if molecule:
+                        AllChem.Compute2DCoords(molecule)
+                        rdkit_mol_list.append(molecule)
                 single_dict[self.import_keyname] = rdkit_mol_list
                 all_dicts[dict_name] = single_dict
                 if id:
