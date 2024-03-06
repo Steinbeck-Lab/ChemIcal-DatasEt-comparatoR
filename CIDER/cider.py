@@ -312,10 +312,7 @@ class ChemicalDatasetComparator:
                 for column in range(len(smi_table.columns)):
                     is_mol = []
                     for row in range(3):
-                        molecule = Chem.MolFromSmiles(smi_table[column][row])
-                        if molecule:
-                            AllChem.Compute2DCoords(molecule)
-                            is_mol.append(molecule)
+                        is_mol.append(Chem.MolFromSmiles(smi_table[column][row]))
                     if any(is_mol):
                         smi_column = column
                         break
