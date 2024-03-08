@@ -17,7 +17,7 @@ authors:
     given-names: "Christoph"
     orcid: "https://orcid.org/0000-0001-6966-0814"
 title: "ChemIcal DatasEt comparatoR CIDER"
-version: 0.0.1-dev
+version: 1.0.0
 doi: 10.5281/??
 date-released: 2022.06.09
 url: "https://github.com/hannbus/ChemIcal_DatasEt_compaRator"
