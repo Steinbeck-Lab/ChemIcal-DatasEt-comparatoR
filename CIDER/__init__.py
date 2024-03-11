@@ -7,7 +7,7 @@ which primarily utilizes RDKit to compare two or more chemical structure dataset
 e.g. size, overlap, molecular descriptor distributions, chemical space clustering, etc., most of which can be visually inspected in the notebook.
 """
 
-__version__ = "0.0.1-dev"
+__version__ = "1.0.0"
 
 __all__ = [
     "CIDER",

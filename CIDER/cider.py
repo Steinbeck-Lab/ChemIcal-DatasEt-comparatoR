@@ -295,59 +295,75 @@ class ChemicalDatasetComparator:
         all_dicts = {}
         data_dir = os.path.abspath(str(path_to_data))
         for dict_name in os.listdir(data_dir):
-            if (
-                dict_name[-3:] == "smi"
-                or dict_name[-3:] == "SMI"
-                or dict_name[-3:] == "txt"
-            ):
+            if dict_name.lower().endswith((".smi", ".txt")):
                 single_dict = {}
                 dict_path = os.path.join(data_dir, dict_name)
+
                 try:
                     smi_table = pd.read_csv(
                         dict_path, sep=None, engine="python", header=None
                     )
                 except ParserError:
                     smi_table = pd.read_csv(dict_path, header=None)
+
                 for column in range(len(smi_table.columns)):
-                    is_mol = []
-                    for row in range(3):
-                        is_mol.append((Chem.MolFromSmiles(smi_table[column][row])))
-                    if any(is_mol):
+                    is_mol = any(
+                        Chem.MolFromSmiles(smi_table[column][row]) is not None
+                        for row in range(3)
+                    )
+                    if is_mol:
                         smi_column = column
                         break
+
                 rdkit_mol_list = []
+                id_column_mapping = {
+                    0: 1,
+                    1: 0,
+                }  # Mapping for ID column based on SMILES column
+
                 for mol in smi_table[smi_column]:
-                    rdkit_mol_list.append(Chem.MolFromSmiles(mol))
+                    molecule = Chem.MolFromSmiles(mol)
+                    if molecule:
+                        AllChem.Compute2DCoords(molecule)
+                        rdkit_mol_list.append(molecule)
+
                 single_dict[self.import_keyname] = rdkit_mol_list
                 all_dicts[dict_name] = single_dict
+
                 if id:
                     try:
-                        if smi_column == 1:
-                            id_column = 0
-                        elif smi_column == 0:
-                            id_column = 1
-                        id_list = list(smi_table[id_column])
-                        single_dict[self.database_id_keyname] = id_list
+                        id_column = id_column_mapping.get(smi_column)
+                        if id_column is not None:
+                            id_list = list(smi_table[id_column])
+                            single_dict[self.database_id_keyname] = id_list
+                        else:
+                            raise KeyError("Invalid SMILES column specified.")
                     except KeyError:
                         logger.info(
-                            "Cannot find IDs for file %s! SMILES strings and database ID should be the first a d second entry of the files to import the ID."
-                            % (dict_name)
+                            f"Cannot find IDs for file {dict_name}! "
+                            "SMILES strings and database ID should be the first and second entries of the files to import the ID."
                         )
-                        continue
+
         if not all_dicts:
-            raise KeyError("No SMI files found in the given directory %s!" % (data_dir))
+            raise KeyError(f"No *.smi files found in the given directory {data_dir}!")
+
         figure_dict = {}
         all_dicts[self.figure_dict_keyname] = figure_dict
+
         self._check_invalid_mols_in_SDF(all_dicts)
+
         logger.info("Created dictionary with keys: %s", list(all_dicts.keys()))
+
         os.chdir(os.path.dirname(data_dir))
-        if not os.path.exists("output"):
-            os.mkdir("output")
-        else:
-            if os.listdir("output"):
-                logger.warning(
-                    "Already existing output folder with files! Old data will be overwritten!"
-                )
+
+        output_dir = os.path.join(os.getcwd(), "output")
+        if not os.path.exists(output_dir):
+            os.mkdir(output_dir)
+        elif os.listdir(output_dir):
+            logger.warning(
+                "Already existing output folder with files! Old data will be overwritten!"
+            )
+
         return all_dicts
 
     # Section: Saving figures and images
