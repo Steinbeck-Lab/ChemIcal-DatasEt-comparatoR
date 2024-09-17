@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-
 import setuptools
 
 with open("README.md", "r") as fh:
@@ -7,7 +6,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="cider-chem",
-    version="0.0.1-dev",
+    version="1.0.0",
     author="Hannah Busch",
     author_email="hannah.busch@uni-jena.de",
     maintainer="Jonas Schaub, Otto Brinkhaus, Kohulan Rajan",
@@ -24,7 +23,7 @@ setuptools.setup(
         "matplotlib==3.5.1",
         "matplotlib_venn==0.11.6",
         "fpdf2==2.6.0",
-        "rdkit-pypi",
+        "rdkit-pypi==2022.9.5",
         "pytest",
         "scikit-learn==1.1.1",
         "chemplot @ git+https://github.com/Kohulan/ChemPlot.git@main#egg=chemplot",
@@ -33,8 +32,6 @@ setuptools.setup(
     package_data={"CIDER": ["assets/*.*", "assets/*/*.*", "assets/*/*/*.*"]},
     classifiers=[
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.5",
-        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",

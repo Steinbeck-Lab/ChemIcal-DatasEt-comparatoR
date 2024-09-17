@@ -3,9 +3,7 @@
 # This file only contains a selection of the most common options. For a full
 # list see the documentation:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
-
 # -- Path setup --------------------------------------------------------------
-
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
@@ -23,7 +21,7 @@ copyright = "2022, Hannah Busch, Jonas Schaub, Otto Brinkhaus and Kohulan Rajan"
 author = "Hannah Busch, Jonas Schaub, Otto Brinkhaus and Kohulan Rajan"
 
 # The full version, including alpha/beta/rc tags
-release = "Version 1.0.0 - alpha"
+release = "Version 1.0.0 - beta"
 
 
 # -- General configuration ---------------------------------------------------
@@ -35,7 +33,6 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx_autodoc_typehints",
     "sphinx.ext.autosummary",
-    "sphinx_rtd_theme",
     "nbsphinx",
     "sphinx.ext.mathjax",
     "sphinx.ext.githubpages",
@@ -60,7 +57,13 @@ master_doc = "index"
 exclude_patterns = []
 
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = None
+pygments_style = "sphinx"
+
+# Decides the language used for syntax highlighting of code blocks.
+highlight_language = "python3"
+
+# If true, `todo` and `todoList` produce output, else they produce nothing.
+todo_include_todos = False
 
 
 # -- Options for HTML output -------------------------------------------------
@@ -68,13 +71,22 @@ pygments_style = None
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = "sphinx_rtd_theme"
+html_theme = "furo"
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
 #
-# html_theme_options = {}
+html_theme_options = {
+    "light_css_variables": {
+        "color-brand-primary": "red",
+        "color-brand-content": "#CC3333",
+        "color-admonition-background": "orange",
+    },
+    "sidebar_hide_name": True,
+    "navigation_with_keys": True,
+    "top_of_page_button": "edit",
+}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
