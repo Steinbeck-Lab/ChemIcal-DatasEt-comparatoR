@@ -6,7 +6,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="cider-chem",
-    version="1.0.0",
+    version="0.1.0-dev",
     author="Hannah Busch",
     author_email="hannah.busch@uni-jena.de",
     maintainer="Jonas Schaub, Otto Brinkhaus, Kohulan Rajan",
