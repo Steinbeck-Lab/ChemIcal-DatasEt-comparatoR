@@ -25,7 +25,7 @@ setuptools.setup(
         "fpdf2==2.6.0",
         "rdkit-pypi==2022.9.5",
         "pytest",
-        "scikit-learn==1.1.1",
+        "scikit-learn==1.5.0",
         "chemplot @ git+https://github.com/Kohulan/ChemPlot.git@main#egg=chemplot",
         "bokeh==2.4.3",
     ],
